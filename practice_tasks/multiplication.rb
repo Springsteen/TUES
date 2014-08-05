@@ -1,9 +1,14 @@
-
 doubles_string = String.new
 i = 1
 
 puts "Enter a number between 1 and 3 200 000"
-N = (gets.chomp).to_i
+N = gets.chomp
+if N.scan(/\/D/)
+	puts "Bad input"
+	N = -1
+end
+N = N.to_i
+
 if N < 0 or N > 3200000
 	puts "You've entered bad index!!! Please try again"
 else
