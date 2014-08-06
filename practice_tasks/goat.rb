@@ -1,18 +1,21 @@
 puts "Enter N"
-n = gets.to_i
-
-return if n == 0 
+n = gets
+return if n.scan(/\D/).length > 1
+n = n.to_i
+return if n <= 0 or n > 1000 
 
 puts "Enter K"
-k = gets.to_i
-
-return if k == 0
+k = gets
+return if k.scan(/\D/).length > 1
+k = k.to_i
+return if k <= 0 or k > 1000
 
 puts "Enter the weights"
 weights_input = gets
 weights_input = weights_input.split(" ")
 weights_input.each do |e|
-	return if e.to_i == 0
+	return if e.scan(/\D/).length > 1
+	return if e.to_i <= 0 or e.to_i >100000
 end
 weights_input = weights_input.collect{|i| i.to_i}
 weights_input = weights_input.sort.reverse
