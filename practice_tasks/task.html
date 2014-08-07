@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+
+<html>
+
+	<head>
+		<script src="http://code.jquery.com/jquery-2.1.0.min.js"></script>
+		
+	</head>
+
+	<body>
+		
+		<div id="id_initial_input">
+			<input type="text" id="id_circles_count">
+			<button type="submit" id="id_submit_button">Submit</button>
+		</div>
+
+		<div class="container">
+		</div>
+		<div class="draw_panel">
+			<canvas id="myCanvas" width="1000" height="1000" style="border:1px solid #d3d3d3;">
+		</div>
+
+		<script type="text/javascript">
+			var circles = [], distances = [], neighbourTable = [], inputCircles, check = 0;
+			$("#id_submit_button").on("click", function(){
+				inputCircles = $("#id_circles_count").val();
+				if(inputCircles.match(/\D/) == null){
+					inputCircles = parseInt(inputCircles);
+					if ((inputCircles < 2) || (inputCircles > 1000)){
+						location.reload();
+					}
+				}else{
+					location.reload();
+				}
+				$("#id_initial_input").remove();
+				for (var i = 0; i < inputCircles; ++i) {
+					$(".container").append(i + ":<br><input type=\"text\" id=\""+ i +"_circle\"><br>");
+				}
+				$(".container").append("<button type=\"submit\" id=\"id_form_submit\">Submit</button>");
+			});
+			
+			$(document).on("click", "#id_form_submit", function() { 
+				var currentCircle;
+				for (var i = 0; i < inputCircles; ++i) {
+					currentCircle = $("#" + i + "_circle").val();
+					// if((currentCircle.match(/\D/) == " ") ||
+					// 	currentCircle.match(/\D/) == null
+					// ){
+						currentCircle = currentCircle.split(" ");
+						// if ((currentCircle.length < 3) || (currentCircle.length >3)){
+						// 	$("#" + i + "_circle").val("");
+						// 	check = 1;
+						// 	break;
+						// }
+						for(k in currentCircle) {
+							currentCircle[k] = parseInt(currentCircle[k]);
+						}	
+						circles.push(currentCircle);
+					// }else{
+					// 	$("#" + i + "_circle").val("");
+					// 	check = 1;
+					// 	break
+					// }
+				}
+				console.log("check is: " + check);
+				if (check == 0){
+					for (var i=0; i < circles.length; ++i) {
+						neighbourTable[i] = [];
+						distances[i] = [];
+						for(var k = 0; k < circles.length; ++k){
+							currentDistance = Math.sqrt(
+								Math.pow((circles[k][0] - circles[i][0]), 2) +
+								Math.pow((circles[k][1] - circles[i][1]), 2)
+							);
+							console.log("distance between " + (parseInt(k)+1) + " and" + " " + (parseInt(i)+1) + " is" + currentDistance)
+							if(k == i){
+								neighbourTable[i][k] = "X";
+								distances[i][k] = "X";
+							}else if(
+								(Math.abs(circles[k][2] + circles[i][2]) > currentDistance) &&
+								(Math.abs(circles[k][2] - circles[i][2]) < currentDistance)
+							){
+								neighbourTable[i][k] = 1;
+								distances[i][k] = currentDistance
+							}else{
+								neighbourTable[i][k] = 0;
+								distances[i][k] = "X";
+							}
+
+						}
+					};
+
+					console.log(neighbourTable);
+					console.log(distances);				
+
+					var ribs = 0;
+					for (var i=0; i < circles.length;) {
+						var nearestNeighbour = 0;
+						for (var k=0; k < circles.length; ++k) {
+							if( distances[i][k] != "X" && nearestNeighbour < distances[i][k]){
+								nearestNeighbour = k;
+							}
+						};	
+						console.log((parseInt(i)) + " nearest neighbour is: " + (nearestNeighbour) );
+						// console.log("i+2 == (circles.length) == " + ((i+2) == (circles.length)));
+						if( i+2 == (circles.length)){
+							ribs++;
+							break;
+						}else{
+							i+= (parseInt(nearestNeighbour) - i);
+							ribs++;
+						}
+					};
+					console.log("The ribs are: " + ribs);
+					
+				}
+				var c=document.getElementById("myCanvas");
+				var ctx=c.getContext("2d");
+				for (var i=0; i<circles.length; ++i){
+					ctx.beginPath();
+					console.log(circles[i]);
+					ctx.arc((circles[i][0]*20)+400, (circles[i][1]*20)+400, (circles[i][2]*20), 0, 2*Math.PI);
+					ctx.stroke();
+					ctx.closePath();
+				}
+			});
+
+		</script>
+
+	</body>
+
+</html>
