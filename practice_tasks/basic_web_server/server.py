@@ -28,10 +28,12 @@ class RequestHandler(BaseHTTPRequestHandler):
 				self.end_headers()
 				self.wfile.write(f.read())
 				f.close()
-				return
 			
 			except IOError:
-				self.send_error(404,'The requested file was not found: %' % self.path)
+				self.send_response(404)
+				self.send_header('Content-type','text/html')
+				self.end_headers()
+				self.wfile.write("404: File Not Found")
 
 		elif self.path=="/process_file.html":
 			try:
@@ -51,10 +53,12 @@ class RequestHandler(BaseHTTPRequestHandler):
 
 				self.wfile.write("Chunks read: %d" % chunks_read)
 				f.close()
-				return
 			
 			except IOError:
-				self.send_error(404,'The requested file was not found: %' % self.path)
+				self.send_response(404)
+				self.send_header('Content-type','text/html')
+				self.end_headers()
+				self.wfile.write("404: File Not Found")
 
 	def do_POST(self):
 		form = cgi.FieldStorage(
