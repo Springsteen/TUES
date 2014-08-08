@@ -3,6 +3,7 @@ from SocketServer import ThreadingMixIn
 from os import curdir, sep
 import cgi, sys, re
 
+FILE_FOR_PROCESSING = ""
 PATTERN = r'[^\.0-9]'
 
 def read_in_chunks(file_object, chunk_size=1024):
@@ -39,7 +40,10 @@ class RequestHandler(BaseHTTPRequestHandler):
 				self.send_header('Content-type','text/html')
 				self.end_headers()
 				chunks_read = 0
-				f = open('Harry.Brown.DVDRip.XviD-DoNE.avi')
+				if FILE_FOR_PROCESSING:
+					f = open(FILE_FOR_PROCESSING)
+				else:
+					raise IOError
 				for piece in read_in_chunks(f):
 				    chunks_read+=1
 				    print "Chunk %d %s" % (chunks_read, (re.search('r[^\.0-1]', piece) == True))
@@ -72,8 +76,12 @@ class RequestHandler(BaseHTTPRequestHandler):
 
 
 try:
-	if sys.argv[1:]:
-		PORT_NUMBER = int(sys.argv[1])
+	if sys.argv[2:]:
+		FILE_FOR_PROCESSING = sys.argv[1]
+		PORT_NUMBER = int(sys.argv[2])
+	elif sys.argv[1:]:
+		FILE_FOR_PROCESSING = sys.argv[1]
+		PORT_NUMBER = 8080
 	else:
 		PORT_NUMBER = 8080
 
