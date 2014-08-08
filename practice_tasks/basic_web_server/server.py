@@ -5,6 +5,13 @@ import cgi, sys, re
 
 PATTERN = r'[^\.0-9]'
 
+def read_in_chunks(file_object, chunk_size=1024):
+    while True:
+        data = file_object.read(chunk_size)
+        if not data:
+            break
+        yield data
+
 class ThreadingServer(ThreadingMixIn, HTTPServer):
 	pass
 
@@ -13,18 +20,36 @@ class RequestHandler(BaseHTTPRequestHandler):
 	def do_GET(self):
 		if self.path=="/":
 			self.path = "/calc.html"
+			try:
+				f = open(curdir + sep + self.path)
+				self.send_response(200)
+				self.send_header('Content-type','text/html')
+				self.end_headers()
+				self.wfile.write(f.read())
+				f.close()
+				return
+			
+			except IOError:
+				self.send_error(404,'The requested file was not found: %' % self.path)
 
-		try:
-			f = open(curdir + sep + self.path)
-			self.send_response(200)
-			self.send_header('Content-type','text/html')
-			self.end_headers()
-			self.wfile.write(f.read())
-			f.close()
-			return
-		
-		except IOError:
-			self.send_error(404,'The requested file was not found: %' % self.path)
+		elif self.path=="/process_file.html":
+			try:
+				f = open(curdir + sep + self.path)
+				self.send_response(200)
+				self.send_header('Content-type','text/html')
+				self.end_headers()
+				chunks_read = 0
+				f = open('Harry.Brown.DVDRip.XviD-DoNE.avi')
+				for piece in read_in_chunks(f):
+				    chunks_read+=1
+				    print "Chunk %d %s" % (chunks_read, (re.search('r[^\.0-1]', piece) == True))
+
+				self.wfile.write("Chunks read: %d" % chunks_read)
+				f.close()
+				return
+			
+			except IOError:
+				self.send_error(404,'The requested file was not found: %' % self.path)
 
 	def do_POST(self):
 		form = cgi.FieldStorage(
