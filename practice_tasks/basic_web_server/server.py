@@ -44,9 +44,10 @@ class RequestHandler(BaseHTTPRequestHandler):
 					f = open(FILE_FOR_PROCESSING)
 				else:
 					raise IOError
+				
+				print "Processing file: %s" % FILE_FOR_PROCESSING
 				for piece in read_in_chunks(f):
-				    chunks_read+=1
-				    print "Chunk %d %s" % (chunks_read, (re.search('r[^\.0-1]', piece) == True))
+				    chunks_read+=1    
 
 				self.wfile.write("Chunks read: %d" % chunks_read)
 				f.close()
@@ -74,22 +75,22 @@ class RequestHandler(BaseHTTPRequestHandler):
 			self.wfile.write(result)
 			return
 
+if __name__ == "__main__":
+	try:
+		if sys.argv[2:]:
+			FILE_FOR_PROCESSING = sys.argv[1]
+			PORT_NUMBER = int(sys.argv[2])
+		elif sys.argv[1:]:
+			FILE_FOR_PROCESSING = sys.argv[1]
+			PORT_NUMBER = 8080
+		else:
+			PORT_NUMBER = 8080
 
-try:
-	if sys.argv[2:]:
-		FILE_FOR_PROCESSING = sys.argv[1]
-		PORT_NUMBER = int(sys.argv[2])
-	elif sys.argv[1:]:
-		FILE_FOR_PROCESSING = sys.argv[1]
-		PORT_NUMBER = 8080
-	else:
-		PORT_NUMBER = 8080
+		server = ThreadingServer(('', PORT_NUMBER), RequestHandler)
+		print 'Started web server on port: ' , PORT_NUMBER
+		
+		server.serve_forever()
 
-	server = ThreadingServer(('', PORT_NUMBER), RequestHandler)
-	print 'Started web server on port: ' , PORT_NUMBER
-	
-	server.serve_forever()
-
-except KeyboardInterrupt:
-	print '\n^C received: SHUTTING DOWN'
-	server.socket.close()
+	except KeyboardInterrupt:
+		print '\n^C received: SHUTTING DOWN'
+		server.socket.close()
