@@ -1,8 +1,15 @@
 from BaseHTTPServer import BaseHTTPRequestHandler,HTTPServer
+from SocketServer import ThreadingMixIn
 from os import curdir, sep
-import cgi, sys
+import cgi, sys, re
+
+PATTERN = r'[^\.0-9]'
+
+class ThreadingServer(ThreadingMixIn, HTTPServer):
+	pass
 
 class RequestHandler(BaseHTTPRequestHandler):
+	# protocol_version = "HTTP/1.1"
 	def do_GET(self):
 		if self.path=="/":
 			self.path = "/calc.html"
@@ -28,12 +35,14 @@ class RequestHandler(BaseHTTPRequestHandler):
 		}) 
 
 		if self.path=="/send_numbers":
-			first_num = int(form["first_number"].value)
-			second_num = int(form["second_number"].value)
+			result = "Your input is bad !!! Please try again !!!"
+			if not (re.search(PATTERN, form["first_number"].value) or
+					re.search(PATTERN, form["second_number"].value)):
+				result = "Result is: " + str(int(form["first_number"].value) + int(form["second_number"].value))
 
 			self.send_response(200)
 			self.end_headers()
-			self.wfile.write("The sum is %d !" % (first_num+second_num))
+			self.wfile.write(result)
 			return
 
 
@@ -43,7 +52,7 @@ try:
 	else:
 		PORT_NUMBER = 8080
 
-	server = HTTPServer(('', PORT_NUMBER), RequestHandler)
+	server = ThreadingServer(('', PORT_NUMBER), RequestHandler)
 	print 'Started web server on port: ' , PORT_NUMBER
 	
 	server.serve_forever()
