@@ -29,7 +29,6 @@ sub ParseDoc {
 	}
 }
 
-
 sub Initialize {
 	`unzip Ekatte.zip`;
 	`unzip Ekatte_xls.zip`;
@@ -57,6 +56,7 @@ our $psqlPassword = 'Parola';
 our @columnsNeeded;
 my $regionDocName = 'Ek_reg2.xls';
 my $areaDocName = 'Ek_obl.xls';
+my $munDocName = 'Ek_obst.xls';
 
 Initialize();
 
@@ -73,7 +73,6 @@ for (my $e = 0; $e < scalar @nameArray; $e+=2) {
 $dbHandler->commit or die $DBI::errstr;
 undef @nameArray, @columnsNeeded;
 
-
 @columnsNeeded = (0, 2, 3);
 ParseDoc($areaDocName);
 for (my $e = 0; $e < scalar @nameArray; $e+=3) {
@@ -82,6 +81,19 @@ for (my $e = 0; $e < scalar @nameArray; $e+=3) {
 	                        values
 	                       (?, ?, ?)");
 	$statementHandler->execute(@nameArray[$e+1], @nameArray[$e+2], @nameArray[$e]) or die $DBI::errstr;
+	$statementHandler->finish();
+}
+$dbHandler->commit or die $DBI::errstr;
+undef @nameArray, @columnsNeeded;
+
+@columnsNeeded = (0, 2);
+ParseDoc($munDocName);
+for (my $e = 0; $e < scalar @nameArray; $e+=2) {
+	my $statementHandler = $dbHandler->prepare("INSERT INTO municipality
+	                       (name, mun_abbreviation)
+	                        values
+	                       (?, ?)");
+	$statementHandler->execute(@nameArray[$e+1], @nameArray[$e]) or die $DBI::errstr;
 	$statementHandler->finish();
 }
 $dbHandler->commit or die $DBI::errstr;
