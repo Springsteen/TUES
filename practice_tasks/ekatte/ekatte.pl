@@ -30,20 +30,22 @@ sub ParseDoc {
 }
 
 
-sub PrepareFilesForParsing {
+sub Initialize {
 	`unzip Ekatte.zip`;
 	`unzip Ekatte_xls.zip`;
-	$dbHandler = DBI->connect("dbi:Pg:dbname=$dbName",
-									$psqlUser,
-									$psqlPassword,
-									{AutoCommit=>0,
-										RaiseError=>1,
-										PrintError=>1
-									}
-								);
+	$dbHandler = DBI->connect(
+		"dbi:Pg:dbname=$dbName",
+		$psqlUser,
+		$psqlPassword,
+		{
+			AutoCommit=>0,
+			RaiseError=>1,
+			PrintError=>1
+		}
+	);
 }
 
-sub RemoveUnneededResources {
+sub Deinitialize {
 	`rm *.xls *.txt Ekatte_xls.zip`;
 }
 
@@ -56,7 +58,7 @@ our @columnsNeeded;
 my $regionDocName = 'Ek_reg2.xls';
 my $areaDocName = 'Ek_obl.xls';
 
-PrepareFilesForParsing();
+Initialize();
 
 @columnsNeeded = (0, 1);
 ParseDoc($regionDocName);
@@ -85,7 +87,7 @@ for (my $e = 0; $e < scalar @nameArray; $e+=3) {
 $dbHandler->commit or die $DBI::errstr;
 undef @nameArray, @columnsNeeded;
 
-RemoveUnneededResources();
+Deinitialize();
 
 
 
