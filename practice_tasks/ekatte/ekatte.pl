@@ -157,9 +157,10 @@ undef @nameArray, @columnsNeeded;
 @columnsNeeded = (2, 3, 4);
 ParseDoc($locationDocName, 1);
 for (my $e = 0; $e < scalar @nameArray; $e+=3) {
+	print @nameArray[$e] . " " . @nameArray[$e+1] . " " . @nameArray[$e+2] . " \n"; 	
 	my $statementHandler = $dbHandler->prepare("SELECT * FROM location
-	                       WHERE name = ?");
-	$statementHandler->execute($nameArray[$e+1]) or die $DBI::errstr;
+	                       WHERE name = '$nameArray[$e]' AND area = '$nameArray[$e+1]' AND municipality = '$nameArray[$e+2]' ");
+	$statementHandler->execute() or die $DBI::errstr;
 	if ($statementHandler->rows()==0) {
 		my $statementHandler = $dbHandler->prepare("INSERT INTO location
 		                       (name, area, municipality, existence)
@@ -168,10 +169,10 @@ for (my $e = 0; $e < scalar @nameArray; $e+=3) {
 		$statementHandler->execute(@nameArray[$e], @nameArray[$e+1], @nameArray[@e+2], 'TRUE') or die $DBI::errstr;
 		$statementHandler->finish();
 	}else{
-		$statementHandler = $dbHandler->prepare("UPDATE municipality
-	    	                   SET area =?, municipality = ?, existence = ?
-	        	               WHERE name = ?");
-		$statementHandler->execute($nameArray[$e+1], $nameArray[$e+2], 'TRUE', $nameArray[$e+2]) or die $DBI::errstr;
+		$statementHandler = $dbHandler->prepare("UPDATE location
+	    	                   SET area = '$nameArray[$e+1]', municipality = '$nameArray[$e+2]', existence = TRUE
+	        	               WHERE name = '$nameArray[$e]'");
+		$statementHandler->execute() or die $DBI::errstr;
 		$statementHandler->finish();	
 
 	}
