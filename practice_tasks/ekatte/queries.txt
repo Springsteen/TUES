@@ -1,0 +1,28 @@
+CREATE TABLE region(
+name varchar(200),
+region_name varchar(10) primary key,
+existence boolean
+);
+
+CREATE TABLE area (
+name varchar(200),
+region varchar(10) references region(region_name),
+area_abbreviation varchar(10) primary key,
+existence boolean
+);
+
+CREATE TABLE municipality (
+name varchar(200),
+mun_abbreviation varchar(10) primary key,
+existence boolean
+);
+
+CREATE TABLE location (
+name varchar(200),
+area varchar(10) references area(area_abbreviation),
+municipality varchar(10) references municipality(mun_abbreviation),
+existence boolean,
+ekatte varchar(30)
+);
+
+DROP TABLE region, area CASCADE;
