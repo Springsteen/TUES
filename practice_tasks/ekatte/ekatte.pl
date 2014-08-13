@@ -59,8 +59,11 @@ my $regionDocName = 'Ek_reg2.xls';
 my $areaDocName = 'Ek_obl.xls';
 my $munDocName = 'Ek_obst.xls';
 my $locationDocName = 'Ek_atte.xls';
+my $townHallDocName = 'Ek_kmet.xls';
+my $TSBDocName = 'Ek_tsb.xls';
+my $documentDocName = 'Ek_doc.xls';
 
-my @table_names = ('region', 'area', 'municipality', 'location');
+my @table_names = ('region', 'area', 'municipality', 'town_hall', 'tsb', 'document');
 
 Initialize();
 
@@ -155,27 +158,107 @@ for (my $e = 0; $e < scalar @nameArray; $e+=2) {
 $dbHandler->commit or die $DBI::errstr;
 undef @nameArray, @columnsNeeded;
 
-@columnsNeeded = (0, 2, 3, 4);
-ParseDoc($locationDocName, 1);
-for (my $e = 0; $e < scalar @nameArray; $e+=4) {
-	# print @nameArray[$e] . " " . @nameArray[$e+1] . " " . @nameArray[$e+2] . " " . @nameArray[$e+3] . " \n"; 	
-	my $statementHandler = $dbHandler->prepare("SELECT * FROM location
-	                       WHERE ekatte = '$nameArray[$e]' ");
+@columnsNeeded = (0, 1, 2);
+ParseDoc($townHallDocName, 0);
+for (my $e = 0; $e < scalar @nameArray; $e+=3) {
+	# print @nameArray[$e] . " " . @nameArray[$e+1] . " \n"; 	
+	my $statementHandler = $dbHandler->prepare("SELECT * FROM town_hall
+	                       WHERE town_hall_abbreviation = '$nameArray[$e]'" );
 	$statementHandler->execute() or die $DBI::errstr;
 	if ($statementHandler->rows()==0) {
-		my $statementHandler = $dbHandler->prepare("INSERT INTO location
-		                       (name, area, municipality, existence, ekatte)
+		$statementHandler = $dbHandler->prepare("INSERT INTO town_hall
+		                       (name, ekatte, town_hall_abbreviation, existence)
 		                        values
-		                       (?, ?, ?, ?, ?)");
-		$statementHandler->execute(@nameArray[$e+1], @nameArray[$e+2], @nameArray[@e+3], 'TRUE', $nameArray[$e]) or die $DBI::errstr;
+		                       (?, ?, ?, ?)");
+		$statementHandler->execute(@nameArray[$e+2], @nameArray[$e+1], @nameArray[$e], 'TRUE') or die $DBI::errstr;
 		$statementHandler->finish();
 	}else{
-		$statementHandler = $dbHandler->prepare("UPDATE location
-	    	                   SET name = '$nameArray[$e+1]', area = '$nameArray[$e+2]', municipality = '$nameArray[$e+3]', existence = TRUE
-	        	               WHERE ekatte = '$nameArray[$e]'");
-		$statementHandler->execute() or die $DBI::errstr;
+		$statementHandler = $dbHandler->prepare("UPDATE town_hall
+	    	                   SET existence = ?, ekatte = ?, name = ?
+	        	               WHERE town_hall_abbreviation = ?");
+		$statementHandler->execute('TRUE', $nameArray[$e+1], $nameArray[$e+2], $nameArray[$e]) or die $DBI::errstr;
 		$statementHandler->finish();	
+	}
+}
+$dbHandler->commit or die $DBI::errstr;
+undef @nameArray, @columnsNeeded;
 
+@columnsNeeded = (0, 1);
+ParseDoc($TSBDocName, 0);
+for (my $e = 0; $e < scalar @nameArray; $e+=2) {
+	# print @nameArray[$e] . " " . @nameArray[$e+1] . " \n"; 	
+	my $statementHandler = $dbHandler->prepare("SELECT * FROM tsb
+	                       WHERE tsb_number = '$nameArray[$e]'" );
+	$statementHandler->execute() or die $DBI::errstr;
+	if ($statementHandler->rows()==0) {
+		$statementHandler = $dbHandler->prepare("INSERT INTO tsb
+		                       (name, tsb_number, existence)
+		                        values
+		                       (?, ?, ?)");
+		$statementHandler->execute(@nameArray[$e+1], @nameArray[$e], 'TRUE') or die $DBI::errstr;
+		$statementHandler->finish();
+	}else{
+		$statementHandler = $dbHandler->prepare("UPDATE tsb
+	    	                   SET existence = ?, name = ?
+	        	               WHERE tsb_number = ?");
+		$statementHandler->execute('TRUE', $nameArray[$e+1], $nameArray[$e]) or die $DBI::errstr;
+		$statementHandler->finish();	
+	}
+}
+$dbHandler->commit or die $DBI::errstr;
+undef @nameArray, @columnsNeeded;
+
+@columnsNeeded = (0, 1, 2, 3);
+ParseDoc($documentDocName, 0);
+for (my $e = 0; $e < scalar @nameArray; $e+=4) {
+	# print @nameArray[$e] . " " . @nameArray[$e+1] . " \n"; 	
+	my $statementHandler = $dbHandler->prepare("SELECT * FROM document
+	                       WHERE doc_number = '$nameArray[$e]'" );
+	$statementHandler->execute() or die $DBI::errstr;
+	if ($statementHandler->rows()==0) {
+		$statementHandler = $dbHandler->prepare("INSERT INTO document
+		                       (doc_number, doc_kind, name, doc_inst, existence)
+		                        values
+		                       (?, ?, ?, ?, ?)");
+		$statementHandler->execute(@nameArray[$e], @nameArray[$e+1], @nameArray[$e+2], @nameArray[$e+3],  'TRUE') or die $DBI::errstr;
+		$statementHandler->finish();
+	}else{
+		$statementHandler = $dbHandler->prepare("UPDATE document
+	    	                   SET doc_kind = ?, name = ?, doc_inst = ?, existence = ?
+	        	               WHERE doc_number = ?");
+		$statementHandler->execute($nameArray[$e+1], $nameArray[$e+2], $nameArray[$e+3],'TRUE', $nameArray[$e]) or die $DBI::errstr;
+		$statementHandler->finish();	
+	}
+}
+$dbHandler->commit or die $DBI::errstr;
+undef @nameArray, @columnsNeeded;
+
+@columnsNeeded = (0, 2, 3, 4, 5, 9, 10);
+ParseDoc($locationDocName, 1);
+for (my $e = 0; $e < scalar @nameArray; $e+=7) { 	
+	my $check  = substr $nameArray[$e+4], 6, 2;
+	if( $check != "00")	{
+		my $statementHandler = $dbHandler->prepare("SELECT * FROM location
+		                       WHERE ekatte = '$nameArray[$e]' ");
+		$statementHandler->execute() or die $DBI::errstr;
+		if ($statementHandler->rows()==0) {
+			my $statementHandler = $dbHandler->prepare("INSERT INTO location
+			                       (name, area, municipality, existence, ekatte, town_hall_abbreviation, tsb_number, doc_number)
+			                        values
+			                       (?, ?, ?, ?, ?, ?, ?, ?)");
+			$statementHandler->execute($nameArray[$e+1], $nameArray[$e+2], $nameArray[@e+3], 'TRUE', 
+										$nameArray[$e], $nameArray[$e+4], $nameArray[$e+6], $nameArray[$e+5]) or die $DBI::errstr;
+			$statementHandler->finish();
+		}else{
+			$statementHandler = $dbHandler->prepare("UPDATE location
+		    	                   	SET name = '$nameArray[$e+1]', area = '$nameArray[$e+2]', municipality = '$nameArray[$e+3]', 
+		    	                   		existence = TRUE, town_hall_abbreviation = '$nameArray[$e+4]', 
+		    	                   		tsb_number = '$nameArray[$e+6]', doc_number = '$nameArray[$e+5]' 
+		        	               	WHERE ekatte = '$nameArray[$e]'");
+			$statementHandler->execute() or die $DBI::errstr;
+			$statementHandler->finish();	
+
+		}
 	}
 }
 $dbHandler->commit or die $DBI::errstr;
