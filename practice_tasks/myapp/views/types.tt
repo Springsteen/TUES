@@ -1,0 +1,15 @@
+<div class=content>
+	<div class=types_form>
+      <form method=post>
+        Type name:<br>
+        <input type=text name=><br><br>
+        <input type=submit value=Save>
+      </form>
+    </div>
+
+    <% IF types %>
+		<% FOREACH id IN types.keys.nsort %>
+			<% types.$id.name %><br><br>
+		<% END %>
+	<% END %>
+</div>

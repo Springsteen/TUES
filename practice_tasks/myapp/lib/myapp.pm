@@ -34,19 +34,20 @@ any ['get', 'post'] => '/' => sub {
 	    $dbh->disconnect();
 		template 'home', {
 			'msg' => $check,
-			'err' => "Wrong username or password"
+			'err' => "Wrong username or password",
+			'logout_url' => uri_for('/logout'),
+			'types_url' => uri_for('/types')
 		};	
 	}else{
 		if (session 'logged_in') {
 			template 'home', {
 				'msg' => 1,
-				'info' => "You'are logged in",
-				'logout_url' => uri_for('/logout')
+				'logout_url' => uri_for('/logout'),
+				'types_url' => uri_for('/types')
 			}
 		}else{
 			template 'home', {
 				'msg' => 0,
-				'logout_url' => uri_for('/logout')
 			};
 		}
 	}
@@ -61,5 +62,25 @@ get '/logout' => sub {
 	}
 };
 
+any ['get', 'post'] => '/types' => sub {
+	if (session 'logged_in') {
+		if (request->method() eq "POST"){
+			
+		}else{
+			my $dbh = connect_db();
+			my $sth = $dbh->prepare("SELECT id,name FROM types") or die $dbh->errstr;
+			$sth->execute() or die $sth->errstr;
+			my $typesHash = $sth->fetchall_hashref('id');
+			$sth->finish();
+			$dbh->disconnect();
+
+			template 'types', {
+				'types' => $typesHash
+			};
+		}
+	}else{
+		redirect '/';
+	}
+};
 
 true;

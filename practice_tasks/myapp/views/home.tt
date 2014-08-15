@@ -4,7 +4,7 @@
       <p><% err %></p>
     <% END %>
     <div class=login_form>
-      <form action="<% login %>" method=post>
+      <form method=post>
         Username:<br>
         <input type=text name=username><br><br>
         Password:<br>
@@ -13,11 +13,11 @@
       </form>
     </div>
   <% ELSE %>
-    <% IF info %>
-      <% info %><br><br>
-    <% ELSE %>
-      You've logged in successfully<br><br>
-    <% END %>
-    
+    <form method="get" action="<% logout_url %>">
+      <button type="submit">Log out</button>
+    </form>
+    <form method="get" action="<% types_url %>">
+      <button type="submit">Types list</button>
+    </form>
   <% END %>
 </div>
