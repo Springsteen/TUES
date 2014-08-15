@@ -37,9 +37,27 @@ any ['get', 'post'] => '/' => sub {
 			'err' => "Wrong username or password"
 		};	
 	}else{
-		template 'home', {
-			'msg' => 0
-		};
+		if (session 'logged_in') {
+			template 'home', {
+				'msg' => 1,
+				'info' => "You'are logged in",
+				'logout_url' => uri_for('/logout')
+			}
+		}else{
+			template 'home', {
+				'msg' => 0,
+				'logout_url' => uri_for('/logout')
+			};
+		}
+	}
+};
+
+get '/logout' => sub {
+	if (session 'logged_in') {
+		session->destroy();
+		redirect '/';
+	}else{
+		redirect '/';
 	}
 };
 

@@ -1,3 +1,20 @@
+.content {
+	padding: 0 30% 0 30%;
+}
+
+.content > * {
+	border: 2px solid black;
+}
+
+.login_form {
+	width: 300px;
+	border-radius: 10px;
+}
+
+.login_form > * {
+	padding: 10px;
+}
+
 body {
 margin: 0;
 margin-bottom: 25px;
@@ -49,13 +66,14 @@ padding-left: 75px;
 padding-right: 30px;
 }
 
-
 #header {
-background-image: url("/images/perldancer.jpg");
 background-repeat: no-repeat;
 background-position: top left;
 height: 64px;
+padding: 0 30% 0 30%;
+font-size: 30px;
 }
+
 #header h1, #header h2 {margin: 0}
 #header h2 {
 color: #888;
