@@ -1,0 +1,18 @@
+<div>
+  <% IF msg == 0 %>
+    <% IF err %>
+      <p><% err %></p>
+    <% END %>
+    <div>
+      <form action="<% login %>" method=post class=login_form>
+        Username:<br>
+        <input type=text name=username><br><br>
+        Password:<br>
+        <input type=password name=password><br><br>
+        <input type=submit value=Login>
+      </form>
+    </div>
+  <% ELSE %>
+    Lognahte se
+  <% END %>
+</div>
