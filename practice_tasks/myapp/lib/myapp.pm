@@ -64,20 +64,22 @@ get '/logout' => sub {
 
 any ['get', 'post'] => '/types' => sub {
 	if (session 'logged_in') {
+		my $dbh = connect_db();
 		if (request->method() eq "POST"){
-			
-		}else{
-			my $dbh = connect_db();
-			my $sth = $dbh->prepare("SELECT id,name FROM types") or die $dbh->errstr;
-			$sth->execute() or die $sth->errstr;
-			my $typesHash = $sth->fetchall_hashref('id');
+			my $sth = $dbh->prepare("INSERT INTO types (name) values (?)") or die $dbh->errstr;	
+			$sth->execute(params->{'type_name'}) or die $sth->errstr;
 			$sth->finish();
-			$dbh->disconnect();
-
-			template 'types', {
-				'types' => $typesHash
-			};
+			$dbh->commit or die	$dbh->errstr;
 		}
+		my $sth = $dbh->prepare("SELECT id,name FROM types") or die $dbh->errstr;
+		$sth->execute() or die $sth->errstr;
+		my $typesHash = $sth->fetchall_hashref('id');
+		$sth->finish();
+		$dbh->disconnect();
+
+		template 'types', {
+			'types' => $typesHash
+		};
 	}else{
 		redirect '/';
 	}

@@ -2,7 +2,7 @@
 	<div class=types_form>
       <form method=post>
         Type name:<br>
-        <input type=text name=><br><br>
+        <input type=text name=type_name><br><br>
         <input type=submit value=Save>
       </form>
     </div>
