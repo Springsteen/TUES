@@ -21,8 +21,9 @@
 			</div>
 			<ul class="nav navbar-nav">
 				<% IF logged == 'true' || msg == 1 %>
-				<li><a href="<% types_url %>"> Types </a></li>
-				<li><a href="<% models_url %>"> Models </a></li>
+					<li><a href="<% types_url %>"> Types </a></li>
+					<li><a href="<% models_url %>"> Models </a></li>
+					<li><a href="<% networks_url %>"> Networks </a></li>
 				<% END %>
 			</ul>
 			<ul class="nav navbar-nav navbar-right">

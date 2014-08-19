@@ -40,7 +40,7 @@ sub findID {
 	}
 };
 
-any ['get', 'post'] => '/' => sub {
+any ['post', 'get'] => '/' => sub {
 	my $dbh = connect_db();
 	try {	
 		if (request->method() eq "POST"){
@@ -61,7 +61,8 @@ any ['get', 'post'] => '/' => sub {
 					'err' => "Wrong username or password",
 					'logout_url' => uri_for('/logout'),
 					'types_url' => uri_for('/types'),
-					'models_url' => uri_for('/models')
+					'models_url' => uri_for('/models'),
+					'networks_url' => uri_for('/networks'),
 				};
 			}else{
 				redirect '/types';	
@@ -77,7 +78,7 @@ any ['get', 'post'] => '/' => sub {
 		}
 	}catch{
 		$dbh->disconnect();
-		template "exception";
+		template 'exception';
 	};
 };
 
@@ -90,10 +91,10 @@ get '/logout' => sub {
 	}
 };
 
-any ['get', 'post'] => '/types' => sub {
-	my $dbh = connect_db();
-	try {	
-		if (session 'logged_in') {
+any ['post', 'get'] => '/types' => sub {
+	if (session 'logged_in') {
+		my $dbh = connect_db();
+		try {	
 			if (request->method() eq "POST"){
 				my $sth = $dbh->prepare("INSERT INTO types (name) values (?)") or die $dbh->errstr;	
 				$sth->execute(params->{'type_name'}) or die $sth->errstr;
@@ -111,22 +112,23 @@ any ['get', 'post'] => '/types' => sub {
 				'logout_url' => uri_for('/logout'),
 				'types_url' => uri_for('/types'),
 				'models_url' => uri_for('/models'),
+				'networks_url' => uri_for('/networks'),
 				'logged' => 'true',
 				'user' => $current_user
 			};
-		}else{
-			redirect '/';
-		}
-	}catch{
-		$dbh->disconnect();
-		template "exception";
-	};
+		}catch{
+			$dbh->disconnect();
+			template 'exception';
+		};
+	}else{
+		redirect '/';
+	}
 };
 
 any ['post', 'get'] => '/types/:id' => sub {
-	my $dbh = connect_db();
-	try {	
-		if (session 'logged_in'){
+	if (session 'logged_in'){
+		my $dbh = connect_db();
+		try {	
 			if (request->method() eq "POST"){
 				my $id = params->{'id'};
 				my $sth = $dbh->prepare("UPDATE types SET name = ? WHERE id = $id") or die $dbh->errstr;	
@@ -143,20 +145,20 @@ any ['post', 'get'] => '/types/:id' => sub {
 				$dbh->disconnect();
 				redirect '/types';
 			}
-		}else{
-			redirect '/';
-		}
-	}catch{
-		$dbh->disconnect();
-		template "exception";
-	};
+		}catch{
+			$dbh->disconnect();
+			template 'exception';
+		};
+	}else{
+		redirect '/';
+	}
 };
 
 
 any ['post', 'get'] => '/models' => sub {
-	my $dbh = connect_db();
-	try {
-		if (session 'logged_in') {
+	if (session 'logged_in') {
+		my $dbh = connect_db();
+		try {
 			my $sth = $dbh->prepare("SELECT id, name FROM types") or die $dbh->errstr;
 			$sth->execute() or die $sth->errstr;
 			my $typesHash = $sth->fetchall_hashref('id');
@@ -166,19 +168,8 @@ any ['post', 'get'] => '/models' => sub {
 				$sth->execute(params->{'model_name'}, findID('types', params->{'type_select'}));
 				$sth->finish();
 				$dbh->commit or die $dbh->errstr;
-				$sth = $dbh->prepare("SELECT models.id, models.name AS m_name, types.name AS t_name FROM models, types WHERE models.type_id = types.id");
-				$sth->execute();
-				my $modelsHash = $sth->fetchall_hashref('id');
 				$dbh->disconnect();
-				template 'models', {
-					'types' => $typesHash,
-					'models' => $modelsHash,
-					'logout_url' => uri_for('/logout'),
-					'types_url' => uri_for('/types'),
-					'models_url' => uri_for('/models'),
-					'logged' => 'true',
-					'user' => $current_user
-				};
+				redirect '/models';
 			}else{
 				$sth = $dbh->prepare("SELECT models.id, models.name AS m_name, types.name AS t_name FROM models, types WHERE models.type_id = types.id");
 				$sth->execute();
@@ -190,23 +181,24 @@ any ['post', 'get'] => '/models' => sub {
 					'logout_url' => uri_for('/logout'),
 					'types_url' => uri_for('/types'),
 					'models_url' => uri_for('/models'),
+					'networks_url' => uri_for('/networks'),
 					'logged' => 'true',
 					'user' => $current_user
 				};
 			}
-		}else{
-			redirect '/';
-		}
-	}catch{
-		$dbh->disconnect();
-		template "exception";
-	};
+		}catch{
+			$dbh->disconnect();
+			template 'exception';
+		};
+	}else{
+		redirect '/';
+	}
 };
 
 any ['post', 'get'] => '/models/:id' => sub {
-	my $dbh = connect_db();
-	try {	
-		if (session 'logged_in'){
+	if (session 'logged_in'){
+		my $dbh = connect_db();
+		try {	
 			if (request->method() eq "POST"){
 				my $id = params->{'id'};
 				my $sth = $dbh->prepare("UPDATE models SET name = ? WHERE id = $id") or die $dbh->errstr;	
@@ -223,13 +215,74 @@ any ['post', 'get'] => '/models/:id' => sub {
 				$dbh->disconnect();
 				redirect '/models';
 			}
-		}else{
-			redirect '/';
-		}
-	}catch{
-		$dbh->disconnect();
-		template "exception";
-	};
+		}catch{
+			$dbh->disconnect();
+			template 'exception';
+		};
+	}else{
+		redirect '/';
+	}
+};
+
+any ['post', 'get'] => '/networks' => sub {
+	if (session 'logged_in') {
+		my $dbh = connect_db();
+		try {
+			if (request->method() eq "POST"){
+				my $sth = $dbh->prepare("INSERT INTO networks (name) values (?)") or die $dbh->errstr;	
+				$sth->execute(params->{'network_name'}) or die $sth->errstr;
+				$sth->finish();
+				$dbh->commit or die	$dbh->errstr;
+				$dbh->disconnect();
+				redirect '/networks';
+			}else{
+				my $sth = $dbh->prepare("SELECT id, name FROM networks") or die $dbh->errstr;
+				$sth->execute() or die $sth->errstr;
+				my $networksHash = $sth->fetchall_hashref('id');
+				$sth->finish();
+				$dbh->disconnect();
+				template 'networks', {
+					'networks' => $networksHash,
+					'logout_url' => uri_for('/logout'),
+					'types_url' => uri_for('/types'),
+					'models_url' => uri_for('/models'),
+					'networks_url' => uri_for('/networks'),
+					'logged' => 'true',
+					'user' => $current_user
+				};
+			}
+		}catch{
+			$dbh->disconnect();
+			template 'exception';
+		}; 
+	}else{
+		redirect '/';
+	}
+};
+
+any ['get', 'post'] => '/networks/:id' => sub {
+		my $dbh = connect_db();
+		try {	
+			if (request->method() eq "POST"){
+				my $id = params->{'id'};
+				my $sth = $dbh->prepare("UPDATE networks SET name = ? WHERE id = $id") or die $dbh->errstr;	
+				$sth->execute(params->{"new_network_name_$id"}) or die $sth->errstr;
+				$sth->finish();
+				$dbh->commit or die	$dbh->errstr;
+				$dbh->disconnect();
+				redirect '/networks';
+			}else{
+				my $sth = $dbh->prepare("DELETE FROM networks WHERE id = ?") or die $dbh->errstr;	
+				$sth->execute(params->{'id'}) or die $sth->errstr;
+				$sth->finish();
+				$dbh->commit or die	$dbh->errstr;
+				$dbh->disconnect();
+				redirect '/networks';
+			}
+		}catch{
+			$dbh->disconnect();
+			template 'exception';
+		};
 };
 
 true;
