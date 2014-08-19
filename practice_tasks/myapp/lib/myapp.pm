@@ -63,6 +63,7 @@ any ['post', 'get'] => '/' => sub {
 					'types_url' => uri_for('/types'),
 					'models_url' => uri_for('/models'),
 					'networks_url' => uri_for('/networks'),
+					'net_devices_url' => uri_for('/network_devices'),
 				};
 			}else{
 				redirect '/types';	
@@ -113,6 +114,7 @@ any ['post', 'get'] => '/types' => sub {
 				'types_url' => uri_for('/types'),
 				'models_url' => uri_for('/models'),
 				'networks_url' => uri_for('/networks'),
+				'net_devices_url' => uri_for('/network_devices'),
 				'logged' => 'true',
 				'user' => $current_user
 			};
@@ -182,6 +184,7 @@ any ['post', 'get'] => '/models' => sub {
 					'types_url' => uri_for('/types'),
 					'models_url' => uri_for('/models'),
 					'networks_url' => uri_for('/networks'),
+					'net_devices_url' => uri_for('/network_devices'),
 					'logged' => 'true',
 					'user' => $current_user
 				};
@@ -247,6 +250,7 @@ any ['post', 'get'] => '/networks' => sub {
 					'types_url' => uri_for('/types'),
 					'models_url' => uri_for('/models'),
 					'networks_url' => uri_for('/networks'),
+					'net_devices_url' => uri_for('/network_devices'),
 					'logged' => 'true',
 					'user' => $current_user
 				};
@@ -261,6 +265,7 @@ any ['post', 'get'] => '/networks' => sub {
 };
 
 any ['get', 'post'] => '/networks/:id' => sub {
+	if (session 'logged_in'){
 		my $dbh = connect_db();
 		try {	
 			if (request->method() eq "POST"){
@@ -283,6 +288,83 @@ any ['get', 'post'] => '/networks/:id' => sub {
 			$dbh->disconnect();
 			template 'exception';
 		};
+	}else{
+		redirect '/';
+	}
+};
+
+any ['get', 'post'] => '/network_devices' => sub {
+	if (session 'logged_in') {
+		my $dbh = connect_db();
+		try {
+			my $sth = $dbh->prepare("SELECT id, name FROM networks") or die $dbh->errstr;
+			$sth->execute() or die $sth->errstr;
+			my $networksHash = $sth->fetchall_hashref('id');
+			$sth->finish();
+			if (request->method() eq "POST"){
+				my $sth = $dbh->prepare("INSERT INTO network_devices (name, network_id) values (?, ?)") or die $dbh->errstr;
+				$sth->execute(params->{'net_device_name'}, findID('networks', params->{'network_select'}));
+				$sth->finish();
+				$dbh->commit or die $dbh->errstr;
+				$dbh->disconnect();
+				redirect '/network_devices';
+			}else{
+				$sth = $dbh->prepare("SELECT network_devices.id, 
+											network_devices.name AS d_name, 
+											networks.name AS n_name 
+									FROM network_devices, networks 
+									WHERE network_devices.network_id = networks.id");
+				$sth->execute();
+				my $netDevicesHash = $sth->fetchall_hashref('id');
+				$dbh->disconnect();
+				template 'net_devices.tt', {
+					'net_devices' => $netDevicesHash,
+					'networks' => $networksHash,
+					'logout_url' => uri_for('/logout'),
+					'types_url' => uri_for('/types'),
+					'models_url' => uri_for('/models'),
+					'networks_url' => uri_for('/networks'),
+					'net_devices_url' => uri_for('/network_devices'),
+					'logged' => 'true',
+					'user' => $current_user
+				};
+			}
+		}catch{
+			$dbh->disconnect();
+			template 'exception';
+		};
+	}else{
+		redirect '/';
+	}
+};
+
+any ['get', 'post'] => '/network_devices/:id' => sub {
+	if (session 'logged_in'){	
+		my $dbh = connect_db();
+		try {	
+			if (request->method() eq "POST"){
+				my $id = params->{'id'};
+				my $sth = $dbh->prepare("UPDATE network_devices SET name = ? WHERE id = $id") or die $dbh->errstr;	
+				$sth->execute(params->{"new_net_device_name_$id"}) or die $sth->errstr;
+				$sth->finish();
+				$dbh->commit or die	$dbh->errstr;
+				$dbh->disconnect();
+				redirect '/network_devices';
+			}else{
+				my $sth = $dbh->prepare("DELETE FROM network_devices WHERE id = ?") or die $dbh->errstr;	
+				$sth->execute(params->{'id'}) or die $sth->errstr;
+				$sth->finish();
+				$dbh->commit or die	$dbh->errstr;
+				$dbh->disconnect();
+				redirect '/network_devices';
+			}
+		}catch{
+			$dbh->disconnect();
+			template 'exception';
+		};
+	}else{
+		redirect '/';
+	}
 };
 
 true;

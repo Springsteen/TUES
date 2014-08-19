@@ -1,0 +1,38 @@
+<div class="content panel ">
+  <div class="panel panel-primary"> 
+    <div class=input-group>
+      <form method=post>
+        Net device's name:<br>
+        <input type=text name=net_device_name class=form-control><br><br>
+        <input type=submit value=Save class="btn btn-primary">
+        <% IF networks %> 
+          <select name=network_select class="selectpicker">
+            <% FOREACH id IN networks.keys.nsort %>  
+              <option value=<%networks.$id.name%>><%networks.$id.name%></option>
+            <% END %>
+          </select>
+        <% ELSE %>
+          <p> There aren't any networks in the database <p>
+        <% END %> 
+      </form>
+    </div>
+  </div>
+
+  <% IF net_devices %>
+    <% FOREACH id IN net_devices.keys.nsort%>
+      <div class="panel panel-primary"> 
+        <div class=input-group> 
+          <form method=post action=/network_devices/<%id%>>
+            Net devices's name:<br>
+            <input type=text name=new_net_device_name_<%id%> value=<% net_devices.$id.d_name %> class=form-control><br><br>
+            <span class="label label-info">Net device's network: <% net_devices.$id.n_name %></span><br><br>
+            <input type=submit value=Update class="btn btn-primary">
+          </form><br>
+          <form method=delete action=/network_devices/<%id%>>
+            <input type=submit value=Delete class="btn btn-danger">
+          </form>
+        </div>
+      </div>
+    <% END %>
+  <% END %>
+</div>
