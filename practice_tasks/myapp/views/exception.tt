@@ -1,0 +1,5 @@
+<div class=content>
+	<div class="alert alert-danger" role="alert">	
+		<p>The item you want to create/modify is associated with some other items. Please change these associations and try again.</p>
+	</div>
+</div>
