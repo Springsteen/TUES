@@ -1,0 +1,38 @@
+<div class="content panel ">
+  <div class="panel panel-primary">	
+    <div class=input-group>
+      <form method=post>
+        Model name:<br>
+        <input type=text name=model_name class=form-control><br><br>
+        <input type=submit value=Save class="btn btn-primary">
+        <% IF types %> 
+          <select name=type_select class="selectpicker">
+            <% FOREACH id IN types.keys.nsort %>  
+              <option value=<%types.$id.name%>><%types.$id.name%></option>
+            <% END %>
+          </select>
+        <% ELSE %>
+          <p> There aren't any types in the database <p>
+        <% END %> 
+      </form>
+    </div>
+  </div>
+
+  <% IF models %>
+  	<% FOREACH id IN models.keys.nsort%>
+    	<div class="panel panel-primary">	
+        <div class=input-group>	
+          <form method=post action=/models/<%id%>>
+            Model name:<br>
+            <input type=text name=new_model_name_<%id%> value=<% models.$id.m_name %> class=form-control><br>
+            Model's type: <% models.$id.t_name %><br><br>
+            <input type=submit value=Update class="btn btn-primary">
+          </form><br>
+          <form method=delete action=/models/<%id%>>
+            <input type=submit value=Delete class="btn btn-danger">
+          </form>
+        </div>
+      </div>
+    <% END %>
+	<% END %>
+</div>

@@ -21,6 +21,24 @@ sub connect_db {
 	return $dbh;
 };
 
+sub findID {
+	my $table = $_[0];
+	my $name_pattern = $_[1];
+	my $dbh = connect_db();
+	my $sth = $dbh->prepare("SELECT id FROM $table WHERE name = '$name_pattern'");
+	$sth->execute() or die $sth->errstr;
+	if ($sth->rows() == 1){
+		my @a = $sth->fetchrow_array;
+		$sth->finish();
+		$dbh->disconnect();
+		return $a[0];
+	}else{
+		$sth->finish();
+		$dbh->disconnect();
+		return -1
+	}
+};
+
 any ['get', 'post'] => '/' => sub {
 	if (request->method() eq "POST"){
 		my $check = 0;
@@ -40,7 +58,8 @@ any ['get', 'post'] => '/' => sub {
 				'msg' => $check,
 				'err' => "Wrong username or password",
 				'logout_url' => uri_for('/logout'),
-				'types_url' => uri_for('/types')
+				'types_url' => uri_for('/types'),
+				'models_url' => uri_for('/models')
 			};
 		}else{
 			redirect '/types';	
@@ -83,6 +102,8 @@ any ['get', 'post'] => '/types' => sub {
 		template 'types', {
 			'types' => $typesHash,
 			'logout_url' => uri_for('/logout'),
+			'types_url' => uri_for('/types'),
+			'models_url' => uri_for('/models'),
 			'logged' => 'true',
 			'user' => $current_user
 		};
@@ -92,22 +113,96 @@ any ['get', 'post'] => '/types' => sub {
 };
 
 any ['post', 'get'] => '/types/:id' => sub {
-	my $dbh = connect_db();
-	if (request->method() eq "POST"){
-		my $id = params->{'id'};
-		my $sth = $dbh->prepare("UPDATE types SET name = ? WHERE id = $id") or die $dbh->errstr;	
-		$sth->execute(params->{"new_type_name_$id"}) or die $sth->errstr;
-		$sth->finish();
-		$dbh->commit or die	$dbh->errstr;
-		$dbh->disconnect();
-		redirect '/types';
+	if (session 'logged_in'){
+		my $dbh = connect_db();
+		if (request->method() eq "POST"){
+			my $id = params->{'id'};
+			my $sth = $dbh->prepare("UPDATE types SET name = ? WHERE id = $id") or die $dbh->errstr;	
+			$sth->execute(params->{"new_type_name_$id"}) or die $sth->errstr;
+			$sth->finish();
+			$dbh->commit or die	$dbh->errstr;
+			$dbh->disconnect();
+			redirect '/types';
+		}else{
+			my $sth = $dbh->prepare("DELETE FROM types WHERE id = ?") or die $dbh->errstr;	
+			$sth->execute(params->{'id'}) or die $sth->errstr;
+			$sth->finish();
+			$dbh->commit or die	$dbh->errstr;
+			$dbh->disconnect();
+			redirect '/types';
+		}
 	}else{
-		my $sth = $dbh->prepare("DELETE FROM types WHERE id = ?") or die $dbh->errstr;	
-		$sth->execute(params->{'id'}) or die $sth->errstr;
+		redirect '/';
+	}
+};
+
+
+any ['post', 'get'] => '/models' => sub {
+	if (session 'logged_in') {
+		my $dbh = connect_db();
+		my $sth = $dbh->prepare("SELECT id, name FROM types") or die $dbh->errstr;
+		$sth->execute() or die $sth->errstr;
+		my $typesHash = $sth->fetchall_hashref('id');
 		$sth->finish();
-		$dbh->commit or die	$dbh->errstr;
-		$dbh->disconnect();
-		redirect '/types';
+		if (request->method() eq "POST"){
+			my $sth = $dbh->prepare("INSERT INTO models (name, type_id) values (?, ?)") or die $dbh->errstr;
+			$sth->execute(params->{'model_name'}, findID('types', params->{'type_select'}));
+			$sth->finish();
+			$dbh->commit or die $dbh->errstr;
+			$sth = $dbh->prepare("SELECT models.id, models.name AS m_name, types.name AS t_name FROM models, types WHERE models.type_id = types.id");
+			$sth->execute();
+			my $modelsHash = $sth->fetchall_hashref('id');
+			$dbh->disconnect();
+			template 'models', {
+				'types' => $typesHash,
+				'models' => $modelsHash,
+				'logout_url' => uri_for('/logout'),
+				'types_url' => uri_for('/types'),
+				'models_url' => uri_for('/models'),
+				'logged' => 'true',
+				'user' => $current_user
+			};
+		}else{
+			$sth = $dbh->prepare("SELECT models.id, models.name AS m_name, types.name AS t_name FROM models, types WHERE models.type_id = types.id");
+			$sth->execute();
+			my $modelsHash = $sth->fetchall_hashref('id');
+			$dbh->disconnect();
+			template 'models', {
+				'types' => $typesHash,
+				'models' => $modelsHash,
+				'logout_url' => uri_for('/logout'),
+				'types_url' => uri_for('/types'),
+				'models_url' => uri_for('/models'),
+				'logged' => 'true',
+				'user' => $current_user
+			};
+		}
+	}else{
+		redirect '/';
+	}
+};
+
+any ['post', 'get'] => '/models/:id' => sub {
+	if (session 'logged_in'){
+		my $dbh = connect_db();
+		if (request->method() eq "POST"){
+			my $id = params->{'id'};
+			my $sth = $dbh->prepare("UPDATE models SET name = ? WHERE id = $id") or die $dbh->errstr;	
+			$sth->execute(params->{"new_model_name_$id"}) or die $sth->errstr;
+			$sth->finish();
+			$dbh->commit or die	$dbh->errstr;
+			$dbh->disconnect();
+			redirect '/models';
+		}else{
+			my $sth = $dbh->prepare("DELETE FROM models WHERE id = ?") or die $dbh->errstr;	
+			$sth->execute(params->{'id'}) or die $sth->errstr;
+			$sth->finish();
+			$dbh->commit or die	$dbh->errstr;
+			$dbh->disconnect();
+			redirect '/models';
+		}
+	}else{
+		redirect '/';
 	}
 };
 

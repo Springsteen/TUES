@@ -1,4 +1,4 @@
-<div class="content panel panel-primary">
+<div class="content panel">
   <div class="panel panel-primary">	
     <div class=input-group>
       <form method=post>
@@ -11,7 +11,7 @@
 
   <% IF types %>
   	<% FOREACH id IN types.keys.nsort %>
-    	<div class="inner-panel panel panel-primary">	
+    	<div class="panel panel-primary">	
         <div class=input-group>	
           <form method=post action=/types/<%id%>>
             Type name:<br>
