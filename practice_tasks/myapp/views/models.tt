@@ -19,20 +19,19 @@
   </div>
 
   <% IF models %>
-  	<% FOREACH id IN models.keys.nsort%>
-    	<div class="panel panel-primary">	
-        <div class=input-group>	
+    <table class="table table-bordered">	
+      <% FOREACH id IN models.keys.nsort%>		
+        <tr>
           <form method=post action=/models/<%id%>>
-            Model name:<br>
-            <input type=text name=new_model_name_<%id%> value=<% models.$id.m_name %> class=form-control><br><br>
-            <span class="label label-info">Model's type: <% models.$id.t_name %></span><br><br>
-            <input type=submit value=Update class="btn btn-primary">
-          </form><br>
-          <form method=delete action=/models/<%id%>>
-            <input type=submit value=Delete class="btn btn-danger">
+          <td><input type=text name=new_model_name_<%id%> value=<% models.$id.m_name %> class=form-control></td>
+          <td><% models.$id.t_name %></td>
+          <td><input type=submit value=Update class="btn btn-primary"></td>
           </form>
-        </div>
-      </div>
-    <% END %>
+          <form method=delete action=/models/<%id%>>
+            <td><input type=submit value=Delete class="btn btn-danger"></td>
+          </form>
+        </tr>
+      <% END %>
+    </table>
 	<% END %>
 </div>

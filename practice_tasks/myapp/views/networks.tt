@@ -10,19 +10,18 @@
   </div>
 
   <% IF networks %>
-  	<% FOREACH id IN networks.keys.nsort %>
-    	<div class="panel panel-primary">	
-        <div class=input-group>	
+    <table class="table table-bordered">	
+      <% FOREACH id IN networks.keys.nsort %>
+        <tr>	
           <form method=post action=/networks/<%id%>>
-            Network name:<br>
-            <input type=text name=new_network_name_<%id%> value=<% networks.$id.name %> class=form-control><br><br>
-            <input type=submit value=Update class="btn btn-primary">
-          </form><br>
-          <form method=delete action=/networks/<%id%>>
-            <input type=submit value=Delete class="btn btn-danger">
+            <td><input type=text name=new_network_name_<%id%> value=<% networks.$id.name %> class=form-control></td>
+            <td><input type=submit value=Update class="btn btn-primary"></td>
           </form>
-        </div>
-      </div>
-    <% END %>
+          <form method=delete action=/networks/<%id%>>
+            <td><input type=submit value=Delete class="btn btn-danger"></td>
+          </form>
+        </tr>
+      <% END %>
+    </table>
 	<% END %>
 </div>
