@@ -1,15 +1,28 @@
-<div class=content>
-	<div class=types_form>
+<div class="content panel panel-primary">
+  <div class="panel panel-primary">	
+    <div class=input-group>
       <form method=post>
         Type name:<br>
-        <input type=text name=type_name><br><br>
-        <input type=submit value=Save>
+        <input type=text name=type_name class=form-control><br><br>
+        <input type=submit value=Save class="btn btn-primary">
       </form>
     </div>
+  </div>
 
-    <% IF types %>
-		<% FOREACH id IN types.keys.nsort %>
-			<% types.$id.name %><br><br>
-		<% END %>
+  <% IF types %>
+  	<% FOREACH id IN types.keys.nsort %>
+    	<div class="inner-panel panel panel-primary">	
+        <div class=input-group>	
+          <form method=post action=/types/<%id%>>
+            Type name:<br>
+            <input type=text name=new_type_name_<%id%> value=<% types.$id.name %> class=form-control><br><br>
+            <input type=submit value=Update class="btn btn-primary">
+          </form><br>
+          <form method=delete action=/types/<%id%>>
+            <input type=submit value=Delete class="btn btn-danger">
+          </form>
+        </div>
+      </div>
+    <% END %>
 	<% END %>
 </div>

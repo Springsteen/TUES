@@ -1,11 +1,15 @@
 .content {
-	padding: 0 30% 0 30%;
+	width: 800px;
+	margin: 0 0 0 100px;
 }
 
 .content > * {
-	border: 2px solid black;
+	padding: 10px 0 10px 100px;
+	margin: 10px 10px 10px 10px;
 }
 
+
+/*
 .login_form {
 	width: 300px;
 	border-radius: 10px;
@@ -202,3 +206,4 @@ padding-right: 160px;
 font-family: sans-serif;
 font-size: 10px;
 }
+*/

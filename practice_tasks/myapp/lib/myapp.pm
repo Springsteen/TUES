@@ -5,6 +5,8 @@ use Data::Dumper;
 
 our $VERSION = '0.1';
 
+my $current_user = '';
+
 sub connect_db {
 	my $dbh = DBI->connect(
 		"dbi:Pg:dbname=myapp_db",
@@ -28,23 +30,24 @@ any ['get', 'post'] => '/' => sub {
 		$sth->execute(params->{'username'}, params->{'password'}) or die $sth->errstr;
 		if ($sth->rows() > 0) {
 			session 'logged_in' => true;
+			$current_user = params->{'username'};
 			$check = 1;
 		}
 	    $sth->finish();
 	    $dbh->disconnect();
-		template 'home', {
-			'msg' => $check,
-			'err' => "Wrong username or password",
-			'logout_url' => uri_for('/logout'),
-			'types_url' => uri_for('/types')
-		};	
-	}else{
-		if (session 'logged_in') {
+	    if ($check == 0) { 
 			template 'home', {
-				'msg' => 1,
+				'msg' => $check,
+				'err' => "Wrong username or password",
 				'logout_url' => uri_for('/logout'),
 				'types_url' => uri_for('/types')
-			}
+			};
+		}else{
+			redirect '/types';	
+		}
+	}else{
+		if (session 'logged_in') {
+			redirect '/types';
 		}else{
 			template 'home', {
 				'msg' => 0,
@@ -78,10 +81,33 @@ any ['get', 'post'] => '/types' => sub {
 		$dbh->disconnect();
 
 		template 'types', {
-			'types' => $typesHash
+			'types' => $typesHash,
+			'logout_url' => uri_for('/logout'),
+			'logged' => 'true',
+			'user' => $current_user
 		};
 	}else{
 		redirect '/';
+	}
+};
+
+any ['post', 'get'] => '/types/:id' => sub {
+	my $dbh = connect_db();
+	if (request->method() eq "POST"){
+		my $id = params->{'id'};
+		my $sth = $dbh->prepare("UPDATE types SET name = ? WHERE id = $id") or die $dbh->errstr;	
+		$sth->execute(params->{"new_type_name_$id"}) or die $sth->errstr;
+		$sth->finish();
+		$dbh->commit or die	$dbh->errstr;
+		$dbh->disconnect();
+		redirect '/types';
+	}else{
+		my $sth = $dbh->prepare("DELETE FROM types WHERE id = ?") or die $dbh->errstr;	
+		$sth->execute(params->{'id'}) or die $sth->errstr;
+		$sth->finish();
+		$dbh->commit or die	$dbh->errstr;
+		$dbh->disconnect();
+		redirect '/types';
 	}
 };
 

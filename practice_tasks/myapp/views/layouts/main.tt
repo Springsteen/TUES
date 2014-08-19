@@ -5,18 +5,32 @@
 	<meta http-equiv="Content-type" content="text/html; charset=<% settings.charset %>" />
 	<title>myapp</title>
 	<link rel="stylesheet" href="<% request.uri_base %>/css/style.css" />
+	<link rel="stylesheet" href="<% request.uri_base %>/css/bootstrap.min.css" />
 
-	<!-- Grab jQuery from a CDN, fall back to local if necessary -->
+
 	<script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
-	<script type="text/javascript">/* <![CDATA[ */
+	<script type="text/javascript">
 	    !window.jQuery && document.write('<script type="text/javascript" src="<% request.uri_base %>/javascripts/jquery.min.js"><\/script>')
-	/* ]]> */</script>
+	</script>
 
 </head>
 <body>
-	<div id="header">
-		Products manager
-	</div>
+		<nav class="navbar navbar-default" role="navigation">
+			<div class="navbar-header">
+			    <a class="navbar-brand" href="#">Products manager</a>
+			</div>
+			<ul class="nav navbar-nav">
+				<% IF logged == 'true' || msg == 1 %>
+				<li><a href="<% types_url %>"> Types </a></li>
+				<% END %>
+			</ul>
+			<ul class="nav navbar-nav navbar-right">
+				<% IF logged == 'true' || msg == 1 %>
+					<li><a href="#"> Logged as: <%user%></a></li>
+					<li><a href="<% logout_url %>"> Logout </a></li>
+				<% END %>
+			</ul>
+		</nav>
 	<% content %>
 	<div id="footer">
 	</div>
