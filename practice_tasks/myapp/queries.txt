@@ -14,3 +14,20 @@ CREATE TABLE models (
 	name varchar(100) not null,
 	type_id int references types(id)
 );
+
+CREATE TABLE networks (
+	id serial primary key,
+	name varchar(100) unique not null
+);
+
+CREATE TABLE network_devices (
+	id serial primary key,
+	name varchar(100) not null,
+	network_id int references networks(id)
+);
+
+CREATE TABLE computers (
+	id serial primary key,
+	name varchar(100) not null,
+	network_id int references networks(id)
+);

@@ -1,0 +1,37 @@
+<div class="content panel ">
+  <div class="panel panel-primary"> 
+    <div class=input-group>
+      <form method=post>
+        Computer's name:<br>
+        <input type=text name=computer_name class=form-control><br><br>
+        <input type=submit value=Save class="btn btn-primary">
+        <% IF networks %> 
+          <select name=network_select class="selectpicker">
+            <% FOREACH id IN networks.keys.nsort %>  
+              <option value=<%networks.$id.name%>><%networks.$id.name%></option>
+            <% END %>
+          </select>
+        <% ELSE %>
+          <p> There aren't any networks in the database <p>
+        <% END %> 
+      </form>
+    </div>
+  </div>
+
+  <% IF computers %>
+    <table class="table table-bordered">  
+      <% FOREACH id IN computers.keys.nsort%>
+        <tr> 
+          <form method=post action=/computers/<%id%>>
+          <td><input type=text name=new_computer_name_<%id%> value=<% computers.$id.c_name %> class=form-control></td>
+          <td><% computers.$id.n_name %></td>
+          <td><input type=submit value=Update class="btn btn-primary"></td>
+          </form>
+          <form method=delete action=/computers/<%id%>>
+          <td><input type=submit value=Delete class="btn btn-danger"></td>
+          </form>
+        </tr>
+      <% END %>
+    </table>
+  <% END %>
+</div>

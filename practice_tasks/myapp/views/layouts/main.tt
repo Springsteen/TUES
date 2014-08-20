@@ -25,6 +25,7 @@
 					<li><a href="<% models_url %>"> Models </a></li>
 					<li><a href="<% networks_url %>"> Networks </a></li>
 					<li><a href="<% net_devices_url %>"> Network devices </a></li>
+					<li><a href="<% computers_url %>"> Computers </a></li>
 				<% END %>
 			</ul>
 			<ul class="nav navbar-nav navbar-right">
