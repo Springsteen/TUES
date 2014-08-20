@@ -553,7 +553,7 @@ any ['get', 'post'] => '/parts/:id' => sub {
 };
 
 any ['get', 'post'] => '/search' => sub {
-	# if (session 'logged_in') {
+	if (session 'logged_in') {
 		my $dbh = connect_db();
 		try {
 			if (request->method() eq "POST"){
@@ -599,9 +599,9 @@ any ['get', 'post'] => '/search' => sub {
 			$dbh->disconnect();
 			template 'exception';
 		};
-	# }else{
-	# 	redirect '/';
-	# }
+	}else{
+		redirect '/';
+	}
 };
 
 true;
