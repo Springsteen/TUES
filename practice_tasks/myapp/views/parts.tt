@@ -5,6 +5,7 @@
         Part's name:<br>
         <input type=text name=part_name class=form-control><br><br>
         Part's waranty end date:<br>
+        <span class="label label-info">(2020-01-01)</span>
         <input type=date name=part_waranty class=form-control><br><br>
         <input type=submit value=Save class="btn btn-primary">
         <% IF models && computers %> 

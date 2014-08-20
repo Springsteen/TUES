@@ -65,7 +65,8 @@ any ['post', 'get'] => '/' => sub {
 					'networks_url' => uri_for('/networks'),
 					'net_devices_url' => uri_for('/network_devices'),
 					'computers_url' => uri_for('/computers'),
-					'net_devices_url' => uri_for('/network_devices'),
+					'parts_url' => uri_for('/parts'),
+					'search_url' => uri_for('/search'),
 				};
 			}else{
 				redirect '/types';	
@@ -118,6 +119,8 @@ any ['post', 'get'] => '/types' => sub {
 				'networks_url' => uri_for('/networks'),
 				'net_devices_url' => uri_for('/network_devices'),
 				'computers_url' => uri_for('/computers'),
+				'parts_url' => uri_for('/parts'),
+				'search_url' => uri_for('/search'),
 				'logged' => 'true',
 				'user' => $current_user
 			};
@@ -190,6 +193,8 @@ any ['post', 'get'] => '/models' => sub {
 					'networks_url' => uri_for('/networks'),
 					'net_devices_url' => uri_for('/network_devices'),
 					'computers_url' => uri_for('/computers'),
+					'parts_url' => uri_for('/parts'),
+					'search_url' => uri_for('/search'),
 					'logged' => 'true',
 					'user' => $current_user
 				};
@@ -257,6 +262,8 @@ any ['post', 'get'] => '/networks' => sub {
 					'networks_url' => uri_for('/networks'),
 					'net_devices_url' => uri_for('/network_devices'),
 					'computers_url' => uri_for('/computers'),
+					'parts_url' => uri_for('/parts'),
+					'search_url' => uri_for('/search'),
 					'logged' => 'true',
 					'user' => $current_user
 				};
@@ -333,6 +340,8 @@ any ['get', 'post'] => '/network_devices' => sub {
 					'networks_url' => uri_for('/networks'),
 					'net_devices_url' => uri_for('/network_devices'),
 					'computers_url' => uri_for('/computers'),
+					'parts_url' => uri_for('/parts'),
+					'search_url' => uri_for('/search'),
 					'logged' => 'true',
 					'user' => $current_user
 				};
@@ -409,6 +418,8 @@ any ['get', 'post'] => '/computers' => sub {
 					'networks_url' => uri_for('/networks'),
 					'net_devices_url' => uri_for('/network_devices'),
 					'computers_url' => uri_for('/computers'),
+					'parts_url' => uri_for('/parts'),
+					'search_url' => uri_for('/search'),
 					'logged' => 'true',
 					'user' => $current_user
 				};
@@ -497,6 +508,8 @@ any ['get', 'post'] => '/parts' => sub {
 					'networks_url' => uri_for('/networks'),
 					'net_devices_url' => uri_for('/network_devices'),
 					'computers_url' => uri_for('/computers'),
+					'parts_url' => uri_for('/parts'),
+					'search_url' => uri_for('/search'),
 					'logged' => 'true',
 					'user' => $current_user
 				}			
@@ -537,6 +550,58 @@ any ['get', 'post'] => '/parts/:id' => sub {
 	}else{
 		redirect '/';
 	}
+};
+
+any ['get', 'post'] => '/search' => sub {
+	# if (session 'logged_in') {
+		my $dbh = connect_db();
+		try {
+			if (request->method() eq "POST"){
+				my $db = params->{'select_db'} ;
+				my $sth = $dbh->prepare("SELECT * FROM  $db
+										WHERE name ~ ?") or die $dbh->errstr;
+				$sth->execute("^".params->{'search_pattern'}) or die $sth->errstr;
+				die if $sth->rows() < 1;
+				my $searchHash = $sth->fetchall_arrayref();
+				$sth = $dbh->column_info('','',$db,'');
+				my $columnNames = $sth->fetchall_arrayref();
+				$dbh->disconnect();
+				template 'search.tt', {
+					'query' => $searchHash,
+					'column_names' => $columnNames,
+					'logout_url' => uri_for('/logout'),
+					'types_url' => uri_for('/types'),
+					'models_url' => uri_for('/models'),
+					'networks_url' => uri_for('/networks'),
+					'net_devices_url' => uri_for('/network_devices'),
+					'computers_url' => uri_for('/computers'),
+					'parts_url' => uri_for('/parts'),
+					'search_url' => uri_for('/search'),
+					'logged' => 'true',
+					'user' => $current_user
+				}
+			}else{
+				template 'search.tt', {
+					'logout_url' => uri_for('/logout'),
+					'types_url' => uri_for('/types'),
+					'models_url' => uri_for('/models'),
+					'networks_url' => uri_for('/networks'),
+					'net_devices_url' => uri_for('/network_devices'),
+					'computers_url' => uri_for('/computers'),
+					'parts_url' => uri_for('/parts'),
+					'search_url' => uri_for('/search'),
+					'logged' => 'true',
+					'user' => $current_user
+				}
+			}
+		}catch{
+			print STDERR "\n\n" . $_ . "\n\n";
+			$dbh->disconnect();
+			template 'exception';
+		};
+	# }else{
+	# 	redirect '/';
+	# }
 };
 
 true;
