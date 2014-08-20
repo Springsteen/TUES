@@ -557,7 +557,8 @@ any ['get', 'post'] => '/search' => sub {
 		my $dbh = connect_db();
 		try {
 			if (request->method() eq "POST"){
-				my $db = params->{'select_db'} ;
+				my $db = params->{'select_db'};
+				redirect '/search' if (params->{'search_pattern'} =~ /\s/) or (params->{'search_pattern'} eq "");
 				my $sth = $dbh->prepare("SELECT * FROM  $db
 										WHERE name ~ ?") or die $dbh->errstr;
 				$sth->execute("^".params->{'search_pattern'}) or die $sth->errstr;
