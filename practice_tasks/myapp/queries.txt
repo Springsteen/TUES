@@ -31,3 +31,11 @@ CREATE TABLE computers (
 	name varchar(100) not null,
 	network_id int references networks(id)
 );
+
+CREATE TABLE parts (
+	id serial primary key,
+	name varchar(100) not null,
+	waranty date,
+	model_id int references models(id),
+	computer_id int references computers(id)
+);

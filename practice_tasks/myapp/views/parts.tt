@@ -1,0 +1,46 @@
+<div class="content panel ">
+  <div class="panel panel-primary"> 
+    <div class=input-group>
+      <form method=post>
+        Part's name:<br>
+        <input type=text name=part_name class=form-control><br><br>
+        Part's waranty end date:<br>
+        <input type=date name=part_waranty class=form-control><br><br>
+        <input type=submit value=Save class="btn btn-primary">
+        <% IF models && computers %> 
+          <select name=model_select class="selectpicker">
+            <% FOREACH id IN models.keys.nsort %>  
+              <option value=<%models.$id.name%>><%models.$id.name%></option>
+            <% END %>
+          </select>
+          <select name=computer_select class="selectpicker">
+            <% FOREACH id IN computers.keys.nsort %>  
+              <option value=<%computers.$id.name%>><%computers.$id.name%></option>
+            <% END %>
+          </select>
+        <% ELSE %>
+          <p> There aren't any models or/and computers in the database <p>
+        <% END %> 
+      </form>
+    </div>
+  </div>
+
+  <% IF parts %>
+    <table class="table table-bordered">  
+      <% FOREACH id IN parts.keys.nsort%>
+        <tr> 
+          <form method=post action=/parts/<%id%>>
+          <td><input type=text name=new_part_name_<%id%> value=<% parts.$id.p_name %> class=form-control></td>
+          <td><% parts.$id.m_name %></td>
+          <td><% parts.$id.c_name %></td>
+          <td><input type=date name=new_part_waranty_<%id%> value=<% parts.$id.waranty %> class=form-control></td>
+          <td><input type=submit value=Update class="btn btn-primary"></td>
+          </form>
+          <form method=delete action=/parts/<%id%>>
+          <td><input type=submit value=Delete class="btn btn-danger"></td>
+          </form>
+        </tr>
+      <% END %>
+    </table>
+  <% END %>
+</div>

@@ -376,7 +376,7 @@ any ['get', 'post'] => '/network_devices/:id' => sub {
 };
 
 any ['get', 'post'] => '/computers' => sub {
-	# if (session 'logged_in') {
+	if (session 'logged_in') {
 		my $dbh = connect_db();
 		try {
 			my $sth = $dbh->prepare("SELECT id, name FROM networks") or die $dbh->errstr;
@@ -417,13 +417,13 @@ any ['get', 'post'] => '/computers' => sub {
 			$dbh->disconnect();
 			template 'exception';
 		};
-	# }else{
-	# 	redirect '/';
-	# }
+	}else{
+		redirect '/';
+	}
 };
 
 any ['get', 'post'] => '/computers/:id' => sub {
-	# if (session 'logged_in'){	
+	if (session 'logged_in'){	
 		my $dbh = connect_db();
 		try {	
 			if (request->method() eq "POST"){
@@ -446,9 +446,97 @@ any ['get', 'post'] => '/computers/:id' => sub {
 			$dbh->disconnect();
 			template 'exception';
 		};
-	# }else{
-	# 	redirect '/';
-	# }
+	}else{
+		redirect '/';
+	}
+};
+
+any ['get', 'post'] => '/parts' => sub {
+	if (session 'logged_in'){
+		my $dbh = connect_db();
+		try {
+			my $sth = $dbh->prepare("SELECT id, name FROM models") or die $dbh->errstr;
+			$sth->execute() or die $sth->errstr;
+			die if $sth->rows() < 1;
+			my $modelsHash = $sth->fetchall_hashref('id');
+			$sth->finish();
+			$sth = $dbh->prepare("SELECT id, name FROM computers") or die $dbh->errstr;
+			$sth->execute or die $sth->errstr;
+			die if $sth->rows() < 1;
+			my $computersHash = $sth->fetchall_hashref('id');
+			$sth->finish();
+			if (request->method() eq "POST"){
+				$sth = $dbh->prepare("INSERT INTO parts (name, model_id, computer_id, waranty) 
+										values (?, ?, ?, ?)") or die $dbh->errstr;
+				$sth->execute(params->{'part_name'}, 
+							findID('models', params->{'model_select'}), 
+							findID('computers', params->{'computer_select'}),
+							params->{'part_waranty'});
+				$sth->finish();
+				$dbh->commit or die $dbh->errstr;
+				$dbh->disconnect(); 
+				redirect '/parts';
+			}else{
+				$sth = $dbh->prepare("SELECT parts.id, parts.waranty, 
+									parts.name AS p_name, 
+									models.name AS m_name, 
+									computers.name AS c_name 
+									FROM parts, models, computers 
+									WHERE computers.id = parts.computer_id 
+									AND models.id = parts.model_id") or die $dbh->errstr;
+				$sth->execute() or die $sth->errstr;
+				my $partsHash = $sth->fetchall_hashref('id');
+				$dbh->disconnect();
+				template 'parts.tt', {
+					'parts' => $partsHash,
+					'models' => $modelsHash,
+					'computers' => $computersHash,
+					'logout_url' => uri_for('/logout'),
+					'types_url' => uri_for('/types'),
+					'models_url' => uri_for('/models'),
+					'networks_url' => uri_for('/networks'),
+					'net_devices_url' => uri_for('/network_devices'),
+					'computers_url' => uri_for('/computers'),
+					'logged' => 'true',
+					'user' => $current_user
+				}			
+			}
+		}catch{	
+			$dbh->disconnect();
+			template 'exception';
+		};
+	}else{
+		redirect '/';
+	}
+};
+
+any ['get', 'post'] => '/parts/:id' => sub {
+	if (session 'logged_in'){	
+		my $dbh = connect_db();
+		try {	
+			if (request->method() eq "POST"){
+				my $id = params->{'id'};
+				my $sth = $dbh->prepare("UPDATE parts SET name = ?, waranty = ? WHERE id = $id") or die $dbh->errstr;	
+				$sth->execute(params->{"new_part_name_$id"}, params->{"new_part_waranty_$id"}) or die $sth->errstr;
+				$sth->finish();
+				$dbh->commit or die	$dbh->errstr;
+				$dbh->disconnect();
+				redirect '/parts';
+			}else{
+				my $sth = $dbh->prepare("DELETE FROM parts WHERE id = ?") or die $dbh->errstr;	
+				$sth->execute(params->{'id'}) or die $sth->errstr;
+				$sth->finish();
+				$dbh->commit or die	$dbh->errstr;
+				$dbh->disconnect();
+				redirect '/parts';
+			}
+		}catch{
+			$dbh->disconnect();
+			template 'exception';
+		};
+	}else{
+		redirect '/';
+	}
 };
 
 true;
