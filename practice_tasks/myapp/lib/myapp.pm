@@ -3,7 +3,7 @@ use Dancer ':syntax';
 use DBI;
 use Data::Dumper;
 use Try::Tiny;
-
+use Math::Round;
 our $VERSION = '0.1';
 
 my $current_user = '';
@@ -105,14 +105,26 @@ any ['post', 'get'] => '/types' => sub {
 				$sth->finish();
 				$dbh->commit or die	$dbh->errstr;
 			}
-			my $sth = $dbh->prepare("SELECT id,name FROM types") or die $dbh->errstr;
-			$sth->execute() or die $sth->errstr;
+			my ($pages, $offset, $sth);
+			if (!params->{'offset'}){
+				$offset = 0;
+			}else{
+				$offset = int(params->{'offset'})-1;
+			}
+			$sth = $dbh->prepare("SELECT * FROM types");
+			$sth->execute(); 
+			$pages =  int(($sth->rows()) / 10);
+			$pages++ if ($sth->rows % 10) != 0;
+			$sth = $dbh->prepare("SELECT id,name FROM types LIMIT 10 OFFSET ?") or die $dbh->errstr;
+			$sth->execute(($offset)*10) or die $sth->errstr;
 			my $typesHash = $sth->fetchall_hashref('id');
 			$sth->finish();
 			$dbh->disconnect();
 
 			template 'types', {
 				'types' => $typesHash,
+				'pages' => $pages,
+				'curr_page' => $offset+1,
 				'logout_url' => uri_for('/logout'),
 				'types_url' => uri_for('/types'),
 				'models_url' => uri_for('/models'),
@@ -139,7 +151,7 @@ any ['post', 'get'] => '/types/:id' => sub {
 		try {	
 			if (request->method() eq "POST"){
 				my $id = params->{'id'};
-				my $sth = $dbh->prepare("UPDATE types SET name = ? WHERE id = $id") or die $dbh->errstr;	
+				my $sth = $dbh->prepare("UPDATE types SET name = ? WHERE id = $id") or die $dbh->errstr;
 				$sth->execute(params->{"new_type_name_$id"}) or die $sth->errstr;
 				$sth->finish();
 				$dbh->commit or die	$dbh->errstr;
@@ -180,13 +192,28 @@ any ['post', 'get'] => '/models' => sub {
 				$dbh->disconnect();
 				redirect '/models';
 			}else{
-				$sth = $dbh->prepare("SELECT models.id, models.name AS m_name, types.name AS t_name FROM models, types WHERE models.type_id = types.id");
-				$sth->execute();
+				my ($pages, $offset);
+				if (!params->{'offset'}){
+					$offset = 0;
+				}else{
+					$offset = int(params->{'offset'})-1;
+				}
+				$sth = $dbh->prepare("SELECT * FROM models");
+				$sth->execute(); 
+				$pages =  int(($sth->rows()) / 10);
+				$pages++ if ($sth->rows % 10) != 0;
+				$sth = $dbh->prepare("SELECT models.id, models.name AS m_name, 
+									types.name AS t_name 
+									FROM models, types 
+									WHERE models.type_id = types.id LIMIT 10 OFFSET ?");
+				$sth->execute($offset*10);
 				my $modelsHash = $sth->fetchall_hashref('id');
 				$dbh->disconnect();
 				template 'models', {
 					'types' => $typesHash,
 					'models' => $modelsHash,
+					'pages' => $pages,
+					'curr_page' => $offset+1,
 					'logout_url' => uri_for('/logout'),
 					'types_url' => uri_for('/types'),
 					'models_url' => uri_for('/models'),
@@ -249,13 +276,26 @@ any ['post', 'get'] => '/networks' => sub {
 				$dbh->disconnect();
 				redirect '/networks';
 			}else{
-				my $sth = $dbh->prepare("SELECT id, name FROM networks") or die $dbh->errstr;
-				$sth->execute() or die $sth->errstr;
+				my ($pages, $offset, $sth);
+				if (!params->{'offset'}){
+					$offset = 0;
+				}else{
+					$offset = int(params->{'offset'})-1;
+				}
+				$sth = $dbh->prepare("SELECT * FROM networks");
+				$sth->execute() or die $sth->errstr; 
+				$pages = int(($sth->rows()) / 10);
+				$pages++ if ($sth->rows % 10) != 0;
+				$sth->finish();
+				my $sth = $dbh->prepare("SELECT id, name FROM networks LIMIT 10 OFFSET ?") or die $dbh->errstr;
+				$sth->execute($offset*10) or die $sth->errstr;
 				my $networksHash = $sth->fetchall_hashref('id');
 				$sth->finish();
 				$dbh->disconnect();
 				template 'networks', {
 					'networks' => $networksHash,
+					'pages' => $pages,
+					'curr_page' => $offset+1,
 					'logout_url' => uri_for('/logout'),
 					'types_url' => uri_for('/types'),
 					'models_url' => uri_for('/models'),
@@ -323,17 +363,31 @@ any ['get', 'post'] => '/network_devices' => sub {
 				$dbh->disconnect();
 				redirect '/network_devices';
 			}else{
+				my ($pages, $offset);
+				if (!params->{'offset'}){
+					$offset = 0;
+				}else{
+					$offset = int(params->{'offset'})-1;
+				}
+				$sth = $dbh->prepare("SELECT * FROM network_devices");
+				$sth->execute() or die $sth->errstr; 
+				$pages = int(($sth->rows()) / 10);
+				$pages++ if ($sth->rows % 10) != 0;
+				$sth->finish();
 				$sth = $dbh->prepare("SELECT network_devices.id, 
 											network_devices.name AS d_name, 
 											networks.name AS n_name 
 									FROM network_devices, networks 
-									WHERE network_devices.network_id = networks.id");
-				$sth->execute();
+									WHERE network_devices.network_id = networks.id
+									LIMIT 10 OFFSET ?");
+				$sth->execute($offset*10);
 				my $netDevicesHash = $sth->fetchall_hashref('id');
 				$dbh->disconnect();
 				template 'net_devices.tt', {
 					'net_devices' => $netDevicesHash,
 					'networks' => $networksHash,
+					'pages' => $pages,
+					'curr_page' => $offset+1,
 					'logout_url' => uri_for('/logout'),
 					'types_url' => uri_for('/types'),
 					'models_url' => uri_for('/models'),
@@ -401,17 +455,31 @@ any ['get', 'post'] => '/computers' => sub {
 				$dbh->disconnect();
 				redirect '/computers';
 			}else{
+				my ($pages, $offset);
+				if (!params->{'offset'}){
+					$offset = 0;
+				}else{
+					$offset = int(params->{'offset'})-1;
+				}
+				$sth = $dbh->prepare("SELECT * FROM computers");
+				$sth->execute() or die $sth->errstr; 
+				$pages = int(($sth->rows()) / 10);
+				$pages++ if ($sth->rows % 10) != 0;
+				$sth->finish();
 				$sth = $dbh->prepare("SELECT computers.id, 
 											computers.name AS c_name, 
 											networks.name AS n_name 
 									FROM computers, networks 
-									WHERE computers.network_id = networks.id");
-				$sth->execute();
+									WHERE computers.network_id = networks.id
+									LIMIT 10 OFFSET ?");
+				$sth->execute($offset*10);
 				my $computersHash = $sth->fetchall_hashref('id');
 				$dbh->disconnect();
 				template 'computers.tt', {
 					'computers' => $computersHash,
 					'networks' => $networksHash,
+					'pages' => $pages,
+					'curr_page' => $offset+1,
 					'logout_url' => uri_for('/logout'),
 					'types_url' => uri_for('/types'),
 					'models_url' => uri_for('/models'),
@@ -488,20 +556,34 @@ any ['get', 'post'] => '/parts' => sub {
 				$dbh->disconnect(); 
 				redirect '/parts';
 			}else{
+				my ($pages, $offset);
+				if (!params->{'offset'}){
+					$offset = 0;
+				}else{
+					$offset = int(params->{'offset'})-1;
+				}
+				$sth = $dbh->prepare("SELECT * FROM parts");
+				$sth->execute() or die $sth->errstr; 
+				$pages = int(($sth->rows()) / 10);
+				$pages++ if ($sth->rows % 10) != 0;
+				$sth->finish();
 				$sth = $dbh->prepare("SELECT parts.id, parts.waranty, 
 									parts.name AS p_name, 
 									models.name AS m_name, 
 									computers.name AS c_name 
 									FROM parts, models, computers 
 									WHERE computers.id = parts.computer_id 
-									AND models.id = parts.model_id") or die $dbh->errstr;
-				$sth->execute() or die $sth->errstr;
+									AND models.id = parts.model_id
+									LIMIT 10 OFFSET ?") or die $dbh->errstr;
+				$sth->execute($offset*10) or die $sth->errstr;
 				my $partsHash = $sth->fetchall_hashref('id');
 				$dbh->disconnect();
 				template 'parts.tt', {
 					'parts' => $partsHash,
 					'models' => $modelsHash,
 					'computers' => $computersHash,
+					'pages' => $pages,
+					'curr_page' => $offset+1,
 					'logout_url' => uri_for('/logout'),
 					'types_url' => uri_for('/types'),
 					'models_url' => uri_for('/models'),

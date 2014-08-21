@@ -18,6 +18,25 @@
     </div>
   </div>
 
+  <% IF pages %>
+    <div class="panel panel-primary">
+      <form method=get> 
+        <select name=offset value=<%curr_page%>>
+          <% i = 1%>
+          <% WHILE i <= pages%>
+            <% IF i == curr_page%>
+              <option value=<%i%> selected><%i%></option>
+            <% ELSE%>
+              <option value=<%i%>><%i%></option>
+            <% END %>
+            <% i= i+1%>
+          <% END %>
+        </select>
+        <input type=submit value=Get page class="btn btn-primary">
+      </form>
+    </div>
+  <% END %>
+
   <% IF net_devices %>
     <table class="table table-bordered">  
       <% FOREACH id IN net_devices.keys.nsort%>
