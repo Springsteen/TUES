@@ -1,0 +1,41 @@
+<div class="content panel ">
+  <div class="panel panel-primary"> 
+    <div class=input-group>
+      <%k=0%>
+      <%i=0%>
+      <form method=post action=/parts/edit/<%part.$k.$i%>>
+        <%i=2%>
+        Part's name:<br>
+        <input type=text name=part_name class="form-control field" value=<%part.$k.$i%> ><br><br>
+        Part's waranty end date:<br>
+        <span class="label label-info">(2020-01-01)</span>
+        <%i=1%>
+        <input type=date name=part_waranty class="form-control field" value=<%part.$k.$i%>><br><br>
+        <input type=submit value=Update class="btn btn-primary">
+        <% IF models && computers %> 
+          <select name=model_select class="selectpicker">
+            <% FOREACH id IN models.keys.nsort %>
+              <%i=3%>  
+              <% IF models.$id.name == part.$k.$i %>  
+                <option value=<%models.$id.name%> selected><%models.$id.name%></option>
+              <% ELSE %>
+                <option value=<%models.$id.name%>><%models.$id.name%></option>
+              <% END %>
+            <% END %>
+          </select>
+          <select name=computer_select class="selectpicker">
+            <% FOREACH id IN computers.keys.nsort %>  
+              <%i=4%>
+              <% IF computers.$id.name == part.$k.$i %>
+                <option value=<%computers.$id.name%> selected><%computers.$id.name%></option>
+              <% ELSE %>
+                <option value=<%computers.$id.name%>><%computers.$id.name%></option>
+              <% END %>
+            <% END %>
+          </select>
+        <% ELSE %>
+          <p> There aren't any models or/and computers in the database <p>
+        <% END %> 
+      </form>
+    </div>
+  </div>

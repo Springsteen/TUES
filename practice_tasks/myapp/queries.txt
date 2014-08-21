@@ -11,7 +11,7 @@ CREATE TABLE types (
 
 CREATE TABLE models (
 	id serial primary key,
-	name varchar(100) not null,
+	name varchar(100) unique not null,
 	type_id int references types(id)
 );
 
@@ -22,19 +22,19 @@ CREATE TABLE networks (
 
 CREATE TABLE network_devices (
 	id serial primary key,
-	name varchar(100) not null,
+	name varchar(100) unique not null,
 	network_id int references networks(id)
 );
 
 CREATE TABLE computers (
 	id serial primary key,
-	name varchar(100) not null,
+	name varchar(100) unique not null,
 	network_id int references networks(id)
 );
 
 CREATE TABLE parts (
 	id serial primary key,
-	name varchar(100) not null,
+	name varchar(100) unique not null,
 	waranty date,
 	model_id int references models(id),
 	computer_id int references computers(id)

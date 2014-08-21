@@ -556,9 +556,7 @@ any ['get', 'post'] => '/parts' => sub {
 			my $computersHash = $sth->fetchall_hashref('id');
 			$sth->finish();
 			if (request->method() eq "POST"){
-				print STDERR "\nIM HERE\n";
 				die if (validateDate(params->{'part_waranty'}) != 1);
-				print STDERR "\nIM THERE\n";
 				$sth = $dbh->prepare("INSERT INTO parts (name, model_id, computer_id, waranty) 
 										values (?, ?, ?, ?)") or die $dbh->errstr;
 				$sth->execute(params->{'part_name'}, 
@@ -693,13 +691,231 @@ any ['get', 'post'] => '/search' => sub {
 				}
 			}
 		}catch{
-			print STDERR "\n\n" . $_ . "\n\n";
 			$dbh->disconnect();
 			template 'exception';
 		};
 	}else{
 		redirect '/';
 	}
+};
+
+any ['get', 'post'] => '/parts/edit/:id' => sub {
+	if (session 'logged_in') {
+		my $dbh = connect_db();
+		try {
+			my $id = params->{'id'};
+			my $sth = $dbh->prepare("SELECT id, name FROM models") or die $dbh->errstr;
+			$sth->execute() or die $sth->errstr;
+			die if $sth->rows() < 1;
+			my $modelsHash = $sth->fetchall_hashref('id');
+			$sth->finish();
+			$sth = $dbh->prepare("SELECT id, name FROM computers") or die $dbh->errstr;
+			$sth->execute or die $sth->errstr;
+			die if $sth->rows() < 1;
+			my $computersHash = $sth->fetchall_hashref('id');
+			$sth->finish();
+			if (request->method() eq "POST"){
+				$sth = $dbh->prepare("UPDATE parts SET name = ?, waranty = ?,
+									model_id = ?, computer_id = ? WHERE id = ?") or die $dbh->errstr;
+				$sth->execute(params->{'part_name'}, 
+							params->{'part_waranty'},
+							findID('models', params->{'model_select'}), 
+							findID('computers', params->{'computer_select'}),
+							$id) or die $sth->errstr;
+				$sth->finish();
+				$dbh->commit or die $dbh->errstr;
+				$dbh->disconnect();
+				redirect "/parts/edit/$id";
+			}else{
+				$sth = $dbh->prepare("SELECT parts.id, parts.waranty, 
+									parts.name AS p_name, 
+									models.name AS m_name, 
+									computers.name AS c_name 
+									FROM parts, models, computers 
+									WHERE computers.id = parts.computer_id 
+									AND models.id = parts.model_id
+									AND parts.id = ?") or die $dbh->errstr;
+				$sth->execute($id) or die $sth->errstr;
+				my $part = $sth->fetchall_arrayref();
+				template 'edit_part.tt', {
+					'computers' => $computersHash,
+					'models' => $modelsHash,
+					'part' => $part,
+					'logout_url' => uri_for('/logout'),
+					'types_url' => uri_for('/types'),
+					'models_url' => uri_for('/models'),
+					'networks_url' => uri_for('/networks'),
+					'net_devices_url' => uri_for('/network_devices'),
+					'computers_url' => uri_for('/computers'),
+					'parts_url' => uri_for('/parts'),
+					'search_url' => uri_for('/search'),
+					'logged' => 'true',
+					'user' => $current_user
+				}
+			}
+		}catch{
+			$dbh->disconnect();
+			template 'exception';
+		};
+	}else{
+		redirect '/';
+	}
+};
+
+any ['get', 'post'] => '/computers/edit/:id' => sub {
+	if (session 'logged_in') {
+		my $dbh = connect_db();
+		try {
+			my $id = params->{'id'};
+			my $sth = $dbh->prepare("SELECT id, name FROM networks") or die $dbh->errstr;
+			$sth->execute or die $sth->errstr;
+			die if $sth->rows() < 1;
+			my $networksHash = $sth->fetchall_hashref('id');
+			$sth->finish();
+			if (request->method() eq "POST"){
+				$sth = $dbh->prepare("UPDATE computers SET name = ?, network_id = ? WHERE id = ?") or die $dbh->errstr;
+				$sth->execute(params->{'computer_name'}, 
+							findID('networks', params->{'network_select'}),
+							$id) or die $sth->errstr;
+				$sth->finish();
+				$dbh->commit or die $dbh->errstr;
+				$dbh->disconnect();
+				redirect "/computers/edit/$id";
+			}else{
+				$sth = $dbh->prepare("SELECT computers.id, 
+									computers.name AS c_name, 
+									networks.name AS n_name 
+									FROM computers, networks 
+									WHERE computers.network_id = networks.id
+									AND computers.id = ?") or die $dbh->errstr;
+				$sth->execute($id) or die $sth->errstr;
+				my $computer = $sth->fetchall_arrayref();
+				template 'edit_computer.tt', {
+					'networks' => $networksHash,
+					'computer' => $computer,
+					'logout_url' => uri_for('/logout'),
+					'types_url' => uri_for('/types'),
+					'models_url' => uri_for('/models'),
+					'networks_url' => uri_for('/networks'),
+					'net_devices_url' => uri_for('/network_devices'),
+					'computers_url' => uri_for('/computers'),
+					'parts_url' => uri_for('/parts'),
+					'search_url' => uri_for('/search'),
+					'logged' => 'true',
+					'user' => $current_user
+				}
+			}
+		}catch{
+			$dbh->disconnect();
+			template 'exception';
+		};
+	}else{
+		redirect '/';
+	}
+};
+
+any ['get', 'post'] => '/network_devices/edit/:id' => sub {
+	if (session 'logged_in') {
+		my $dbh = connect_db();
+		try {
+			my $id = params->{'id'};
+			my $sth = $dbh->prepare("SELECT id, name FROM networks") or die $dbh->errstr;
+			$sth->execute or die $sth->errstr;
+			die if $sth->rows() < 1;
+			my $networksHash = $sth->fetchall_hashref('id');
+			$sth->finish();
+			if (request->method() eq "POST"){
+				$sth = $dbh->prepare("UPDATE network_devices SET name = ?, network_id = ? WHERE id = ?") or die $dbh->errstr;
+				$sth->execute(params->{'network_device_name'}, 
+							findID('networks', params->{'network_select'}),
+							$id) or die $sth->errstr;
+				$sth->finish();
+				$dbh->commit or die $dbh->errstr;
+				$dbh->disconnect();
+				redirect "/network_devices/edit/$id";
+			}else{
+				$sth = $dbh->prepare("SELECT network_devices.id, 
+									network_devices.name AS d_name, 
+									networks.name AS n_name 
+									FROM network_devices, networks 
+									WHERE network_devices.network_id = networks.id
+									AND network_devices.id = ?") or die $dbh->errstr;
+				$sth->execute($id) or die $sth->errstr;
+				my $device = $sth->fetchall_arrayref();
+				template 'edit_network_device.tt', {
+					'networks' => $networksHash,
+					'device' => $device,
+					'logout_url' => uri_for('/logout'),
+					'types_url' => uri_for('/types'),
+					'models_url' => uri_for('/models'),
+					'networks_url' => uri_for('/networks'),
+					'net_devices_url' => uri_for('/network_devices'),
+					'computers_url' => uri_for('/computers'),
+					'parts_url' => uri_for('/parts'),
+					'search_url' => uri_for('/search'),
+					'logged' => 'true',
+					'user' => $current_user
+				}
+			}
+		}catch{
+			$dbh->disconnect();
+			template 'exception';
+		};
+	}else{
+		redirect '/';
+	}
+};
+
+any ['get', 'post'] => '/models/edit/:id' => sub {
+	# if (session 'logged_in') {
+		my $dbh = connect_db();
+		try {
+			my $id = params->{'id'};
+			my $sth = $dbh->prepare("SELECT id, name FROM types") or die $dbh->errstr;
+			$sth->execute or die $sth->errstr;
+			die if $sth->rows() < 1;
+			my $typesHash = $sth->fetchall_hashref('id');
+			$sth->finish();
+			if (request->method() eq "POST"){
+				$sth = $dbh->prepare("UPDATE models SET name = ?, type_id = ? WHERE id = ?") or die $dbh->errstr;
+				$sth->execute(params->{'model_name'}, 
+							findID('types', params->{'type_select'}),
+							$id) or die $sth->errstr;
+				$sth->finish();
+				$dbh->commit or die $dbh->errstr;
+				$dbh->disconnect();
+				redirect "/models/edit/$id";
+			}else{
+				$sth = $dbh->prepare("SELECT models.id, models.name AS m_name, 
+									types.name AS t_name 
+									FROM models, types
+									WHERE models.type_id = types.id
+									AND models.id = ?") or die $dbh->errstr;
+				$sth->execute($id) or die $sth->errstr;
+				my $model = $sth->fetchall_arrayref();
+				template 'edit_model.tt', {
+					'types' => $typesHash,
+					'model' => $model,
+					'logout_url' => uri_for('/logout'),
+					'types_url' => uri_for('/types'),
+					'models_url' => uri_for('/models'),
+					'networks_url' => uri_for('/networks'),
+					'net_devices_url' => uri_for('/network_devices'),
+					'computers_url' => uri_for('/computers'),
+					'parts_url' => uri_for('/parts'),
+					'search_url' => uri_for('/search'),
+					'logged' => 'true',
+					'user' => $current_user
+				}
+			}
+		}catch{
+			$dbh->disconnect();
+			print STDERR Dumper($_);
+			template 'exception';
+		};
+	# }else{
+	# 	redirect '/';
+	# }
 };
 
 true;

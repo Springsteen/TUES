@@ -51,6 +51,7 @@
         <th>Name</th>
         <th>Model</th>
         <th>Computer</th>
+        <th>Waranty</th>
         <th></th>
         <th></th>
       </tr>  
@@ -63,9 +64,12 @@
           <td><input type=date name=new_part_waranty_<%id%> value=<% parts.$id.waranty %> class="form-control field"></td>
           <td><input type=submit value=Update class="btn btn-primary"></td>
           </form>
+          <form method=get action=/parts/edit/<%id%>>
+          <td><input type=submit value=Edit class="btn btn-warning"></td>
+          </form>
+          </form>
           <form method=delete action=/parts/<%id%>>
           <td><input type=submit value=Delete class="btn btn-danger"></td>
-          </form>
         </tr>
       <% END %>
     </table>

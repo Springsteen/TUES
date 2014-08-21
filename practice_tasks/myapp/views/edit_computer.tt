@@ -1,0 +1,27 @@
+<div class="content panel ">
+  <div class="panel panel-primary"> 
+    <div class=input-group>
+      <%k=0%>
+      <%i=0%>
+      <form method=post action=/computers/edit/<%computer.$k.$i%>>
+        <%i=1%>
+        Computer's name:<br>
+        <input type=text name=computer_name class="form-control field" value=<%computer.$k.$i%> ><br><br>
+        <input type=submit value=Update class="btn btn-primary">
+        <% IF networks %> 
+          <select name=network_select class="selectpicker">
+            <% FOREACH id IN networks.keys.nsort %>
+              <%i=2%>  
+              <% IF networks.$id.name == computer.$k.$i %>  
+                <option value=<%networks.$id.name%> selected><%networks.$id.name%></option>
+              <% ELSE %>
+                <option value=<%networks.$id.name%>><%networks.$id.name%></option>
+              <% END %>
+            <% END %>
+          </select>
+        <% ELSE %>
+          <p> There aren't any networks in the database <p>
+        <% END %> 
+      </form>
+    </div>
+  </div>
