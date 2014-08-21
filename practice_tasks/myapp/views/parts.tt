@@ -46,14 +46,21 @@
   <% END %>
 
   <% IF parts %>
-    <table class="table table-bordered">  
+    <table class="table table-bordered">
+      <tr>
+        <th>Name</th>
+        <th>Model</th>
+        <th>Computer</th>
+        <th></th>
+        <th></th>
+      </tr>  
       <% FOREACH id IN parts.keys.nsort%>
         <tr> 
           <form method=post action=/parts/<%id%>>
-          <td><input type=text name=new_part_name_<%id%> value=<% parts.$id.p_name %> class=form-control></td>
+          <td><input type=text name=new_part_name_<%id%> value=<% parts.$id.p_name %> class="form-control field"></td>
           <td><% parts.$id.m_name %></td>
           <td><% parts.$id.c_name %></td>
-          <td><input type=date name=new_part_waranty_<%id%> value=<% parts.$id.waranty %> class=form-control></td>
+          <td><input type=date name=new_part_waranty_<%id%> value=<% parts.$id.waranty %> class="form-control field"></td>
           <td><input type=submit value=Update class="btn btn-primary"></td>
           </form>
           <form method=delete action=/parts/<%id%>>

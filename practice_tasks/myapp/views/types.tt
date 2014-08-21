@@ -30,10 +30,13 @@
 
   <% IF types %>
     <table class="table table-bordered">
+      <th>Name</th>
+      <th></th>
+      <th></th>
       <% FOREACH id IN types.keys.nsort %>
         <tr>
           <form method=post action=/types/<%id%>>
-          <td><input type=text name=new_type_name_<%id%> value=<% types.$id.name %> class=form-control></td>
+          <td><input type=text name=new_type_name_<%id%> value=<% types.$id.name %> class="form-control field"></td>
           <td><input type=submit value=Update class="btn btn-primary"></td>
           </form>
           <form method=delete action=/types/<%id%>>

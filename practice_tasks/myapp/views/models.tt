@@ -39,10 +39,16 @@
 
   <% IF models %>
     <table class="table table-bordered">	
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th></th>
+        <th></th>
+      </tr>
       <% FOREACH id IN models.keys.nsort%>		
         <tr>
           <form method=post action=/models/<%id%>>
-          <td><input type=text name=new_model_name_<%id%> value=<% models.$id.m_name %> class=form-control></td>
+          <td><input type=text name=new_model_name_<%id%> value=<% models.$id.m_name %> class="form-control field"></td>
           <td><% models.$id.t_name %></td>
           <td><input type=submit value=Update class="btn btn-primary"></td>
           </form>

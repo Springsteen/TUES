@@ -40,6 +40,17 @@ sub findID {
 	}
 };
 
+sub validateDate {
+	my $str = $_[0];
+	my $year = int(substr $str, 0, 4);
+	my $month = int(substr $str, 5, 2);
+	my $day = int(substr $str, 8, 2);
+	return -1 if ($year < 2014 or $year > 2030);
+	return -1 if ($month < 1 or $month > 12);
+	return -1 if ($day < 1 or $day > 31);
+	return 1
+};
+
 any ['post', 'get'] => '/' => sub {
 	my $dbh = connect_db();
 	try {	
@@ -545,6 +556,9 @@ any ['get', 'post'] => '/parts' => sub {
 			my $computersHash = $sth->fetchall_hashref('id');
 			$sth->finish();
 			if (request->method() eq "POST"){
+				print STDERR "\nIM HERE\n";
+				die if (validateDate(params->{'part_waranty'}) != 1);
+				print STDERR "\nIM THERE\n";
 				$sth = $dbh->prepare("INSERT INTO parts (name, model_id, computer_id, waranty) 
 										values (?, ?, ?, ?)") or die $dbh->errstr;
 				$sth->execute(params->{'part_name'}, 
@@ -642,7 +656,8 @@ any ['get', 'post'] => '/search' => sub {
 				my $db = params->{'select_db'};
 				redirect '/search' if (params->{'search_pattern'} =~ /\s/) or (params->{'search_pattern'} eq "");
 				my $sth = $dbh->prepare("SELECT * FROM  $db
-										WHERE name ~ ?") or die $dbh->errstr;
+										WHERE name ~ ?
+										LIMIT 200 OFFSET 0") or die $dbh->errstr;
 				$sth->execute("^".params->{'search_pattern'}) or die $sth->errstr;
 				die if $sth->rows() < 1;
 				my $searchHash = $sth->fetchall_arrayref();

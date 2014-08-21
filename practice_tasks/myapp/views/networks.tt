@@ -29,11 +29,16 @@
   <% END %>
 
   <% IF networks %>
-    <table class="table table-bordered">	
+    <table class="table table-bordered">
+      <tr>
+        <th>Name</th>
+        <th></th>
+        <th></th>
+      </tr>	
       <% FOREACH id IN networks.keys.nsort %>
         <tr>	
           <form method=post action=/networks/<%id%>>
-            <td><input type=text name=new_network_name_<%id%> value=<% networks.$id.name %> class=form-control></td>
+            <td><input type=text name=new_network_name_<%id%> value=<% networks.$id.name %> class="form-control field"></td>
             <td><input type=submit value=Update class="btn btn-primary"></td>
           </form>
           <form method=delete action=/networks/<%id%>>

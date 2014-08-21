@@ -39,10 +39,16 @@
 
   <% IF computers %>
     <table class="table table-bordered">  
+      <tr>
+        <th>Name</th>
+        <th>Network</th>
+        <th></th>
+        <th></th>
+      </tr>
       <% FOREACH id IN computers.keys.nsort%>
         <tr> 
           <form method=post action=/computers/<%id%>>
-          <td><input type=text name=new_computer_name_<%id%> value=<% computers.$id.c_name %> class=form-control></td>
+          <td><input type=text name=new_computer_name_<%id%> value=<% computers.$id.c_name %> class="form-control field"></td>
           <td><% computers.$id.n_name %></td>
           <td><input type=submit value=Update class="btn btn-primary"></td>
           </form>

@@ -38,11 +38,17 @@
   <% END %>
 
   <% IF net_devices %>
-    <table class="table table-bordered">  
+    <table class="table table-bordered">
+      <tr>
+        <th>Name</th>
+        <th>Network</th>
+        <th></th>
+        <th></th>
+      </tr>  
       <% FOREACH id IN net_devices.keys.nsort%>
         <tr> 
           <form method=post action=/network_devices/<%id%>>
-          <td><input type=text name=new_net_device_name_<%id%> value=<% net_devices.$id.d_name %> class=form-control></td>
+          <td><input type=text name=new_net_device_name_<%id%> value=<% net_devices.$id.d_name %> class="form-control field"></td>
           <td><% net_devices.$id.n_name %></td>
           <td><input type=submit value=Update class="btn btn-primary"></td>
           </form>
