@@ -4,6 +4,7 @@ use DBI;
 use Data::Dumper;
 use Try::Tiny;
 use Math::Round;
+ use Digest::MD5 qw(md5 md5_hex md5_base64);	
 our $VERSION = '0.1';
 
 my $current_user = '';
@@ -58,7 +59,7 @@ any ['post', 'get'] => '/' => sub {
 			my $check = 0;
 			my $sth = $dbh->prepare("SELECT id,name,password FROM accounts 
 										WHERE name = ? AND password = ?") or die $dbh->errstr;
-			$sth->execute(params->{'username'}, params->{'password'}) or die $sth->errstr;
+			$sth->execute(params->{'username'}, md5_base64(params->{"password"}, params->{"username"})) or die $sth->errstr;
 			if ($sth->rows() > 0) {
 				session 'logged_in' => true;
 				$current_user = params->{'username'};
@@ -95,6 +96,55 @@ any ['post', 'get'] => '/' => sub {
 		$dbh->disconnect();
 		template 'exception';
 	};
+};
+
+any ['post', 'get'] => '/register' => sub {
+	my $dbh = connect_db();
+	if (session 'logged_in'){
+		redirect '/';	
+	}else{
+		try{
+			if (request->method() eq "POST"){
+				print STDERR "\n" . params->{"password_1"} . "\n";
+				print STDERR "\n" . params->{"password_2"} . "\n";
+				print STDERR "\n" . params->{"username"} . "\n";
+				my $check = (params->{"password_1"} eq params->{"password_2"});
+				die if !$check;
+				print STDERR "\n" . $check . "\n";
+				$check = 1;
+				my $sth = $dbh->prepare("SELECT * FROM accounts WHERE
+										name = ?") or die $dbh->errstr;
+				$sth->execute(params->{"username"}) or die $sth->errstr;
+				print STDERR "\n" . $sth->rows() . "\n";
+				$check = 0 if $sth->rows() != 0;
+				$sth->finish();
+				if ($check) {
+					$sth = $dbh->prepare("INSERT INTO accounts (name, password) values (?, ?)") or die $sth->errstr;
+					$sth->execute(params->{"username"}, md5_base64(params->{"password_1"}, params->{"username"})) or die $sth->errstr;
+					$sth->finish();
+					$dbh->commit or die $dbh->errstr;
+					print STDERR "\nSuccess on creation\n";
+					$dbh->disconnect();
+					template 'home', {
+						'success' => "You're account has been created"
+					};
+				}else{
+					print STDERR "\nUser exists\n";
+					$dbh->disconnect();
+					template 'register', {
+						'err' => "There is another user with that name"
+					};
+				}
+			}else{
+				$dbh->disconnect();
+				template 'register';
+			}
+		}catch{
+			$dbh->disconnect();
+			print STDERR "\n" . $_ . "\n";
+			template 'exception';
+		};
+	}
 };
 
 get '/logout' => sub {
