@@ -4,7 +4,10 @@ use DBI;
 use Data::Dumper;
 use Try::Tiny;
 use Math::Round;
- use Digest::MD5 qw(md5 md5_hex md5_base64);	
+use Digest::MD5 qw(md5 md5_hex md5_base64);	
+use String::Random qw(random_string);
+use MIME::Lite;
+
 our $VERSION = '0.1';
 
 my $current_user = '';
@@ -40,6 +43,14 @@ sub findID {
 		return -1
 	}
 };
+
+# sub sendMail {
+# 	my %mail = ( To => $_[0],
+# 			From => 'konkokodon@abv.bg',
+# 			Message => $_[1]);
+
+# 	sendmail(%mail) or die $Mail::Sendmail::error;
+# };
 
 sub validateDate {
 	my $str = $_[0];
@@ -114,11 +125,27 @@ any ['post', 'get'] => '/register' => sub {
 				$check = 0 if $sth->rows() != 0;
 				$sth->finish();
 				if ($check) {
-					$sth = $dbh->prepare("INSERT INTO accounts (name, password) values (?, ?)") or die $sth->errstr;
-					$sth->execute(params->{"username"}, md5_base64(params->{"password_1"}, params->{"username"})) or die $sth->errstr;
+					my $confirm_code = random_string("..........");
+					$sth = $dbh->prepare("INSERT INTO accounts (name, password, mail, confirm_code, active) 
+										values (?, ?, ?, ?, ?)") or die $sth->errstr;
+					$sth->execute(params->{"username"}, md5_base64(params->{"password_1"}, params->{"username"}), 
+								params->{"mail"}, $confirm_code, "FALSE") or die $sth->errstr;
 					$sth->finish();
 					$dbh->commit or die $dbh->errstr;
 					$dbh->disconnect();
+					my $from ='konkokodon@abv.bg';
+					my $to = params->{"mail"};
+					my $subject = 'Welcome to my app';
+					my $msg = MIME::Lite->new(
+					    From => $from,
+					    To => $to,
+					    Subject  => $subject,
+					    Data => $confirm_code,
+					    Type => 'text/html',
+					    Path => '/root/martin'
+					);
+					                 
+					$msg->send;
 					template 'home', {
 						'success' => "You're account has been created"
 					};
@@ -134,6 +161,7 @@ any ['post', 'get'] => '/register' => sub {
 			}
 		}catch{
 			$dbh->disconnect();
+			print STDERR "\n" . $_ . "\n";
 			template 'exception';
 		};
 	}
@@ -340,7 +368,7 @@ any ['post', 'get'] => '/networks' => sub {
 				$pages = int(($sth->rows()) / 10);
 				$pages++ if ($sth->rows % 10) != 0;
 				$sth->finish();
-				my $sth = $dbh->prepare("SELECT id, name FROM networks LIMIT 10 OFFSET ?") or die $dbh->errstr;
+				$sth = $dbh->prepare("SELECT id, name FROM networks LIMIT 10 OFFSET ?") or die $dbh->errstr;
 				$sth->execute($offset*10) or die $sth->errstr;
 				my $networksHash = $sth->fetchall_hashref('id');
 				$sth->finish();

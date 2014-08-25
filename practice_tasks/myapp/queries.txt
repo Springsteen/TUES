@@ -1,7 +1,10 @@
 CREATE TABLE accounts (
 	id serial primary key,
 	name varchar(50) unique not null,
-	password varchar(50) not null
+	password varchar(50) not null,
+	mail varchar(100) not null,
+	confirm_code varchar(100),
+	active boolean
 );
 
 CREATE TABLE types (

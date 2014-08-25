@@ -10,6 +10,8 @@
       <input type=password name=password_1 class=form-control><br><br>
       Repeat Password:<br>
       <input type=password name=password_2 class=form-control><br><br>
+      Email:<br>
+      <input type=mail name=mail class=form-control><br><br>
       <input type=submit value=Register class="btn btn-primary">
     </form>
   </div>
