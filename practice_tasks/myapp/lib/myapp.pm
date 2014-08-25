@@ -105,17 +105,12 @@ any ['post', 'get'] => '/register' => sub {
 	}else{
 		try{
 			if (request->method() eq "POST"){
-				print STDERR "\n" . params->{"password_1"} . "\n";
-				print STDERR "\n" . params->{"password_2"} . "\n";
-				print STDERR "\n" . params->{"username"} . "\n";
 				my $check = (params->{"password_1"} eq params->{"password_2"});
 				die if !$check;
-				print STDERR "\n" . $check . "\n";
 				$check = 1;
 				my $sth = $dbh->prepare("SELECT * FROM accounts WHERE
 										name = ?") or die $dbh->errstr;
 				$sth->execute(params->{"username"}) or die $sth->errstr;
-				print STDERR "\n" . $sth->rows() . "\n";
 				$check = 0 if $sth->rows() != 0;
 				$sth->finish();
 				if ($check) {
@@ -123,13 +118,11 @@ any ['post', 'get'] => '/register' => sub {
 					$sth->execute(params->{"username"}, md5_base64(params->{"password_1"}, params->{"username"})) or die $sth->errstr;
 					$sth->finish();
 					$dbh->commit or die $dbh->errstr;
-					print STDERR "\nSuccess on creation\n";
 					$dbh->disconnect();
 					template 'home', {
 						'success' => "You're account has been created"
 					};
 				}else{
-					print STDERR "\nUser exists\n";
 					$dbh->disconnect();
 					template 'register', {
 						'err' => "There is another user with that name"
@@ -141,7 +134,6 @@ any ['post', 'get'] => '/register' => sub {
 			}
 		}catch{
 			$dbh->disconnect();
-			print STDERR "\n" . $_ . "\n";
 			template 'exception';
 		};
 	}
@@ -917,7 +909,7 @@ any ['get', 'post'] => '/network_devices/edit/:id' => sub {
 };
 
 any ['get', 'post'] => '/models/edit/:id' => sub {
-	# if (session 'logged_in') {
+	if (session 'logged_in') {
 		my $dbh = connect_db();
 		try {
 			my $id = params->{'id'};
@@ -960,12 +952,11 @@ any ['get', 'post'] => '/models/edit/:id' => sub {
 			}
 		}catch{
 			$dbh->disconnect();
-			print STDERR Dumper($_);
 			template 'exception';
 		};
-	# }else{
-	# 	redirect '/';
-	# }
+	}else{
+		redirect '/';
+	}
 };
 
 true;

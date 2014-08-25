@@ -44,6 +44,7 @@
         <th>Type</th>
         <th></th>
         <th></th>
+        <th></th>
       </tr>
       <% FOREACH id IN models.keys.nsort%>		
         <tr>
@@ -51,6 +52,9 @@
           <td><input type=text name=new_model_name_<%id%> value=<% models.$id.m_name %> class="form-control field"></td>
           <td><% models.$id.t_name %></td>
           <td><input type=submit value=Update class="btn btn-primary"></td>
+          </form>
+          <form method=get action=/models/edit/<%id%>>
+            <td><input type=submit value=Edit class="btn btn-warning"></td>
           </form>
           <form method=delete action=/models/<%id%>>
             <td><input type=submit value=Delete class="btn btn-danger"></td>

@@ -1,6 +1,6 @@
 <div class="content panel panel-primary">
   <% IF err %>
-    <div class="alert alert-danger  "><% err %></div>
+    <div class="alert alert-danger"><% err %></div>
   <% END %>
   <% IF success %>
     <div class="alert alert-success"><% success %></div>
