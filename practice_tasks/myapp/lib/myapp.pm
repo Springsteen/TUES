@@ -185,6 +185,56 @@ any ['post', 'get'] => '/user_panel' => sub {
 	}
 };
 
+any ['post', 'get'] => '/restore_password' => sub {
+	if (session 'logged_in'){
+		redirect '/';
+	}else{
+		my $dbh = connect_db();
+		try {
+			if (request->method() eq "POST"){
+				my $sth = $dbh->prepare("SELECT name FROM accounts
+									WHERE mail = ?") or die $dbh->errstr;
+				$sth->execute(params->{"mail"}) or die $sth->errstr;
+				if ($sth->rows <= 0) {
+					$sth->finish();
+					$dbh->disconnect();
+					template 'restore_password', {
+						err => 1
+					};
+				}else{
+					my $hash = $sth->fetchrow_hashref() or die $sth->errstr;
+					my $user = $hash->{"name"};
+					$sth->finish();
+					$sth = $dbh->prepare("UPDATE accounts 
+										SET password = ? 
+										WHERE mail = ? ") or die $dbh->errstr;
+					my $new_pass = random_string("..........");
+					$sth->execute(md5_base64($new_pass,$user), params->{"mail"}) or die $sth->errstr;
+					$sth->finish();
+					$dbh->commit or die $dbh->errstr;
+					$dbh->disconnect();
+					email {
+						to => params->{"mail"},
+						from => 'konkokodon@abv.bg',
+						subject => 'new password',
+						message => $new_pass
+					};
+					template 'restore_password', {
+						'success' => 1 
+					};
+				}
+			}else{
+				$dbh->disconnect();
+				template 'restore_password';
+			}
+		}catch{
+			$dbh->disconnect();
+			print STDERR "\n" . $_ . "\n";
+			template 'exception';
+		};
+	}
+};
+
 any ['post', 'get'] => '/register' => sub {
 	if (session 'logged_in'){
 		redirect '/';	
@@ -212,8 +262,8 @@ any ['post', 'get'] => '/register' => sub {
 					email {
 				        to => params->{"mail"},
 				        from => 'konkokodon@abv.bg',
-				        subject => 'confirm_code',
-				        message => $confirm_code,
+				        subject => 'email confirmation code',
+				        message => $confirm_code
 				    };
 
 					template 'home', {
