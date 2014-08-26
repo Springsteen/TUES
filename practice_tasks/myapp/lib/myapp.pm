@@ -6,7 +6,7 @@ use Try::Tiny;
 use Math::Round;
 use Digest::MD5 qw(md5 md5_hex md5_base64);	
 use String::Random qw(random_string);
-use MIME::Lite;
+use Dancer::Plugin::Email;
 
 our $VERSION = '0.1';
 
@@ -133,19 +133,13 @@ any ['post', 'get'] => '/register' => sub {
 					$sth->finish();
 					$dbh->commit or die $dbh->errstr;
 					$dbh->disconnect();
-					my $from ='konkokodon@abv.bg';
-					my $to = params->{"mail"};
-					my $subject = 'Welcome to my app';
-					my $msg = MIME::Lite->new(
-					    From => $from,
-					    To => $to,
-					    Subject  => $subject,
-					    Data => $confirm_code,
-					    Type => 'text/html',
-					    Path => '/root/martin'
-					);
-					                 
-					$msg->send;
+					email {
+				        to => params->{"mail"},
+				        from => 'konkokodon@abv.bg',
+				        subject => 'confirm_code',
+				        message => $confirm_code,
+				    };
+
 					template 'home', {
 						'success' => "You're account has been created"
 					};
@@ -164,6 +158,58 @@ any ['post', 'get'] => '/register' => sub {
 			print STDERR "\n" . $_ . "\n";
 			template 'exception';
 		};
+	}
+};
+
+any ['post', 'get'] => '/confirm_account' => sub {
+	if(session 'logged_in') {
+		my $dbh = connect_db();
+		try{
+			my $sth = $dbh->prepare("SELECT * FROM accounts WHERE
+										name = ? AND active = FALSE") or die $dbh->errstr;
+			$sth->execute($current_user) or die $sth->errstr;
+			if ($sth->rows() < 1) {
+				$sth->finish();
+				$dbh->disconnect();
+				redirect '/';
+			}
+			$sth->finish(); 
+			if (request->method() eq "POST"){
+				my $sth = $dbh->prepare("SELECT confirm_code FROM accounts WHERE
+										name = ? AND active = FALSE") or die $dbh->errstr;
+				$sth->execute($current_user) or die $sth->errstr;
+				my $code = $sth->fetchrow_hashref() or die $sth->errstr;
+				$sth->finish();
+				print STDERR "\n" . $code->{"confirm_code"} . "\n";
+				if ($code->{"confirm_code"} eq params->{"code"}){
+					my $sth = $dbh->prepare("UPDATE accounts SET active = TRUE
+											WHERE name = '$current_user'") or die $dbh->errstr;
+					$sth->execute() or die $sth->errstr;
+					$sth->finish();
+					$dbh->commit or die $dbh->errstr;
+					$dbh->disconnect();
+					redirect "/"
+				}else{
+					$dbh->disconnect();
+					template 'confirm_account', {
+						'err' => "Wrong confirmation code."
+					};		
+				}
+			}else{
+				$dbh->disconnect();
+				template 'confirm_account', {
+					'msg' => "You're e-mail address isn't activated. 
+								You may use the application but some options
+								won't be available until you confirm it."
+				};
+			}
+		}catch{
+			$dbh->disconnect();
+			print STDERR "\n" . $_ . "\n";
+			template 'exception';
+		};
+	}else{
+		redirect '/';
 	}
 };
 
