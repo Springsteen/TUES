@@ -77,8 +77,8 @@ any ['post', 'get'] => '/' => sub {
 				$check = 1;
 			}
 		    $sth->finish();
-		    $dbh->disconnect();
 		    if ($check == 0) { 
+		    	$dbh->disconnect();
 				template 'home', {
 					'msg' => $check,
 					'err' => "Wrong username or password",
@@ -92,7 +92,18 @@ any ['post', 'get'] => '/' => sub {
 					'search_url' => uri_for('/search'),
 				};
 			}else{
-				redirect '/types';	
+				$sth = $dbh->prepare("SELECT active FROM accounts 
+										WHERE name = ?") or die $dbh->errstr;
+				$sth->execute(params->{'username'}) or die $sth->errstr;
+				$check = $sth->fetchrow_hashref() or die $sth->errstr;
+				$sth->finish();
+				$dbh->disconnect();
+				print STDERR "\n" . $check->{"active"} . "\n";
+				if ($check->{"active"} == 0){
+					redirect '/confirm_account';
+				}else{
+					redirect '/types';	
+				}
 			}
 		}else{
 			if (session 'logged_in') {
@@ -105,15 +116,80 @@ any ['post', 'get'] => '/' => sub {
 		}
 	}catch{
 		$dbh->disconnect();
+		print STDERR "\n" . $_ . "\n";
 		template 'exception';
 	};
 };
 
+any ['post', 'get'] => '/user_panel' => sub {
+	if (session 'logged_in'){
+		my $dbh = connect_db();
+		try {
+			my $sth = $dbh->prepare("SELECT * FROM accounts 
+									WHERE name = ?") or die $dbh->errstr;
+			$sth->execute($current_user) or die $sth->errstr;
+			my $user = $sth->fetchrow_hashref() or die $sth->errstr;
+			$sth->finish();
+			my $active = "yes";
+			$active = "no" if ($user->{"active"} == 0);
+			if (request->method() eq "POST"){
+				if ((md5_base64(params->{"old_pass"}, $current_user) eq $user->{"password"}) &&
+					(params->{"new_pass_1"} eq params->{"new_pass_2"})){
+					$sth = $dbh->prepare("UPDATE accounts SET
+										password = ? WHERE name = ?") or die $dbh->errstr;
+					$sth->execute(md5_base64(params->{"new_pass_1"}, $current_user), $current_user) or die $sth->errstr;
+					$sth->finish();
+					$dbh->commit or die $dbh->errstr;
+					$dbh->disconnect();
+
+					template 'user_panel', {
+						'user' => $user->{"name"},
+						'mail' => $user->{"mail"}, 
+						'active' => $active,
+						'msg' => "Your password was changed",
+						'logout_url' => uri_for('/logout'),
+						'logged' => 'true',
+						'types_url' => uri_for('/types'),
+						'models_url' => uri_for('/models'),
+						'networks_url' => uri_for('/networks'),
+						'net_devices_url' => uri_for('/network_devices'),
+						'computers_url' => uri_for('/computers'),
+						'parts_url' => uri_for('/parts'),
+						'search_url' => uri_for('/search')
+					};
+				}
+			}else{
+				template 'user_panel', {
+					'user' => $user->{"name"},
+					'mail' => $user->{"mail"}, 
+					'active' => $active,
+					'logout_url' => uri_for('/logout'),
+					'logged' => 'true',
+					'logout_url' => uri_for('/logout'),
+					'types_url' => uri_for('/types'),
+					'models_url' => uri_for('/models'),
+					'networks_url' => uri_for('/networks'),
+					'net_devices_url' => uri_for('/network_devices'),
+					'computers_url' => uri_for('/computers'),
+					'parts_url' => uri_for('/parts'),
+					'search_url' => uri_for('/search')
+				};
+			}
+		}catch{
+			$dbh->disconnect();
+			print STDERR "\n" . $_ . "\n";
+			template 'exception';
+		};	
+	}else{
+		redirect '/';
+	}
+};
+
 any ['post', 'get'] => '/register' => sub {
-	my $dbh = connect_db();
 	if (session 'logged_in'){
 		redirect '/';	
 	}else{
+		my $dbh = connect_db();
 		try{
 			if (request->method() eq "POST"){
 				my $check = (params->{"password_1"} eq params->{"password_2"});

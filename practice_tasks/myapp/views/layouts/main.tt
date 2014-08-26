@@ -33,7 +33,7 @@
 			</ul>
 			<ul class="nav navbar-nav navbar-right">
 				<% IF logged == 'true' || msg == 1 %>
-					<li><a href="#"> Logged as: <%user%></a></li>
+					<li><a href="<% request.uri_base %>/user_panel"> Logged as: <%user%></a></li>
 					<li><a href="<% logout_url %>"> Logout </a></li>
 				<% END %>
 			</ul>
