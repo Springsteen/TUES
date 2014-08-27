@@ -11,9 +11,10 @@ use Dancer::Plugin::Email;
 our $VERSION = '0.1';
 
 my $current_user = '';
+my $dbh;
 
 sub connect_db {
-	my $dbh = DBI->connect(
+	$dbh = DBI->connect(
 		"dbi:Pg:dbname=myapp_db",
 		"martin",
 		"Parola",
@@ -29,7 +30,7 @@ sub connect_db {
 sub findID {
 	my $table = $_[0];
 	my $name_pattern = $_[1];
-	my $dbh = connect_db();
+	$dbh = connect_db();
 	my $sth = $dbh->prepare("SELECT id FROM $table WHERE name = '$name_pattern'");
 	$sth->execute() or die $sth->errstr;
 	if ($sth->rows() == 1){
@@ -57,7 +58,7 @@ sub validateDate {
 
 any ['post', 'get'] => '/' => sub {
 	try {	
-		my $dbh = connect_db();
+		$dbh = connect_db();
 		if (request->method() eq "POST"){
 			my $check = 0;
 			my $sth = $dbh->prepare("SELECT id,name,password FROM accounts 
@@ -109,6 +110,7 @@ any ['post', 'get'] => '/' => sub {
 		}
 	}catch{
 		try {
+			$dbh->disconnect();
 			template 'exception';
 		}catch{
 			template 'exception';
@@ -119,7 +121,7 @@ any ['post', 'get'] => '/' => sub {
 any ['post', 'get'] => '/user_panel' => sub {
 	try {
 		if (session 'logged_in'){
-			my $dbh = connect_db();
+			$dbh = connect_db();
 			my $sth = $dbh->prepare("SELECT * FROM accounts 
 									WHERE name = ?") or die $dbh->errstr;
 			$sth->execute($current_user) or die $sth->errstr;
@@ -155,6 +157,7 @@ any ['post', 'get'] => '/user_panel' => sub {
 					};
 				}
 			}else{
+				$dbh->disconnect();
 				template 'user_panel', {
 					'user' => $user->{"name"},
 					'mail' => $user->{"mail"}, 
@@ -177,6 +180,7 @@ any ['post', 'get'] => '/user_panel' => sub {
 		}
 	}catch{
 		try {
+			$dbh->disconnect();
 			template 'exception';
 		}catch{
 			template 'exception';
@@ -189,7 +193,7 @@ any ['post', 'get'] => '/restore_password' => sub {
 		if (session 'logged_in'){
 			redirect '/';
 		}else{
-			my $dbh = connect_db();
+			$dbh = connect_db();
 			if (request->method() eq "POST"){
 				my $sth = $dbh->prepare("SELECT name, active FROM accounts
 									WHERE mail = ?") or die $dbh->errstr;
@@ -231,6 +235,7 @@ any ['post', 'get'] => '/restore_password' => sub {
 		}
 	}catch{
 		try{
+			$dbh->disconnect();
 			template 'exception';
 		}catch{
 			template 'exception';
@@ -243,7 +248,7 @@ any ['post', 'get'] => '/register' => sub {
 		if (session 'logged_in'){
 			redirect '/';	
 		}else{
-			my $dbh = connect_db();
+			$dbh = connect_db();
 			if (request->method() eq "POST"){
 				my $check = (params->{"password_1"} eq params->{"password_2"});
 				die if !$check;
@@ -285,6 +290,7 @@ any ['post', 'get'] => '/register' => sub {
 		}
 	}catch{
 		try{
+			$dbh->disconnect();
 			template 'exception';
 		}catch{
 			template 'exception';
@@ -295,7 +301,7 @@ any ['post', 'get'] => '/register' => sub {
 any ['post', 'get'] => '/confirm_account' => sub {
 	try{
 		if(session 'logged_in') {
-			my $dbh = connect_db();
+			$dbh = connect_db();
 			my $sth = $dbh->prepare("SELECT * FROM accounts WHERE
 										name = ? AND active = FALSE") or die $dbh->errstr;
 			$sth->execute($current_user) or die $sth->errstr;
@@ -339,6 +345,7 @@ any ['post', 'get'] => '/confirm_account' => sub {
 		}
 	}catch{
 		try{
+			$dbh->disconnect();
 			template 'exception';
 		}catch{
 			template 'exception';
@@ -348,6 +355,7 @@ any ['post', 'get'] => '/confirm_account' => sub {
 
 get '/logout' => sub {
 	if (session 'logged_in') {
+		$dbh->disconnect();
 		session->destroy();
 		redirect '/';
 	}else{
@@ -358,7 +366,7 @@ get '/logout' => sub {
 any ['post', 'get'] => '/types' => sub {
 	try {	
 		if (session 'logged_in') {
-			my $dbh = connect_db();
+			$dbh = connect_db();
 			if (request->method() eq "POST"){
 				my $sth = $dbh->prepare("INSERT INTO types (name) values (?)") or die $dbh->errstr;	
 				$sth->execute(params->{'type_name'}) or die $sth->errstr;
@@ -402,6 +410,7 @@ any ['post', 'get'] => '/types' => sub {
 		}
 	}catch{
 		try{
+			$dbh->disconnect();
 			template 'exception';
 		}catch{
 			template 'exception';
@@ -412,7 +421,7 @@ any ['post', 'get'] => '/types' => sub {
 any ['post', 'get'] => '/types/:id' => sub {
 	try {	
 		if (session 'logged_in'){
-			my $dbh = connect_db();
+			$dbh = connect_db();
 			if (request->method() eq "POST"){
 				my $id = params->{'id'};
 				my $sth = $dbh->prepare("UPDATE types SET name = ? WHERE id = $id") or die $dbh->errstr;
@@ -434,6 +443,7 @@ any ['post', 'get'] => '/types/:id' => sub {
 		}
 	}catch{
 		try{
+			$dbh->disconnect();
 			template 'exception';
 		}catch{
 			template 'exception';
@@ -445,7 +455,7 @@ any ['post', 'get'] => '/types/:id' => sub {
 any ['post', 'get'] => '/models' => sub {
 	try {
 		if (session 'logged_in') {
-			my $dbh = connect_db();
+			$dbh = connect_db();
 			my $sth = $dbh->prepare("SELECT id, name FROM types") or die $dbh->errstr;
 			$sth->execute() or die $sth->errstr;
 			die if $sth->rows() < 1;
@@ -499,6 +509,7 @@ any ['post', 'get'] => '/models' => sub {
 		}
 	}catch{
 		try{
+			$dbh->disconnect();
 			template 'exception';
 		}catch{
 			template 'exception';
@@ -509,7 +520,7 @@ any ['post', 'get'] => '/models' => sub {
 any ['post', 'get'] => '/models/:id' => sub {
 	try {	
 		if (session 'logged_in'){
-			my $dbh = connect_db();
+			$dbh = connect_db();
 			if (request->method() eq "POST"){
 				my $id = params->{'id'};
 				my $sth = $dbh->prepare("UPDATE models SET name = ? WHERE id = $id") or die $dbh->errstr;	
@@ -531,6 +542,7 @@ any ['post', 'get'] => '/models/:id' => sub {
 		}
 	}catch{
 		try{
+			$dbh->disconnect();
 			template 'exception';
 		}catch{
 			template 'exception';
@@ -541,7 +553,7 @@ any ['post', 'get'] => '/models/:id' => sub {
 any ['post', 'get'] => '/networks' => sub {
 	try {
 		if (session 'logged_in') {
-			my $dbh = connect_db();
+			$dbh = connect_db();
 			if (request->method() eq "POST"){
 				my $sth = $dbh->prepare("INSERT INTO networks (name) values (?)") or die $dbh->errstr;	
 				$sth->execute(params->{'network_name'}) or die $sth->errstr;
@@ -587,7 +599,8 @@ any ['post', 'get'] => '/networks' => sub {
 			redirect '/';
 		}
 	}catch{
-		try{	
+		try{
+			$dbh->disconnect();	
 			template 'exception';
 		}catch{
 			template 'exception';
@@ -598,7 +611,7 @@ any ['post', 'get'] => '/networks' => sub {
 any ['get', 'post'] => '/networks/:id' => sub {
 	try {	
 		if (session 'logged_in'){
-			my $dbh = connect_db();
+			$dbh = connect_db();
 			if (request->method() eq "POST"){
 				my $id = params->{'id'};
 				my $sth = $dbh->prepare("UPDATE networks SET name = ? WHERE id = $id") or die $dbh->errstr;	
@@ -620,6 +633,7 @@ any ['get', 'post'] => '/networks/:id' => sub {
 		}
 	}catch{
 		try{
+			$dbh->disconnect();
 			template 'exception';
 		}catch{
 			template 'exception';
@@ -630,7 +644,7 @@ any ['get', 'post'] => '/networks/:id' => sub {
 any ['get', 'post'] => '/network_devices' => sub {
 	try {
 		if (session 'logged_in') {
-			my $dbh = connect_db();
+			$dbh = connect_db();
 			my $sth = $dbh->prepare("SELECT id, name FROM networks") or die $dbh->errstr;
 			$sth->execute() or die $sth->errstr;
 			die if $sth->rows() < 1;
@@ -687,6 +701,7 @@ any ['get', 'post'] => '/network_devices' => sub {
 		}
 	}catch{
 		try{
+			$dbh->disconnect();
 			template 'exception';
 		}catch{
 			template 'exception';
@@ -697,7 +712,7 @@ any ['get', 'post'] => '/network_devices' => sub {
 any ['get', 'post'] => '/network_devices/:id' => sub {
 	try {	
 		if (session 'logged_in'){	
-			my $dbh = connect_db();
+			$dbh = connect_db();
 			if (request->method() eq "POST"){
 				my $id = params->{'id'};
 				my $sth = $dbh->prepare("UPDATE network_devices SET name = ? WHERE id = $id") or die $dbh->errstr;	
@@ -719,6 +734,7 @@ any ['get', 'post'] => '/network_devices/:id' => sub {
 		}
 	}catch{
 		try{
+			$dbh->disconnect();
 			template 'exception';
 		}catch{
 			template 'exception';
@@ -729,7 +745,7 @@ any ['get', 'post'] => '/network_devices/:id' => sub {
 any ['get', 'post'] => '/computers' => sub {
 	try {
 		if (session 'logged_in') {
-			my $dbh = connect_db();
+			$dbh = connect_db();
 			my $sth = $dbh->prepare("SELECT id, name FROM networks") or die $dbh->errstr;
 			$sth->execute() or die $sth->errstr;
 			die if $sth->rows() < 1;
@@ -786,6 +802,7 @@ any ['get', 'post'] => '/computers' => sub {
 		}
 	}catch{
 		try{	
+			$dbh->disconnect();
 			template 'exception';
 		}catch{
 			template 'exception';
@@ -796,7 +813,7 @@ any ['get', 'post'] => '/computers' => sub {
 any ['get', 'post'] => '/computers/:id' => sub {
 	try {	
 		if (session 'logged_in'){	
-			my $dbh = connect_db();
+			$dbh = connect_db();
 			if (request->method() eq "POST"){
 				my $id = params->{'id'};
 				my $sth = $dbh->prepare("UPDATE computers SET name = ? WHERE id = $id") or die $dbh->errstr;	
@@ -818,6 +835,7 @@ any ['get', 'post'] => '/computers/:id' => sub {
 		}
 	}catch{
 		try{	
+			$dbh->disconnect();
 			template 'exception';
 		}catch{
 			template 'exception';
@@ -828,7 +846,7 @@ any ['get', 'post'] => '/computers/:id' => sub {
 any ['get', 'post'] => '/parts' => sub {
 	try {
 		if (session 'logged_in'){
-			my $dbh = connect_db();
+			$dbh = connect_db();
 			my $sth = $dbh->prepare("SELECT id, name FROM models") or die $dbh->errstr;
 			$sth->execute() or die $sth->errstr;
 			die if $sth->rows() < 1;
@@ -898,6 +916,7 @@ any ['get', 'post'] => '/parts' => sub {
 		}
 	}catch{	
 		try{
+			$dbh->disconnect();
 			template 'exception';
 		}catch{
 			template 'exception';
@@ -908,7 +927,7 @@ any ['get', 'post'] => '/parts' => sub {
 any ['get', 'post'] => '/parts/:id' => sub {
 	try {	
 		if (session 'logged_in'){	
-			my $dbh = connect_db();
+			$dbh = connect_db();
 			if (request->method() eq "POST"){
 				my $id = params->{'id'};
 				my $sth = $dbh->prepare("UPDATE parts SET name = ?, waranty = ? WHERE id = $id") or die $dbh->errstr;	
@@ -930,6 +949,7 @@ any ['get', 'post'] => '/parts/:id' => sub {
 		}
 	}catch{
 		try{
+			$dbh->disconnect();
 			template 'exception';
 		}catch{	
 			template 'exception';
@@ -940,10 +960,9 @@ any ['get', 'post'] => '/parts/:id' => sub {
 any ['get', 'post'] => '/manuals' => sub {
 	try {
 		if (session 'logged_in'){
-			my $dbh = connect_db();
+			$dbh = connect_db();
 			if (request->method() eq "POST"){
 				my $public_dir = "/" . config->{"public"} . "/uploads";
-				print STDERR Dumper(request) . "\n";
 				my $filename = params->{"filename"};
 				my $file = upload("filename");
   				$file->copy_to("$public_dir/$filename");
@@ -996,6 +1015,32 @@ any ['get', 'post'] => '/manuals' => sub {
 		}
 	}catch{	
 		try{
+			$dbh->disconnect();
+			template 'exception';
+		}catch{
+			template 'exception';
+		};
+	};
+};
+
+any ['get', 'post'] => '/manuals/:id' => sub {
+	try {
+		if (session 'logged_in'){
+			my $id = params->{'id'};
+			$dbh = connect_db();
+			my $sth = $dbh->prepare("DELETE FROM manuals 
+									WHERE id = ?") or die $dbh->errstr;
+			$sth->execute($id) or die $sth->errstr;
+			$dbh->commit or die $dbh->errstr;
+			$sth->finish();
+			$dbh->disconnect();
+			redirect '/manuals';
+		}else{
+			redirect '/';
+		}
+	}catch{	
+		try{
+			$dbh->disconnect();
 			template 'exception';
 		}catch{
 			template 'exception';
@@ -1006,7 +1051,7 @@ any ['get', 'post'] => '/manuals' => sub {
 any ['get', 'post'] => '/search' => sub {
 	try {
 		if (session 'logged_in') {
-			my $dbh = connect_db();
+			$dbh = connect_db();
 			if (request->method() eq "POST"){
 				my $db = params->{'select_db'};
 				redirect '/search' if (params->{'search_pattern'} =~ /\s/) or (params->{'search_pattern'} eq "");
@@ -1054,6 +1099,7 @@ any ['get', 'post'] => '/search' => sub {
 		}
 	}catch{
 		try{
+			$dbh->disconnect();
 			template 'exception';
 		}catch{
 			template 'exception';
@@ -1064,7 +1110,7 @@ any ['get', 'post'] => '/search' => sub {
 any ['get', 'post'] => '/parts/edit/:id' => sub {
 	try {
 		if (session 'logged_in') {
-			my $dbh = connect_db();
+			$dbh = connect_db();
 			my $id = params->{'id'};
 			my $sth = $dbh->prepare("SELECT id, name FROM models") or die $dbh->errstr;
 			$sth->execute() or die $sth->errstr;
@@ -1121,6 +1167,7 @@ any ['get', 'post'] => '/parts/edit/:id' => sub {
 		}
 	}catch{
 		try{
+			$dbh->disconnect();
 			template 'exception';
 		}catch{
 			template 'exception';
@@ -1131,7 +1178,7 @@ any ['get', 'post'] => '/parts/edit/:id' => sub {
 any ['get', 'post'] => '/computers/edit/:id' => sub {
 	try {
 		if (session 'logged_in') {
-			my $dbh = connect_db();
+			$dbh = connect_db();
 			my $id = params->{'id'};
 			my $sth = $dbh->prepare("SELECT id, name FROM networks") or die $dbh->errstr;
 			$sth->execute or die $sth->errstr;
@@ -1177,6 +1224,7 @@ any ['get', 'post'] => '/computers/edit/:id' => sub {
 		}
 	}catch{
 		try{
+			$dbh->disconnect();
 			template 'exception';
 		}catch{	
 			template 'exception';
@@ -1187,7 +1235,7 @@ any ['get', 'post'] => '/computers/edit/:id' => sub {
 any ['get', 'post'] => '/network_devices/edit/:id' => sub {
 	try {
 		if (session 'logged_in') {
-			my $dbh = connect_db();
+			$dbh = connect_db();
 			my $id = params->{'id'};
 			my $sth = $dbh->prepare("SELECT id, name FROM networks") or die $dbh->errstr;
 			$sth->execute or die $sth->errstr;
@@ -1233,6 +1281,7 @@ any ['get', 'post'] => '/network_devices/edit/:id' => sub {
 		}
 	}catch{
 		try{
+			$dbh->disconnect();
 			template 'exception';
 		}catch{
 			template 'exception';
@@ -1243,7 +1292,7 @@ any ['get', 'post'] => '/network_devices/edit/:id' => sub {
 any ['get', 'post'] => '/models/edit/:id' => sub {
 	try {
 		if (session 'logged_in') {
-			my $dbh = connect_db();
+			$dbh = connect_db();
 			my $id = params->{'id'};
 			my $sth = $dbh->prepare("SELECT id, name FROM types") or die $dbh->errstr;
 			$sth->execute or die $sth->errstr;
@@ -1288,6 +1337,7 @@ any ['get', 'post'] => '/models/edit/:id' => sub {
 		}
 	}catch{
 		try{
+			$dbh->disconnect();
 			template 'exception';
 		}catch{
 			template 'exception';
