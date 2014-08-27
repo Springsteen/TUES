@@ -191,10 +191,12 @@ any ['post', 'get'] => '/restore_password' => sub {
 		}else{
 			my $dbh = connect_db();
 			if (request->method() eq "POST"){
-				my $sth = $dbh->prepare("SELECT name FROM accounts
+				my $sth = $dbh->prepare("SELECT name, active FROM accounts
 									WHERE mail = ?") or die $dbh->errstr;
 				$sth->execute(params->{"mail"}) or die $sth->errstr;
-				if ($sth->rows <= 0) {
+				die if $sth->rows <= 0;
+				my $row = $sth->fetchrow_hashref() or die $sth->errstr;
+				if ($row->{"active"} == 0) {
 					$sth->finish();
 					$dbh->disconnect();
 					template 'restore_password', {
