@@ -23,16 +23,23 @@ CREATE TABLE networks (
 	name varchar(100) unique not null
 );
 
+CREATE TABLE manuals (
+	id serial primary key,
+	name varchar(100) unique not null
+);
+
 CREATE TABLE network_devices (
 	id serial primary key,
 	name varchar(100) unique not null,
-	network_id int references networks(id)
+	network_id int references networks(id),
+	manual_id int references manuals(id)
 );
 
 CREATE TABLE computers (
 	id serial primary key,
 	name varchar(100) unique not null,
-	network_id int references networks(id)
+	network_id int references networks(id),
+	manual_id int references manuals(id)
 );
 
 CREATE TABLE parts (

@@ -28,6 +28,7 @@
 					<li><a href="<% net_devices_url %>"> Network devices </a></li>
 					<li><a href="<% computers_url %>"> Computers </a></li>
 					<li><a href="<% parts_url %>"> Parts </a></li>
+					<li><a href="<% manuals_url %>"> Manuals </a></li>
 					<li><a href="<% search_url %>"> Search </a></li>
 				<% END %>
 			</ul>

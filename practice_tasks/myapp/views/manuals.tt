@@ -1,0 +1,46 @@
+    <div class="content panel panel-primary">
+        <div class="panel panel-primary">
+            <div class=input-group>
+            <form action="/manuals" method="POST" enctype="multipart/form-data">
+                <input type="file" name="filename" id="filename">
+                <input type="submit" value="Upload" class="btn btn-primary">
+            </form>
+        </div>
+    </div>
+
+    <% IF pages %>
+    <div class="panel panel-primary">
+      <form method=get> 
+        <select name=offset value=<%curr_page%>>
+          <% i = 1%>
+          <% WHILE i <= pages%>
+            <% IF i == curr_page%>
+              <option value=<%i%> selected><%i%></option>
+            <% ELSE%>
+              <option value=<%i%>><%i%></option>
+            <% END %>
+            <% i= i+1%>
+          <% END %>
+        </select>
+        <input type=submit value=Get page class="btn btn-primary">
+      </form>
+    </div>
+  <% END %>
+
+  <% IF manuals %>
+    <table class="table table-bordered">
+      <th>Name</th>
+      <th></th>
+      <% FOREACH id IN manuals.keys.nsort %>
+        <tr>
+          <form method=post action=/manuals/<%id%>>
+          <td><% manuals.$id.name %></td>
+          </form>
+          <form method=delete action=/manuals/<%id%>>
+          <td><input type=submit value=Delete class="btn btn-danger"></td>
+          </form>
+        <tr>
+      <% END %>
+    </table>
+  <% END %>
+</div>
