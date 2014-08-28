@@ -1,0 +1,54 @@
+<div class="content panel panel-primary">
+    <div class="row">
+        <div class="col-md-8">    
+            <% IF pages %>
+            <div class="panel panel-primary">
+              <form method=get> 
+                <select name=offset value=<%curr_page%>>
+                  <% i = 1%>
+                  <% WHILE i <= pages%>
+                    <% IF i == curr_page%>
+                      <option value=<%i%> selected><%i%></option>
+                    <% ELSE%>
+                      <option value=<%i%>><%i%></option>
+                    <% END %>
+                    <% i= i+1%>
+                  <% END %>
+                </select>
+                <input type=submit value=Get page class="btn btn-primary">
+              </form>
+            </div>
+            <% END %>
+            
+            <% IF accounts %>
+            <table class="table table-bordered">  
+              <tr>
+                <th>Name</th>
+                <th>Rights</th>
+                <th></th>
+              </tr>
+              <% FOREACH id IN accounts.keys.nsort%>    
+                <tr>
+                  <td><%accounts.$id.name%></td>
+                  <form method=post action=/account_management>
+                    <input type="hidden" name="name" value="<%accounts.$id.name%>">
+                    <td>
+                      <select name=new_account_rights_<%accounts.$id.name%>>
+                        <option value="0" <%IF accounts.$id.rights == 0%>selected<%END%>>None</option>
+                        <option value="1" <%IF accounts.$id.rights == 1%>selected<%END%>>Read</option>
+                        <option value="2" <%IF accounts.$id.rights == 2%>selected<%END%>>Write</option>
+                        <option value="3" <%IF accounts.$id.rights == 3%>selected<%END%>>Read/Write</option>
+                        <option value="4" <%IF accounts.$id.rights == 4%>selected<%END%>>Manage</option>
+                        <option value="5" <%IF accounts.$id.rights == 5%>selected<%END%>>Manage/Read</option>
+                        <option value="6" <%IF accounts.$id.rights == 6%>selected<%END%>>Manage/Read/Write</option>
+                      </select>
+                    </td>
+                    <td><input type=submit value=Update class="btn btn-primary"></td>
+                  </form>
+                </tr>
+              <% END %>
+            </table>
+            <% END %>
+        </div>
+    </div>  
+</div>

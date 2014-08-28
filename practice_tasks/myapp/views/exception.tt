@@ -1,5 +1,11 @@
 <div class=content>
-	<div class="alert alert-danger" role="alert">	
-		<p>The item you want to create/modify already exists or is associated with some other items. Please change these associations and try again.</p>
-	</div>
+	<%IF admin_err%>
+		<div class="alert alert-danger" role="alert">
+			<p><%admin_err%></p>	
+		</div>
+	<%ELSE%>
+		<div class="alert alert-danger" role="alert">	
+			<p>The item you want to create/modify already exists or is associated with some other items. Please change these associations and try again.</p>
+		</div>
+	<%END%>
 </div>

@@ -11,9 +11,10 @@ use Dancer::Plugin::Email;
 our $VERSION = '0.1';
 
 my $current_user = '';
-my $dbh;
+my $user_is_admin = 0; 
 
 sub connect_db {
+	my $dbh;
 	$dbh = DBI->connect(
 		"dbi:Pg:dbname=myapp_db",
 		"martin",
@@ -28,6 +29,7 @@ sub connect_db {
 };
 
 sub findID {
+	my $dbh;
 	my $table = $_[0];
 	my $name_pattern = $_[1];
 	$dbh = connect_db();
@@ -57,6 +59,7 @@ sub validateDate {
 };
 
 any ['post', 'get'] => '/' => sub {
+	my $dbh;
 	try {	
 		$dbh = connect_db();
 		if (request->method() eq "POST"){
@@ -86,13 +89,13 @@ any ['post', 'get'] => '/' => sub {
 					'search_url' => uri_for('/search'),
 				};
 			}else{
-				$sth = $dbh->prepare("SELECT active FROM accounts 
+				$sth = $dbh->prepare("SELECT active, rights FROM accounts 
 										WHERE name = ?") or die $dbh->errstr;
 				$sth->execute(params->{'username'}) or die $sth->errstr;
 				$check = $sth->fetchrow_hashref() or die $sth->errstr;
 				$sth->finish();
 				$dbh->disconnect();
-				print STDERR "\n" . $check->{"active"} . "\n";
+				$user_is_admin = 1 if ($check->{'rights'} >= 4 && $check->{'rights'} <= 6); 
 				if ($check->{"active"} == 0){
 					redirect '/confirm_account';
 				}else{
@@ -100,6 +103,8 @@ any ['post', 'get'] => '/' => sub {
 				}
 			}
 		}else{
+			$dbh->disconnect() or die $dbh->errstr;
+
 			if (session 'logged_in') {
 				redirect '/types';
 			}else{
@@ -110,15 +115,18 @@ any ['post', 'get'] => '/' => sub {
 		}
 	}catch{
 		try {
+			debug $_;
 			$dbh->disconnect();
 			template 'exception';
 		}catch{
+			debug $_;
 			template 'exception';
 		};
 	};
 };
 
 any ['post', 'get'] => '/user_panel' => sub {
+	my $dbh;
 	try {
 		if (session 'logged_in'){
 			$dbh = connect_db();
@@ -153,7 +161,7 @@ any ['post', 'get'] => '/user_panel' => sub {
 						'computers_url' => uri_for('/computers'),
 						'parts_url' => uri_for('/parts'),
 						'manuals_url' => uri_for('/manuals'),
-						'search_url' => uri_for('/search')
+						'search_url' => uri_for('/search'),
 					};
 				}
 			}else{
@@ -172,7 +180,7 @@ any ['post', 'get'] => '/user_panel' => sub {
 					'computers_url' => uri_for('/computers'),
 					'parts_url' => uri_for('/parts'),
 					'manuals_url' => uri_for('/manuals'),
-					'search_url' => uri_for('/search')
+					'search_url' => uri_for('/search'),
 				};
 			}
 		}else{
@@ -180,15 +188,18 @@ any ['post', 'get'] => '/user_panel' => sub {
 		}
 	}catch{
 		try {
+			debug $_;
 			$dbh->disconnect();
 			template 'exception';
 		}catch{
+			debug $_;
 			template 'exception';
 		};
 	};	
 };
 
 any ['post', 'get'] => '/restore_password' => sub {
+	my $dbh;
 	try {
 		if (session 'logged_in'){
 			redirect '/';
@@ -235,15 +246,18 @@ any ['post', 'get'] => '/restore_password' => sub {
 		}
 	}catch{
 		try{
+			debug $_;
 			$dbh->disconnect();
 			template 'exception';
 		}catch{
+			debug $_;
 			template 'exception';
 		};
 	};
 };
 
 any ['post', 'get'] => '/register' => sub {
+	my $dbh;
 	try{
 		if (session 'logged_in'){
 			redirect '/';	
@@ -290,15 +304,18 @@ any ['post', 'get'] => '/register' => sub {
 		}
 	}catch{
 		try{
+			debug $_;
 			$dbh->disconnect();
 			template 'exception';
 		}catch{
+			debug $_;
 			template 'exception';
 		};
 	};
 };
 
 any ['post', 'get'] => '/confirm_account' => sub {
+	my $dbh;
 	try{
 		if(session 'logged_in') {
 			$dbh = connect_db();
@@ -317,7 +334,6 @@ any ['post', 'get'] => '/confirm_account' => sub {
 				$sth->execute($current_user) or die $sth->errstr;
 				my $code = $sth->fetchrow_hashref() or die $sth->errstr;
 				$sth->finish();
-				print STDERR "\n" . $code->{"confirm_code"} . "\n";
 				if ($code->{"confirm_code"} eq params->{"code"}){
 					my $sth = $dbh->prepare("UPDATE accounts SET active = TRUE
 											WHERE name = '$current_user'") or die $dbh->errstr;
@@ -345,9 +361,11 @@ any ['post', 'get'] => '/confirm_account' => sub {
 		}
 	}catch{
 		try{
+			debug $_;
 			$dbh->disconnect();
 			template 'exception';
 		}catch{
+			debug $_;
 			template 'exception';
 		};
 	};
@@ -355,8 +373,9 @@ any ['post', 'get'] => '/confirm_account' => sub {
 
 get '/logout' => sub {
 	if (session 'logged_in') {
-		$dbh->disconnect();
 		session->destroy();
+		$current_user = "";
+		$user_is_admin = 0;
 		redirect '/';
 	}else{
 		redirect '/';
@@ -364,6 +383,7 @@ get '/logout' => sub {
 };
 
 any ['post', 'get'] => '/types' => sub {
+	my $dbh;
 	try {	
 		if (session 'logged_in') {
 			$dbh = connect_db();
@@ -380,7 +400,8 @@ any ['post', 'get'] => '/types' => sub {
 				$offset = int(params->{'offset'})-1;
 			}
 			$sth = $dbh->prepare("SELECT * FROM types");
-			$sth->execute(); 
+			$sth->execute() or die $sth->errstr;
+			$sth->finish(); 
 			$pages =  int(($sth->rows()) / 10);
 			$pages++ if ($sth->rows % 10) != 0;
 			$sth = $dbh->prepare("SELECT id,name FROM types LIMIT 10 OFFSET ?") or die $dbh->errstr;
@@ -410,15 +431,18 @@ any ['post', 'get'] => '/types' => sub {
 		}
 	}catch{
 		try{
+			debug $_;
 			$dbh->disconnect();
 			template 'exception';
 		}catch{
+			debug $_;
 			template 'exception';
 		};
 	};
 };
 
 any ['post', 'get'] => '/types/:id' => sub {
+	my $dbh;
 	try {	
 		if (session 'logged_in'){
 			$dbh = connect_db();
@@ -443,9 +467,11 @@ any ['post', 'get'] => '/types/:id' => sub {
 		}
 	}catch{
 		try{
+			debug $_;
 			$dbh->disconnect();
 			template 'exception';
 		}catch{
+			debug $_;
 			template 'exception';
 		};
 	};
@@ -453,6 +479,7 @@ any ['post', 'get'] => '/types/:id' => sub {
 
 
 any ['post', 'get'] => '/models' => sub {
+	my $dbh;
 	try {
 		if (session 'logged_in') {
 			$dbh = connect_db();
@@ -462,10 +489,10 @@ any ['post', 'get'] => '/models' => sub {
 			my $typesHash = $sth->fetchall_hashref('id');
 			$sth->finish();
 			if (request->method() eq "POST"){
-				my $sth = $dbh->prepare("INSERT INTO models (name, type_id) values (?, ?)") or die $dbh->errstr;
+				$sth = $dbh->prepare("INSERT INTO models (name, type_id) values (?, ?)") or die $dbh->errstr;
 				$sth->execute(params->{'model_name'}, findID('types', params->{'type_select'}));
+				$dbh->commit;
 				$sth->finish();
-				$dbh->commit or die $dbh->errstr;
 				$dbh->disconnect();
 				redirect '/models';
 			}else{
@@ -485,6 +512,7 @@ any ['post', 'get'] => '/models' => sub {
 									WHERE models.type_id = types.id LIMIT 10 OFFSET ?");
 				$sth->execute($offset*10);
 				my $modelsHash = $sth->fetchall_hashref('id');
+				$sth->finish();
 				$dbh->disconnect();
 				template 'models', {
 					'types' => $typesHash,
@@ -509,15 +537,18 @@ any ['post', 'get'] => '/models' => sub {
 		}
 	}catch{
 		try{
+			debug $_;
 			$dbh->disconnect();
 			template 'exception';
 		}catch{
+			debug $_;
 			template 'exception';
 		};
 	};
 };
 
 any ['post', 'get'] => '/models/:id' => sub {
+	my $dbh;
 	try {	
 		if (session 'logged_in'){
 			$dbh = connect_db();
@@ -542,15 +573,18 @@ any ['post', 'get'] => '/models/:id' => sub {
 		}
 	}catch{
 		try{
+			debug $_;
 			$dbh->disconnect();
 			template 'exception';
 		}catch{
+			debug $_;
 			template 'exception';
 		};
 	};
 };
 
 any ['post', 'get'] => '/networks' => sub {
+	my $dbh;
 	try {
 		if (session 'logged_in') {
 			$dbh = connect_db();
@@ -600,15 +634,18 @@ any ['post', 'get'] => '/networks' => sub {
 		}
 	}catch{
 		try{
+			debug $_;
 			$dbh->disconnect();	
 			template 'exception';
 		}catch{
+			debug $_;
 			template 'exception';
 		};
 	}; 
 };
 
 any ['get', 'post'] => '/networks/:id' => sub {
+	my $dbh;
 	try {	
 		if (session 'logged_in'){
 			$dbh = connect_db();
@@ -633,15 +670,18 @@ any ['get', 'post'] => '/networks/:id' => sub {
 		}
 	}catch{
 		try{
+			debug $_;
 			$dbh->disconnect();
 			template 'exception';
 		}catch{
+			debug $_;
 			template 'exception';
 		};
 	};
 };
 
 any ['get', 'post'] => '/network_devices' => sub {
+	my $dbh;
 	try {
 		if (session 'logged_in') {
 			$dbh = connect_db();
@@ -701,15 +741,18 @@ any ['get', 'post'] => '/network_devices' => sub {
 		}
 	}catch{
 		try{
+			debug $_;
 			$dbh->disconnect();
 			template 'exception';
 		}catch{
+			debug $_;
 			template 'exception';
 		};
 	};
 };
 
 any ['get', 'post'] => '/network_devices/:id' => sub {
+	my $dbh;
 	try {	
 		if (session 'logged_in'){	
 			$dbh = connect_db();
@@ -734,15 +777,18 @@ any ['get', 'post'] => '/network_devices/:id' => sub {
 		}
 	}catch{
 		try{
+			debug $_;
 			$dbh->disconnect();
 			template 'exception';
 		}catch{
+			debug $_;
 			template 'exception';
 		};
 	};
 };
 
 any ['get', 'post'] => '/computers' => sub {
+	my $dbh;
 	try {
 		if (session 'logged_in') {
 			$dbh = connect_db();
@@ -802,15 +848,18 @@ any ['get', 'post'] => '/computers' => sub {
 		}
 	}catch{
 		try{	
+			debug $_;
 			$dbh->disconnect();
 			template 'exception';
 		}catch{
+			debug $_;
 			template 'exception';
 		};
 	};
 };
 
 any ['get', 'post'] => '/computers/:id' => sub {
+	my $dbh;
 	try {	
 		if (session 'logged_in'){	
 			$dbh = connect_db();
@@ -834,16 +883,19 @@ any ['get', 'post'] => '/computers/:id' => sub {
 			redirect '/';
 		}
 	}catch{
-		try{	
+		try{
+			debug $_;	
 			$dbh->disconnect();
 			template 'exception';
 		}catch{
+			debug $_;
 			template 'exception';
 		};
 	};
 };
 
 any ['get', 'post'] => '/parts' => sub {
+	my $dbh;
 	try {
 		if (session 'logged_in'){
 			$dbh = connect_db();
@@ -909,22 +961,25 @@ any ['get', 'post'] => '/parts' => sub {
 					'search_url' => uri_for('/search'),
 					'logged' => 'true',
 					'user' => $current_user
-				}			
+				};	
 			}
 		}else{
 			redirect '/';
 		}
 	}catch{	
 		try{
+			debug $_;
 			$dbh->disconnect();
 			template 'exception';
 		}catch{
+			debug $_;
 			template 'exception';
 		};
 	};
 };
 
 any ['get', 'post'] => '/parts/:id' => sub {
+	my $dbh;
 	try {	
 		if (session 'logged_in'){	
 			$dbh = connect_db();
@@ -949,15 +1004,18 @@ any ['get', 'post'] => '/parts/:id' => sub {
 		}
 	}catch{
 		try{
+			debug $_;
 			$dbh->disconnect();
 			template 'exception';
 		}catch{	
+			debug $_;
 			template 'exception';
 		};
 	};
 };
 
 any ['get', 'post'] => '/manuals' => sub {
+	my $dbh;
 	try {
 		if (session 'logged_in'){
 			$dbh = connect_db();
@@ -970,7 +1028,7 @@ any ['get', 'post'] => '/manuals' => sub {
 				$sth->execute($filename) or die $sth->errstr;
 				die if $sth->rows() > 0;
 				$sth->finish();
-				my $sth = $dbh->prepare("INSERT INTO manuals (name) values (?)") or die $dbh->errstr;
+				$sth = $dbh->prepare("INSERT INTO manuals (name) values (?)") or die $dbh->errstr;
 				$sth->execute($filename) or die $sth->errstr;
 				$sth->finish();
 				$dbh->commit;
@@ -1008,22 +1066,25 @@ any ['get', 'post'] => '/manuals' => sub {
 					'search_url' => uri_for('/search'),
 					'logged' => 'true',
 					'user' => $current_user
-				}
+				};
 			}
 		}else{
 			redirect '/';
 		}
 	}catch{	
 		try{
+			debug $_;
 			$dbh->disconnect();
 			template 'exception';
 		}catch{
+			debug $_;
 			template 'exception';
 		};
 	};
 };
 
 any ['get', 'post'] => '/manuals/:id' => sub {
+	my $dbh;
 	try {
 		if (session 'logged_in'){
 			my $id = params->{'id'};
@@ -1040,15 +1101,18 @@ any ['get', 'post'] => '/manuals/:id' => sub {
 		}
 	}catch{	
 		try{
+			debug $_;
 			$dbh->disconnect();
 			template 'exception';
 		}catch{
+			debug $_;
 			template 'exception';
 		};
 	};
 };
 
 any ['get', 'post'] => '/search' => sub {
+	my $dbh;
 	try {
 		if (session 'logged_in') {
 			$dbh = connect_db();
@@ -1078,7 +1142,7 @@ any ['get', 'post'] => '/search' => sub {
 					'search_url' => uri_for('/search'),
 					'logged' => 'true',
 					'user' => $current_user
-				}
+				};
 			}else{
 				template 'search.tt', {
 					'logout_url' => uri_for('/logout'),
@@ -1092,22 +1156,25 @@ any ['get', 'post'] => '/search' => sub {
 					'search_url' => uri_for('/search'),
 					'logged' => 'true',
 					'user' => $current_user
-				}
+				};
 			}
 		}else{
 			redirect '/';
 		}
 	}catch{
 		try{
+			debug $_;
 			$dbh->disconnect();
 			template 'exception';
 		}catch{
+			debug $_;
 			template 'exception';
 		};
 	};
 };
 
 any ['get', 'post'] => '/parts/edit/:id' => sub {
+	my $dbh;
 	try {
 		if (session 'logged_in') {
 			$dbh = connect_db();
@@ -1160,22 +1227,25 @@ any ['get', 'post'] => '/parts/edit/:id' => sub {
 					'search_url' => uri_for('/search'),
 					'logged' => 'true',
 					'user' => $current_user
-				}
+				};
 			}
 		}else{
 			redirect '/';
 		}
 	}catch{
 		try{
+			debug $_;
 			$dbh->disconnect();
 			template 'exception';
 		}catch{
+			debug $_;
 			template 'exception';
 		};
 	};
 };
 
 any ['get', 'post'] => '/computers/edit/:id' => sub {
+	my $dbh;
 	try {
 		if (session 'logged_in') {
 			$dbh = connect_db();
@@ -1217,22 +1287,25 @@ any ['get', 'post'] => '/computers/edit/:id' => sub {
 					'search_url' => uri_for('/search'),
 					'logged' => 'true',
 					'user' => $current_user
-				}
+				};
 			}
 		}else{
 			redirect '/';
 		}
 	}catch{
 		try{
+			debug $_;
 			$dbh->disconnect();
 			template 'exception';
-		}catch{	
+		}catch{
+			debug $_;	
 			template 'exception';
 		};
 	};
 };
 
 any ['get', 'post'] => '/network_devices/edit/:id' => sub {
+	my $dbh;
 	try {
 		if (session 'logged_in') {
 			$dbh = connect_db();
@@ -1274,22 +1347,25 @@ any ['get', 'post'] => '/network_devices/edit/:id' => sub {
 					'search_url' => uri_for('/search'),
 					'logged' => 'true',
 					'user' => $current_user
-				}
+				};
 			}
 		}else{
 			redirect '/';
 		}
 	}catch{
 		try{
+			debug $_;
 			$dbh->disconnect();
 			template 'exception';
 		}catch{
+			debug $_;
 			template 'exception';
 		};
 	};
 };
 
 any ['get', 'post'] => '/models/edit/:id' => sub {
+	my $dbh;
 	try {
 		if (session 'logged_in') {
 			$dbh = connect_db();
@@ -1330,6 +1406,74 @@ any ['get', 'post'] => '/models/edit/:id' => sub {
 					'search_url' => uri_for('/search'),
 					'logged' => 'true',
 					'user' => $current_user
+				};
+			}
+		}else{
+			redirect '/';
+		}
+	}catch{
+		try{
+			debug $_;
+			$dbh->disconnect();
+			template 'exception';
+		}catch{
+			debug $_;
+			template 'exception';
+		};
+	};
+};
+
+any ['get', 'post'] => '/account_management' => sub {
+	my $dbh;
+	try{
+		if(session 'logged_in'){
+			$dbh = connect_db();
+			if(request->method() eq "POST"){
+				my $name = params->{"name"};
+				my $sth = $dbh->prepare("UPDATE accounts SET rights = ? WHERE name = ?") or die $dbh->errstr;
+				$sth->execute(int(params->{"new_account_rights_$name"}), $name) or die $sth->errstr;
+				$dbh->commit or die $dbh->errstr;
+				$sth->finish();
+				$dbh->disconnect();
+				redirect '/account_management';
+			}else{
+				if (!$user_is_admin){
+					$dbh->disconnect();
+					template "exception", {"admin_err" => "You aren't an admin!"}; 
+				}else{
+					my ($pages, $offset);
+					if (!params->{'offset'}){
+						$offset = 0;
+					}else{
+						$offset = int(params->{'offset'})-1;
+					}
+					my $sth = $dbh->prepare("SELECT * FROM accounts");
+					$sth->execute() or die $sth->errstr; 
+					$pages = int(($sth->rows()) / 10);
+					$pages++ if ($sth->rows % 10) != 0;
+					$sth->finish();
+					$sth = $dbh->prepare("SELECT id, name, mail, rights FROM accounts
+											LIMIT 10 OFFSET ?") or die $dbh->errstr;
+					$sth->execute($offset*10) or die $sth->errstr;
+					my $accountsHash = $sth->fetchall_hashref('id');
+					$sth->finish();
+					$dbh->disconnect();
+					template 'account_management', {
+						'accounts' => $accountsHash,
+						'pages' => $pages,
+						'curr_page' => $offset+1,
+						'logout_url' => uri_for('/logout'),
+						'types_url' => uri_for('/types'),
+						'models_url' => uri_for('/models'),
+						'networks_url' => uri_for('/networks'),
+						'net_devices_url' => uri_for('/network_devices'),
+						'computers_url' => uri_for('/computers'),
+						'parts_url' => uri_for('/parts'),
+						'manuals_url' => uri_for('/manuals'),
+						'search_url' => uri_for('/search'),
+						'logged' => 'true',
+						'user' => $current_user
+					};
 				}
 			}
 		}else{
@@ -1337,9 +1481,11 @@ any ['get', 'post'] => '/models/edit/:id' => sub {
 		}
 	}catch{
 		try{
+			debug $_;
 			$dbh->disconnect();
 			template 'exception';
 		}catch{
+			debug $_;
 			template 'exception';
 		};
 	};

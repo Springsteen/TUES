@@ -4,7 +4,8 @@ CREATE TABLE accounts (
 	password varchar(50) not null,
 	mail varchar(100) unique not null,
 	confirm_code varchar(100),
-	active boolean
+	active boolean,
+	rights int CHECK(rights >= 0) CHECK(rights<=6) DEFAULT(3)
 );
 
 CREATE TABLE types (
