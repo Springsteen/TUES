@@ -10,11 +10,6 @@ use Dancer::Plugin::Email;
 
 our $VERSION = '0.1';
 
-my $current_user = '';
-my $user_is_admin = 0;
-my $user_can_read = 0;
-my $user_can_write = 0; 
-
 sub connect_db {
 	my $dbh;
 	$dbh = DBI->connect(
@@ -32,9 +27,10 @@ sub connect_db {
 
 sub checkUserRights {
 	my $rights = $_[0];
-	$user_is_admin = 1 if $rights & 4;
-	$user_can_write = 1 if $rights & 2;
-	$user_can_read = 1 if $rights & 1;
+	my $admin = 1 if $rights & 4;
+	my $write = 1 if $rights & 2;
+	my $read = 1 if $rights & 1;
+	return ($admin, $write, $read); 
 };
 
 sub findID {
@@ -78,7 +74,7 @@ any ['post', 'get'] => '/' => sub {
 			$sth->execute(params->{'username'}, md5_base64(params->{"password"}, params->{"username"})) or die $sth->errstr;
 			if ($sth->rows() > 0) {
 				session 'logged_in' => true;
-				$current_user = params->{'username'};
+				session current_user => params->{'username'};
 				$check = 1;
 			}
 		    $sth->finish();
@@ -104,7 +100,13 @@ any ['post', 'get'] => '/' => sub {
 				$check = $sth->fetchrow_hashref() or die $sth->errstr;
 				$sth->finish();
 				$dbh->disconnect();
-				checkUserRights($check->{'rights'});
+				my @rights = checkUserRights($check->{'rights'});
+				session user_can_read => $rights[2];
+				session user_can_write => $rights[1];
+				session user_is_admin => $rights[0];
+				# print STDERR Dumper(session 'user_can_read');
+				# print STDERR Dumper(session 'user_can_write');
+				# print STDERR Dumper(session 'user_is_admin'); 
 				if ($check->{"active"} == 0){
 					redirect '/confirm_account';
 				}else{
@@ -141,17 +143,17 @@ any ['post', 'get'] => '/user_panel' => sub {
 			$dbh = connect_db();
 			my $sth = $dbh->prepare("SELECT * FROM accounts 
 									WHERE name = ?") or die $dbh->errstr;
-			$sth->execute($current_user) or die $sth->errstr;
+			$sth->execute(session 'current_user') or die $sth->errstr;
 			my $user = $sth->fetchrow_hashref() or die $sth->errstr;
 			$sth->finish();
 			my $active = "yes";
 			$active = "no" if ($user->{"active"} == 0);
 			if (request->method() eq "POST"){
-				if ((md5_base64(params->{"old_pass"}, $current_user) eq $user->{"password"}) &&
+				if ((md5_base64(params->{"old_pass"}, session 'current_user') eq $user->{"password"}) &&
 					(params->{"new_pass_1"} eq params->{"new_pass_2"})){
 					$sth = $dbh->prepare("UPDATE accounts SET
 										password = ? WHERE name = ?") or die $dbh->errstr;
-					$sth->execute(md5_base64(params->{"new_pass_1"}, $current_user), $current_user) or die $sth->errstr;
+					$sth->execute(md5_base64(params->{"new_pass_1"}, session 'current_user'), session 'current_user') or die $sth->errstr;
 					$sth->finish();
 					$dbh->commit or die $dbh->errstr;
 					$dbh->disconnect();
@@ -330,7 +332,7 @@ any ['post', 'get'] => '/confirm_account' => sub {
 			$dbh = connect_db();
 			my $sth = $dbh->prepare("SELECT * FROM accounts WHERE
 										name = ? AND active = FALSE") or die $dbh->errstr;
-			$sth->execute($current_user) or die $sth->errstr;
+			$sth->execute(session 'current_user') or die $sth->errstr;
 			if ($sth->rows() < 1) {
 				$sth->finish();
 				$dbh->disconnect();
@@ -340,13 +342,13 @@ any ['post', 'get'] => '/confirm_account' => sub {
 			if (request->method() eq "POST"){
 				my $sth = $dbh->prepare("SELECT confirm_code FROM accounts WHERE
 										name = ? AND active = FALSE") or die $dbh->errstr;
-				$sth->execute($current_user) or die $sth->errstr;
+				$sth->execute(session 'current_user') or die $sth->errstr;
 				my $code = $sth->fetchrow_hashref() or die $sth->errstr;
 				$sth->finish();
 				if ($code->{"confirm_code"} eq params->{"code"}){
 					my $sth = $dbh->prepare("UPDATE accounts SET active = TRUE
-											WHERE name = '$current_user'") or die $dbh->errstr;
-					$sth->execute() or die $sth->errstr;
+											WHERE name = ?") or die $dbh->errstr;
+					$sth->execute(session 'current_user') or die $sth->errstr;
 					$sth->finish();
 					$dbh->commit or die $dbh->errstr;
 					$dbh->disconnect();
@@ -383,8 +385,6 @@ any ['post', 'get'] => '/confirm_account' => sub {
 get '/logout' => sub {
 	if (session 'logged_in') {
 		session->destroy();
-		$current_user = "";
-		$user_is_admin = 0;
 		redirect '/';
 	}else{
 		redirect '/';
@@ -394,9 +394,9 @@ get '/logout' => sub {
 any ['post', 'get'] => '/types' => sub {
 	my $dbh;
 	try {
-		if ((session 'logged_in') && ($user_can_read)) {
+		if ((session 'logged_in') && (session 'user_can_read')) {
 			$dbh = connect_db();
-			if ((request->method() eq "POST") && ($user_can_write)){
+			if ((request->method() eq "POST") && (session 'user_can_write')){
 				my $sth = $dbh->prepare("INSERT INTO types (name) values (?)") or die $dbh->errstr;	
 				$sth->execute(params->{'type_name'}) or die $sth->errstr;
 				$sth->finish();
@@ -433,7 +433,7 @@ any ['post', 'get'] => '/types' => sub {
 				'search_url' => uri_for('/search'),
 				'manuals_url' => uri_for('/manuals'),
 				'logged' => 'true',
-				'user' => $current_user
+				'user' => session 'current_user'
 			};
 		}else{
 			redirect '/';
@@ -454,7 +454,7 @@ any ['post', 'get'] => '/types/:id' => sub {
 	my $dbh;
 	try {	
 		if (session 'logged_in'){
-			if ($user_can_write){
+			if (session 'user_can_write'){
 				$dbh = connect_db();
 				if (request->method() eq "POST"){
 					my $id = params->{'id'};
@@ -494,14 +494,14 @@ any ['post', 'get'] => '/types/:id' => sub {
 any ['post', 'get'] => '/models' => sub {
 	my $dbh;
 	try {
-		if ((session 'logged_in') && ($user_can_read)) {
+		if ((session 'logged_in') && (session 'user_can_read')) {
 			$dbh = connect_db();
 			my $sth = $dbh->prepare("SELECT id, name FROM types") or die $dbh->errstr;
 			$sth->execute() or die $sth->errstr;
 			die if $sth->rows() < 1;
 			my $typesHash = $sth->fetchall_hashref('id');
 			$sth->finish();
-			if ((request->method() eq "POST") && ($user_can_write)){
+			if ((request->method() eq "POST") && (session 'user_can_write')){
 				$sth = $dbh->prepare("INSERT INTO models (name, type_id) values (?, ?)") or die $dbh->errstr;
 				$sth->execute(params->{'model_name'}, findID('types', params->{'type_select'}));
 				$dbh->commit;
@@ -542,7 +542,7 @@ any ['post', 'get'] => '/models' => sub {
 					'manuals_url' => uri_for('/manuals'),
 					'search_url' => uri_for('/search'),
 					'logged' => 'true',
-					'user' => $current_user
+					'user' => session 'current_user'
 				};
 			}
 		}else{
@@ -564,7 +564,7 @@ any ['post', 'get'] => '/models/:id' => sub {
 	my $dbh;
 	try {	
 		if (session 'logged_in'){
-			if ($user_can_write){	
+			if (session 'user_can_write'){	
 				$dbh = connect_db();
 				if (request->method() eq "POST"){
 					my $id = params->{'id'};
@@ -603,9 +603,9 @@ any ['post', 'get'] => '/models/:id' => sub {
 any ['post', 'get'] => '/networks' => sub {
 	my $dbh;
 	try {
-		if ((session 'logged_in') && ($user_can_read)) {
+		if ((session 'logged_in') && (session 'user_can_read')) {
 			$dbh = connect_db();
-			if ((request->method() eq "POST") && ($user_can_write)){
+			if ((request->method() eq "POST") && (session 'user_can_write')){
 				my $sth = $dbh->prepare("INSERT INTO networks (name) values (?)") or die $dbh->errstr;	
 				$sth->execute(params->{'network_name'}) or die $sth->errstr;
 				$sth->finish();
@@ -643,7 +643,7 @@ any ['post', 'get'] => '/networks' => sub {
 					'manuals_url' => uri_for('/manuals'),
 					'search_url' => uri_for('/search'),
 					'logged' => 'true',
-					'user' => $current_user
+					'user' => session 'current_user'
 				};
 			}
 		}else{
@@ -665,7 +665,7 @@ any ['get', 'post'] => '/networks/:id' => sub {
 	my $dbh;
 	try {	
 		if (session 'logged_in'){
-			if ($user_can_write){
+			if (session 'user_can_write'){
 				$dbh = connect_db();
 				if (request->method() eq "POST"){
 					my $id = params->{'id'};
@@ -704,14 +704,14 @@ any ['get', 'post'] => '/networks/:id' => sub {
 any ['get', 'post'] => '/network_devices' => sub {
 	my $dbh;
 	try {
-		if ((session 'logged_in') && ($user_can_read)) {
+		if ((session 'logged_in') && (session 'user_can_read')) {
 			$dbh = connect_db();
 			my $sth = $dbh->prepare("SELECT id, name FROM networks") or die $dbh->errstr;
 			$sth->execute() or die $sth->errstr;
 			die if $sth->rows() < 1;
 			my $networksHash = $sth->fetchall_hashref('id');
 			$sth->finish();
-			if ((request->method() eq "POST") && ($user_can_write)){
+			if ((request->method() eq "POST") && (session 'user_can_write')){
 				my $sth = $dbh->prepare("INSERT INTO network_devices (name, network_id) values (?, ?)") or die $dbh->errstr;
 				$sth->execute(params->{'net_device_name'}, findID('networks', params->{'network_select'}));
 				$sth->finish();
@@ -754,7 +754,7 @@ any ['get', 'post'] => '/network_devices' => sub {
 					'manuals_url' => uri_for('/manuals'),
 					'search_url' => uri_for('/search'),
 					'logged' => 'true',
-					'user' => $current_user
+					'user' => session 'current_user'
 				};
 			}
 		}else{
@@ -776,7 +776,7 @@ any ['get', 'post'] => '/network_devices/:id' => sub {
 	my $dbh;
 	try {	
 		if (session 'logged_in'){	
-			if ($user_can_write){
+			if (session 'user_can_write'){
 				$dbh = connect_db();
 				if (request->method() eq "POST"){
 					my $id = params->{'id'};
@@ -815,14 +815,14 @@ any ['get', 'post'] => '/network_devices/:id' => sub {
 any ['get', 'post'] => '/computers' => sub {
 	my $dbh;
 	try {
-		if ((session 'logged_in') && ($user_can_read)) {
+		if ((session 'logged_in') && (session 'user_can_read')) {
 			$dbh = connect_db();
 			my $sth = $dbh->prepare("SELECT id, name FROM networks") or die $dbh->errstr;
 			$sth->execute() or die $sth->errstr;
 			die if $sth->rows() < 1;
 			my $networksHash = $sth->fetchall_hashref('id');
 			$sth->finish();
-			if ((request->method() eq "POST") && ($user_can_write)){
+			if ((request->method() eq "POST") && (session 'user_can_write')){
 				my $sth = $dbh->prepare("INSERT INTO computers (name, network_id) values (?, ?)") or die $dbh->errstr;
 				$sth->execute(params->{'computer_name'}, findID('networks', params->{'network_select'}));
 				$sth->finish();
@@ -865,7 +865,7 @@ any ['get', 'post'] => '/computers' => sub {
 					'manuals_url' => uri_for('/manuals'),
 					'search_url' => uri_for('/search'),
 					'logged' => 'true',
-					'user' => $current_user
+					'user' => session 'current_user'
 				};
 			}
 		}else{
@@ -887,7 +887,7 @@ any ['get', 'post'] => '/computers/:id' => sub {
 	my $dbh;
 	try {	
 		if (session 'logged_in'){	
-			if ($user_can_write){	
+			if (session 'user_can_write'){	
 				$dbh = connect_db();
 				if (request->method() eq "POST"){
 					my $id = params->{'id'};
@@ -926,7 +926,7 @@ any ['get', 'post'] => '/computers/:id' => sub {
 any ['get', 'post'] => '/parts' => sub {
 	my $dbh;
 	try {
-		if ((session 'logged_in') && ($user_can_read)){
+		if ((session 'logged_in') && (session 'user_can_read')){
 			$dbh = connect_db();
 			my $sth = $dbh->prepare("SELECT id, name FROM models") or die $dbh->errstr;
 			$sth->execute() or die $sth->errstr;
@@ -938,7 +938,7 @@ any ['get', 'post'] => '/parts' => sub {
 			die if $sth->rows() < 1;
 			my $computersHash = $sth->fetchall_hashref('id');
 			$sth->finish();
-			if ((request->method() eq "POST") && ($user_can_write)){
+			if ((request->method() eq "POST") && (session 'user_can_write')){
 				die if (validateDate(params->{'part_waranty'}) != 1);
 				$sth = $dbh->prepare("INSERT INTO parts (name, model_id, computer_id, waranty) 
 										values (?, ?, ?, ?)") or die $dbh->errstr;
@@ -989,7 +989,7 @@ any ['get', 'post'] => '/parts' => sub {
 					'manuals_url' => uri_for('/manuals'),
 					'search_url' => uri_for('/search'),
 					'logged' => 'true',
-					'user' => $current_user
+					'user' => session 'current_user'
 				};	
 			}
 		}else{
@@ -1011,7 +1011,7 @@ any ['get', 'post'] => '/parts/:id' => sub {
 	my $dbh;
 	try {	
 		if (session 'logged_in'){	
-			if ($user_can_write){	
+			if (session 'user_can_write'){	
 				$dbh = connect_db();
 				if (request->method() eq "POST"){
 					my $id = params->{'id'};
@@ -1050,9 +1050,9 @@ any ['get', 'post'] => '/parts/:id' => sub {
 any ['get', 'post'] => '/manuals' => sub {
 	my $dbh;
 	try {
-		if ((session 'logged_in') && ($user_can_read)){
+		if ((session 'logged_in') && (session 'user_can_read')){
 			$dbh = connect_db();
-			if ((request->method() eq "POST") && ($user_can_write)){
+			if ((request->method() eq "POST") && (session 'user_can_write')){
 				my $public_dir = "/" . config->{"public"} . "/uploads";
 				my $filename = params->{"filename"};
 				my $file = upload("filename");
@@ -1098,7 +1098,7 @@ any ['get', 'post'] => '/manuals' => sub {
 					'manuals_url' => uri_for('/manuals'),
 					'search_url' => uri_for('/search'),
 					'logged' => 'true',
-					'user' => $current_user
+					'user' => session 'current_user'
 				};
 			}
 		}else{
@@ -1120,7 +1120,7 @@ any ['get', 'post'] => '/manuals/:id' => sub {
 	my $dbh;
 	try {
 		if (session 'logged_in'){
-			if ($user_can_write){
+			if (session 'user_can_write'){
 				my $id = params->{'id'};
 				$dbh = connect_db();
 				my $sth = $dbh->prepare("DELETE FROM manuals 
@@ -1149,7 +1149,7 @@ any ['get', 'post'] => '/manuals/:id' => sub {
 any ['get', 'post'] => '/search' => sub {
 	my $dbh;
 	try {
-		if ((session 'logged_in') && ($user_can_read)) {
+		if ((session 'logged_in') && (session 'user_can_read')) {
 			$dbh = connect_db();
 			if (request->method() eq "POST"){
 				my $db = params->{'select_db'};
@@ -1176,7 +1176,7 @@ any ['get', 'post'] => '/search' => sub {
 					'manuals_url' => uri_for('/manuals'),
 					'search_url' => uri_for('/search'),
 					'logged' => 'true',
-					'user' => $current_user
+					'user' => session 'current_user'
 				};
 			}else{
 				template 'search.tt', {
@@ -1190,7 +1190,7 @@ any ['get', 'post'] => '/search' => sub {
 					'manuals_url' => uri_for('/manuals'),
 					'search_url' => uri_for('/search'),
 					'logged' => 'true',
-					'user' => $current_user
+					'user' => session 'current_user'
 				};
 			}
 		}else{
@@ -1211,7 +1211,7 @@ any ['get', 'post'] => '/search' => sub {
 any ['get', 'post'] => '/parts/edit/:id' => sub {
 	my $dbh;
 	try {
-		if ((session 'logged_in') && ($user_can_read)) {
+		if ((session 'logged_in') && (session 'user_can_read')) {
 			$dbh = connect_db();
 			my $id = params->{'id'};
 			my $sth = $dbh->prepare("SELECT id, name FROM models") or die $dbh->errstr;
@@ -1224,7 +1224,7 @@ any ['get', 'post'] => '/parts/edit/:id' => sub {
 			die if $sth->rows() < 1;
 			my $computersHash = $sth->fetchall_hashref('id');
 			$sth->finish();
-			if ((request->method() eq "POST") && ($user_can_write)){
+			if ((request->method() eq "POST") && (session 'user_can_write')){
 				$sth = $dbh->prepare("UPDATE parts SET name = ?, waranty = ?,
 									model_id = ?, computer_id = ? WHERE id = ?") or die $dbh->errstr;
 				$sth->execute(params->{'part_name'}, 
@@ -1263,7 +1263,7 @@ any ['get', 'post'] => '/parts/edit/:id' => sub {
 					'manuals_url' => uri_for('/manuals'),
 					'search_url' => uri_for('/search'),
 					'logged' => 'true',
-					'user' => $current_user
+					'user' => session 'current_user'
 				};
 			}
 		}else{
@@ -1284,7 +1284,7 @@ any ['get', 'post'] => '/parts/edit/:id' => sub {
 any ['get', 'post'] => '/computers/edit/:id' => sub {
 	my $dbh;
 	try {
-		if ((session 'logged_in') && ($user_can_read)) {
+		if ((session 'logged_in') && (session 'user_can_read')) {
 			$dbh = connect_db();
 			my $id = params->{'id'};
 			my $sth = $dbh->prepare("SELECT id, name FROM networks") or die $dbh->errstr;
@@ -1292,7 +1292,7 @@ any ['get', 'post'] => '/computers/edit/:id' => sub {
 			die if $sth->rows() < 1;
 			my $networksHash = $sth->fetchall_hashref('id');
 			$sth->finish();
-			if ((request->method() eq "POST") && ($user_can_write)){
+			if ((request->method() eq "POST") && (session 'user_can_write')){
 				$sth = $dbh->prepare("UPDATE computers SET name = ?, network_id = ? WHERE id = ?") or die $dbh->errstr;
 				$sth->execute(params->{'computer_name'}, 
 							findID('networks', params->{'network_select'}),
@@ -1325,7 +1325,7 @@ any ['get', 'post'] => '/computers/edit/:id' => sub {
 					'manuals_url' => uri_for('/manuals'),
 					'search_url' => uri_for('/search'),
 					'logged' => 'true',
-					'user' => $current_user
+					'user' => session 'current_user'
 				};
 			}
 		}else{
@@ -1346,7 +1346,7 @@ any ['get', 'post'] => '/computers/edit/:id' => sub {
 any ['get', 'post'] => '/network_devices/edit/:id' => sub {
 	my $dbh;
 	try {
-		if ((session 'logged_in') && ($user_can_read)) {
+		if ((session 'logged_in') && (session 'user_can_read')) {
 			$dbh = connect_db();
 			my $id = params->{'id'};
 			my $sth = $dbh->prepare("SELECT id, name FROM networks") or die $dbh->errstr;
@@ -1354,7 +1354,7 @@ any ['get', 'post'] => '/network_devices/edit/:id' => sub {
 			die if $sth->rows() < 1;
 			my $networksHash = $sth->fetchall_hashref('id');
 			$sth->finish();
-			if ((request->method() eq "POST") && ($user_can_write)){
+			if ((request->method() eq "POST") && (session 'user_can_write')){
 				$sth = $dbh->prepare("UPDATE network_devices SET name = ?, network_id = ? WHERE id = ?") or die $dbh->errstr;
 				$sth->execute(params->{'network_device_name'}, 
 							findID('networks', params->{'network_select'}),
@@ -1387,7 +1387,7 @@ any ['get', 'post'] => '/network_devices/edit/:id' => sub {
 					'manuals_url' => uri_for('/manuals'),
 					'search_url' => uri_for('/search'),
 					'logged' => 'true',
-					'user' => $current_user
+					'user' => session 'current_user'
 				};
 			}
 		}else{
@@ -1408,7 +1408,7 @@ any ['get', 'post'] => '/network_devices/edit/:id' => sub {
 any ['get', 'post'] => '/models/edit/:id' => sub {
 	my $dbh;
 	try {
-		if ((session 'logged_in') && ($user_can_read)) {
+		if ((session 'logged_in') && (session 'user_can_read')) {
 			$dbh = connect_db();
 			my $id = params->{'id'};
 			my $sth = $dbh->prepare("SELECT id, name FROM types") or die $dbh->errstr;
@@ -1416,7 +1416,7 @@ any ['get', 'post'] => '/models/edit/:id' => sub {
 			die if $sth->rows() < 1;
 			my $typesHash = $sth->fetchall_hashref('id');
 			$sth->finish();
-			if ((request->method() eq "POST") && ($user_can_write)){
+			if ((request->method() eq "POST") && (session 'user_can_write')){
 				$sth = $dbh->prepare("UPDATE models SET name = ?, type_id = ? WHERE id = ?") or die $dbh->errstr;
 				$sth->execute(params->{'model_name'}, 
 							findID('types', params->{'type_select'}),
@@ -1448,7 +1448,7 @@ any ['get', 'post'] => '/models/edit/:id' => sub {
 					'manuals_url' => uri_for('/manuals'),
 					'search_url' => uri_for('/search'),
 					'logged' => 'true',
-					'user' => $current_user
+					'user' => session 'current_user'
 				};
 			}
 		}else{
@@ -1480,7 +1480,7 @@ any ['get', 'post'] => '/account_management' => sub {
 				$dbh->disconnect();
 				redirect '/account_management';
 			}else{
-				if (!$user_is_admin){
+				if (not session 'user_is_admin'){
 					$dbh->disconnect();
 					template "exception", {"admin_err" => "You aren't an admin!"}; 
 				}else{
@@ -1515,7 +1515,7 @@ any ['get', 'post'] => '/account_management' => sub {
 						'manuals_url' => uri_for('/manuals'),
 						'search_url' => uri_for('/search'),
 						'logged' => 'true',
-						'user' => $current_user
+						'user' => session 'current_user'
 					};
 				}
 			}
