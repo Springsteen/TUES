@@ -11,7 +11,9 @@ use Dancer::Plugin::Email;
 our $VERSION = '0.1';
 
 my $current_user = '';
-my $user_is_admin = 0; 
+my $user_is_admin = 0;
+my $user_can_read = 0;
+my $user_can_write = 0; 
 
 sub connect_db {
 	my $dbh;
@@ -26,6 +28,13 @@ sub connect_db {
 		}
 	);
 	return $dbh;
+};
+
+sub checkUserRights {
+	my $rights = $_[0];
+	$user_is_admin = 1 if $rights & 4;
+	$user_can_write = 1 if $rights & 2;
+	$user_can_read = 1 if $rights & 1;
 };
 
 sub findID {
@@ -95,7 +104,7 @@ any ['post', 'get'] => '/' => sub {
 				$check = $sth->fetchrow_hashref() or die $sth->errstr;
 				$sth->finish();
 				$dbh->disconnect();
-				$user_is_admin = 1 if ($check->{'rights'} >= 4 && $check->{'rights'} <= 6); 
+				checkUserRights($check->{'rights'});
 				if ($check->{"active"} == 0){
 					redirect '/confirm_account';
 				}else{
@@ -106,7 +115,7 @@ any ['post', 'get'] => '/' => sub {
 			$dbh->disconnect() or die $dbh->errstr;
 
 			if (session 'logged_in') {
-				redirect '/types';
+				redirect '/user_panel';
 			}else{
 				template 'home', {
 					'msg' => 0,
@@ -384,10 +393,10 @@ get '/logout' => sub {
 
 any ['post', 'get'] => '/types' => sub {
 	my $dbh;
-	try {	
-		if (session 'logged_in') {
+	try {
+		if ((session 'logged_in') && ($user_can_read)) {
 			$dbh = connect_db();
-			if (request->method() eq "POST"){
+			if ((request->method() eq "POST") && ($user_can_write)){
 				my $sth = $dbh->prepare("INSERT INTO types (name) values (?)") or die $dbh->errstr;	
 				$sth->execute(params->{'type_name'}) or die $sth->errstr;
 				$sth->finish();
@@ -445,21 +454,25 @@ any ['post', 'get'] => '/types/:id' => sub {
 	my $dbh;
 	try {	
 		if (session 'logged_in'){
-			$dbh = connect_db();
-			if (request->method() eq "POST"){
-				my $id = params->{'id'};
-				my $sth = $dbh->prepare("UPDATE types SET name = ? WHERE id = $id") or die $dbh->errstr;
-				$sth->execute(params->{"new_type_name_$id"}) or die $sth->errstr;
-				$sth->finish();
-				$dbh->commit or die	$dbh->errstr;
-				$dbh->disconnect();
-				redirect '/types';
+			if ($user_can_write){
+				$dbh = connect_db();
+				if (request->method() eq "POST"){
+					my $id = params->{'id'};
+					my $sth = $dbh->prepare("UPDATE types SET name = ? WHERE id = $id") or die $dbh->errstr;
+					$sth->execute(params->{"new_type_name_$id"}) or die $sth->errstr;
+					$sth->finish();
+					$dbh->commit or die	$dbh->errstr;
+					$dbh->disconnect();
+					redirect '/types';
+				}else{
+					my $sth = $dbh->prepare("DELETE FROM types WHERE id = ?") or die $dbh->errstr;	
+					$sth->execute(params->{'id'}) or die $sth->errstr;
+					$sth->finish();
+					$dbh->commit or die	$dbh->errstr;
+					$dbh->disconnect();
+					redirect '/types';
+				}
 			}else{
-				my $sth = $dbh->prepare("DELETE FROM types WHERE id = ?") or die $dbh->errstr;	
-				$sth->execute(params->{'id'}) or die $sth->errstr;
-				$sth->finish();
-				$dbh->commit or die	$dbh->errstr;
-				$dbh->disconnect();
 				redirect '/types';
 			}
 		}else{
@@ -481,14 +494,14 @@ any ['post', 'get'] => '/types/:id' => sub {
 any ['post', 'get'] => '/models' => sub {
 	my $dbh;
 	try {
-		if (session 'logged_in') {
+		if ((session 'logged_in') && ($user_can_read)) {
 			$dbh = connect_db();
 			my $sth = $dbh->prepare("SELECT id, name FROM types") or die $dbh->errstr;
 			$sth->execute() or die $sth->errstr;
 			die if $sth->rows() < 1;
 			my $typesHash = $sth->fetchall_hashref('id');
 			$sth->finish();
-			if (request->method() eq "POST"){
+			if ((request->method() eq "POST") && ($user_can_write)){
 				$sth = $dbh->prepare("INSERT INTO models (name, type_id) values (?, ?)") or die $dbh->errstr;
 				$sth->execute(params->{'model_name'}, findID('types', params->{'type_select'}));
 				$dbh->commit;
@@ -551,21 +564,25 @@ any ['post', 'get'] => '/models/:id' => sub {
 	my $dbh;
 	try {	
 		if (session 'logged_in'){
-			$dbh = connect_db();
-			if (request->method() eq "POST"){
-				my $id = params->{'id'};
-				my $sth = $dbh->prepare("UPDATE models SET name = ? WHERE id = $id") or die $dbh->errstr;	
-				$sth->execute(params->{"new_model_name_$id"}) or die $sth->errstr;
-				$sth->finish();
-				$dbh->commit or die	$dbh->errstr;
-				$dbh->disconnect();
-				redirect '/models';
+			if ($user_can_write){	
+				$dbh = connect_db();
+				if (request->method() eq "POST"){
+					my $id = params->{'id'};
+					my $sth = $dbh->prepare("UPDATE models SET name = ? WHERE id = $id") or die $dbh->errstr;	
+					$sth->execute(params->{"new_model_name_$id"}) or die $sth->errstr;
+					$sth->finish();
+					$dbh->commit or die	$dbh->errstr;
+					$dbh->disconnect();
+					redirect '/models';
+				}else{
+					my $sth = $dbh->prepare("DELETE FROM models WHERE id = ?") or die $dbh->errstr;	
+					$sth->execute(params->{'id'}) or die $sth->errstr;
+					$sth->finish();
+					$dbh->commit or die	$dbh->errstr;
+					$dbh->disconnect();
+					redirect '/models';
+				}
 			}else{
-				my $sth = $dbh->prepare("DELETE FROM models WHERE id = ?") or die $dbh->errstr;	
-				$sth->execute(params->{'id'}) or die $sth->errstr;
-				$sth->finish();
-				$dbh->commit or die	$dbh->errstr;
-				$dbh->disconnect();
 				redirect '/models';
 			}
 		}else{
@@ -586,9 +603,9 @@ any ['post', 'get'] => '/models/:id' => sub {
 any ['post', 'get'] => '/networks' => sub {
 	my $dbh;
 	try {
-		if (session 'logged_in') {
+		if ((session 'logged_in') && ($user_can_read)) {
 			$dbh = connect_db();
-			if (request->method() eq "POST"){
+			if ((request->method() eq "POST") && ($user_can_write)){
 				my $sth = $dbh->prepare("INSERT INTO networks (name) values (?)") or die $dbh->errstr;	
 				$sth->execute(params->{'network_name'}) or die $sth->errstr;
 				$sth->finish();
@@ -648,21 +665,25 @@ any ['get', 'post'] => '/networks/:id' => sub {
 	my $dbh;
 	try {	
 		if (session 'logged_in'){
-			$dbh = connect_db();
-			if (request->method() eq "POST"){
-				my $id = params->{'id'};
-				my $sth = $dbh->prepare("UPDATE networks SET name = ? WHERE id = $id") or die $dbh->errstr;	
-				$sth->execute(params->{"new_network_name_$id"}) or die $sth->errstr;
-				$sth->finish();
-				$dbh->commit or die	$dbh->errstr;
-				$dbh->disconnect();
-				redirect '/networks';
+			if ($user_can_write){
+				$dbh = connect_db();
+				if (request->method() eq "POST"){
+					my $id = params->{'id'};
+					my $sth = $dbh->prepare("UPDATE networks SET name = ? WHERE id = $id") or die $dbh->errstr;	
+					$sth->execute(params->{"new_network_name_$id"}) or die $sth->errstr;
+					$sth->finish();
+					$dbh->commit or die	$dbh->errstr;
+					$dbh->disconnect();
+					redirect '/networks';
+				}else{
+					my $sth = $dbh->prepare("DELETE FROM networks WHERE id = ?") or die $dbh->errstr;	
+					$sth->execute(params->{'id'}) or die $sth->errstr;
+					$sth->finish();
+					$dbh->commit or die	$dbh->errstr;
+					$dbh->disconnect();
+					redirect '/networks';
+				}
 			}else{
-				my $sth = $dbh->prepare("DELETE FROM networks WHERE id = ?") or die $dbh->errstr;	
-				$sth->execute(params->{'id'}) or die $sth->errstr;
-				$sth->finish();
-				$dbh->commit or die	$dbh->errstr;
-				$dbh->disconnect();
 				redirect '/networks';
 			}
 		}else{
@@ -683,14 +704,14 @@ any ['get', 'post'] => '/networks/:id' => sub {
 any ['get', 'post'] => '/network_devices' => sub {
 	my $dbh;
 	try {
-		if (session 'logged_in') {
+		if ((session 'logged_in') && ($user_can_read)) {
 			$dbh = connect_db();
 			my $sth = $dbh->prepare("SELECT id, name FROM networks") or die $dbh->errstr;
 			$sth->execute() or die $sth->errstr;
 			die if $sth->rows() < 1;
 			my $networksHash = $sth->fetchall_hashref('id');
 			$sth->finish();
-			if (request->method() eq "POST"){
+			if ((request->method() eq "POST") && ($user_can_write)){
 				my $sth = $dbh->prepare("INSERT INTO network_devices (name, network_id) values (?, ?)") or die $dbh->errstr;
 				$sth->execute(params->{'net_device_name'}, findID('networks', params->{'network_select'}));
 				$sth->finish();
@@ -755,21 +776,25 @@ any ['get', 'post'] => '/network_devices/:id' => sub {
 	my $dbh;
 	try {	
 		if (session 'logged_in'){	
-			$dbh = connect_db();
-			if (request->method() eq "POST"){
-				my $id = params->{'id'};
-				my $sth = $dbh->prepare("UPDATE network_devices SET name = ? WHERE id = $id") or die $dbh->errstr;	
-				$sth->execute(params->{"new_net_device_name_$id"}) or die $sth->errstr;
-				$sth->finish();
-				$dbh->commit or die	$dbh->errstr;
-				$dbh->disconnect();
-				redirect '/network_devices';
+			if ($user_can_write){
+				$dbh = connect_db();
+				if (request->method() eq "POST"){
+					my $id = params->{'id'};
+					my $sth = $dbh->prepare("UPDATE network_devices SET name = ? WHERE id = $id") or die $dbh->errstr;	
+					$sth->execute(params->{"new_net_device_name_$id"}) or die $sth->errstr;
+					$sth->finish();
+					$dbh->commit or die	$dbh->errstr;
+					$dbh->disconnect();
+					redirect '/network_devices';
+				}else{
+					my $sth = $dbh->prepare("DELETE FROM network_devices WHERE id = ?") or die $dbh->errstr;	
+					$sth->execute(params->{'id'}) or die $sth->errstr;
+					$sth->finish();
+					$dbh->commit or die	$dbh->errstr;
+					$dbh->disconnect();
+					redirect '/network_devices';
+				}
 			}else{
-				my $sth = $dbh->prepare("DELETE FROM network_devices WHERE id = ?") or die $dbh->errstr;	
-				$sth->execute(params->{'id'}) or die $sth->errstr;
-				$sth->finish();
-				$dbh->commit or die	$dbh->errstr;
-				$dbh->disconnect();
 				redirect '/network_devices';
 			}
 		}else{
@@ -790,14 +815,14 @@ any ['get', 'post'] => '/network_devices/:id' => sub {
 any ['get', 'post'] => '/computers' => sub {
 	my $dbh;
 	try {
-		if (session 'logged_in') {
+		if ((session 'logged_in') && ($user_can_read)) {
 			$dbh = connect_db();
 			my $sth = $dbh->prepare("SELECT id, name FROM networks") or die $dbh->errstr;
 			$sth->execute() or die $sth->errstr;
 			die if $sth->rows() < 1;
 			my $networksHash = $sth->fetchall_hashref('id');
 			$sth->finish();
-			if (request->method() eq "POST"){
+			if ((request->method() eq "POST") && ($user_can_write)){
 				my $sth = $dbh->prepare("INSERT INTO computers (name, network_id) values (?, ?)") or die $dbh->errstr;
 				$sth->execute(params->{'computer_name'}, findID('networks', params->{'network_select'}));
 				$sth->finish();
@@ -862,21 +887,25 @@ any ['get', 'post'] => '/computers/:id' => sub {
 	my $dbh;
 	try {	
 		if (session 'logged_in'){	
-			$dbh = connect_db();
-			if (request->method() eq "POST"){
-				my $id = params->{'id'};
-				my $sth = $dbh->prepare("UPDATE computers SET name = ? WHERE id = $id") or die $dbh->errstr;	
-				$sth->execute(params->{"new_computer_name_$id"}) or die $sth->errstr;
-				$sth->finish();
-				$dbh->commit or die	$dbh->errstr;
-				$dbh->disconnect();
-				redirect '/computers';
+			if ($user_can_write){	
+				$dbh = connect_db();
+				if (request->method() eq "POST"){
+					my $id = params->{'id'};
+					my $sth = $dbh->prepare("UPDATE computers SET name = ? WHERE id = $id") or die $dbh->errstr;	
+					$sth->execute(params->{"new_computer_name_$id"}) or die $sth->errstr;
+					$sth->finish();
+					$dbh->commit or die	$dbh->errstr;
+					$dbh->disconnect();
+					redirect '/computers';
+				}else{
+					my $sth = $dbh->prepare("DELETE FROM computers WHERE id = ?") or die $dbh->errstr;	
+					$sth->execute(params->{'id'}) or die $sth->errstr;
+					$sth->finish();
+					$dbh->commit or die	$dbh->errstr;
+					$dbh->disconnect();
+					redirect '/computers';
+				}
 			}else{
-				my $sth = $dbh->prepare("DELETE FROM computers WHERE id = ?") or die $dbh->errstr;	
-				$sth->execute(params->{'id'}) or die $sth->errstr;
-				$sth->finish();
-				$dbh->commit or die	$dbh->errstr;
-				$dbh->disconnect();
 				redirect '/computers';
 			}
 		}else{
@@ -897,7 +926,7 @@ any ['get', 'post'] => '/computers/:id' => sub {
 any ['get', 'post'] => '/parts' => sub {
 	my $dbh;
 	try {
-		if (session 'logged_in'){
+		if ((session 'logged_in') && ($user_can_read)){
 			$dbh = connect_db();
 			my $sth = $dbh->prepare("SELECT id, name FROM models") or die $dbh->errstr;
 			$sth->execute() or die $sth->errstr;
@@ -909,7 +938,7 @@ any ['get', 'post'] => '/parts' => sub {
 			die if $sth->rows() < 1;
 			my $computersHash = $sth->fetchall_hashref('id');
 			$sth->finish();
-			if (request->method() eq "POST"){
+			if ((request->method() eq "POST") && ($user_can_write)){
 				die if (validateDate(params->{'part_waranty'}) != 1);
 				$sth = $dbh->prepare("INSERT INTO parts (name, model_id, computer_id, waranty) 
 										values (?, ?, ?, ?)") or die $dbh->errstr;
@@ -982,21 +1011,25 @@ any ['get', 'post'] => '/parts/:id' => sub {
 	my $dbh;
 	try {	
 		if (session 'logged_in'){	
-			$dbh = connect_db();
-			if (request->method() eq "POST"){
-				my $id = params->{'id'};
-				my $sth = $dbh->prepare("UPDATE parts SET name = ?, waranty = ? WHERE id = $id") or die $dbh->errstr;	
-				$sth->execute(params->{"new_part_name_$id"}, params->{"new_part_waranty_$id"}) or die $sth->errstr;
-				$sth->finish();
-				$dbh->commit or die	$dbh->errstr;
-				$dbh->disconnect();
-				redirect '/parts';
+			if ($user_can_write){	
+				$dbh = connect_db();
+				if (request->method() eq "POST"){
+					my $id = params->{'id'};
+					my $sth = $dbh->prepare("UPDATE parts SET name = ?, waranty = ? WHERE id = $id") or die $dbh->errstr;	
+					$sth->execute(params->{"new_part_name_$id"}, params->{"new_part_waranty_$id"}) or die $sth->errstr;
+					$sth->finish();
+					$dbh->commit or die	$dbh->errstr;
+					$dbh->disconnect();
+					redirect '/parts';
+				}else{
+					my $sth = $dbh->prepare("DELETE FROM parts WHERE id = ?") or die $dbh->errstr;	
+					$sth->execute(params->{'id'}) or die $sth->errstr;
+					$sth->finish();
+					$dbh->commit or die	$dbh->errstr;
+					$dbh->disconnect();
+					redirect '/parts';
+				}
 			}else{
-				my $sth = $dbh->prepare("DELETE FROM parts WHERE id = ?") or die $dbh->errstr;	
-				$sth->execute(params->{'id'}) or die $sth->errstr;
-				$sth->finish();
-				$dbh->commit or die	$dbh->errstr;
-				$dbh->disconnect();
 				redirect '/parts';
 			}
 		}else{
@@ -1017,9 +1050,9 @@ any ['get', 'post'] => '/parts/:id' => sub {
 any ['get', 'post'] => '/manuals' => sub {
 	my $dbh;
 	try {
-		if (session 'logged_in'){
+		if ((session 'logged_in') && ($user_can_read)){
 			$dbh = connect_db();
-			if (request->method() eq "POST"){
+			if ((request->method() eq "POST") && ($user_can_write)){
 				my $public_dir = "/" . config->{"public"} . "/uploads";
 				my $filename = params->{"filename"};
 				my $file = upload("filename");
@@ -1087,14 +1120,16 @@ any ['get', 'post'] => '/manuals/:id' => sub {
 	my $dbh;
 	try {
 		if (session 'logged_in'){
-			my $id = params->{'id'};
-			$dbh = connect_db();
-			my $sth = $dbh->prepare("DELETE FROM manuals 
-									WHERE id = ?") or die $dbh->errstr;
-			$sth->execute($id) or die $sth->errstr;
-			$dbh->commit or die $dbh->errstr;
-			$sth->finish();
-			$dbh->disconnect();
+			if ($user_can_write){
+				my $id = params->{'id'};
+				$dbh = connect_db();
+				my $sth = $dbh->prepare("DELETE FROM manuals 
+										WHERE id = ?") or die $dbh->errstr;
+				$sth->execute($id) or die $sth->errstr;
+				$dbh->commit or die $dbh->errstr;
+				$sth->finish();
+				$dbh->disconnect();
+			}
 			redirect '/manuals';
 		}else{
 			redirect '/';
@@ -1114,7 +1149,7 @@ any ['get', 'post'] => '/manuals/:id' => sub {
 any ['get', 'post'] => '/search' => sub {
 	my $dbh;
 	try {
-		if (session 'logged_in') {
+		if ((session 'logged_in') && ($user_can_read)) {
 			$dbh = connect_db();
 			if (request->method() eq "POST"){
 				my $db = params->{'select_db'};
@@ -1176,7 +1211,7 @@ any ['get', 'post'] => '/search' => sub {
 any ['get', 'post'] => '/parts/edit/:id' => sub {
 	my $dbh;
 	try {
-		if (session 'logged_in') {
+		if ((session 'logged_in') && ($user_can_read)) {
 			$dbh = connect_db();
 			my $id = params->{'id'};
 			my $sth = $dbh->prepare("SELECT id, name FROM models") or die $dbh->errstr;
@@ -1189,7 +1224,7 @@ any ['get', 'post'] => '/parts/edit/:id' => sub {
 			die if $sth->rows() < 1;
 			my $computersHash = $sth->fetchall_hashref('id');
 			$sth->finish();
-			if (request->method() eq "POST"){
+			if ((request->method() eq "POST") && ($user_can_write)){
 				$sth = $dbh->prepare("UPDATE parts SET name = ?, waranty = ?,
 									model_id = ?, computer_id = ? WHERE id = ?") or die $dbh->errstr;
 				$sth->execute(params->{'part_name'}, 
@@ -1212,6 +1247,8 @@ any ['get', 'post'] => '/parts/edit/:id' => sub {
 									AND parts.id = ?") or die $dbh->errstr;
 				$sth->execute($id) or die $sth->errstr;
 				my $part = $sth->fetchall_arrayref();
+				$sth->finish();
+				$dbh->disconnect();
 				template 'edit_part.tt', {
 					'computers' => $computersHash,
 					'models' => $modelsHash,
@@ -1247,7 +1284,7 @@ any ['get', 'post'] => '/parts/edit/:id' => sub {
 any ['get', 'post'] => '/computers/edit/:id' => sub {
 	my $dbh;
 	try {
-		if (session 'logged_in') {
+		if ((session 'logged_in') && ($user_can_read)) {
 			$dbh = connect_db();
 			my $id = params->{'id'};
 			my $sth = $dbh->prepare("SELECT id, name FROM networks") or die $dbh->errstr;
@@ -1255,7 +1292,7 @@ any ['get', 'post'] => '/computers/edit/:id' => sub {
 			die if $sth->rows() < 1;
 			my $networksHash = $sth->fetchall_hashref('id');
 			$sth->finish();
-			if (request->method() eq "POST"){
+			if ((request->method() eq "POST") && ($user_can_write)){
 				$sth = $dbh->prepare("UPDATE computers SET name = ?, network_id = ? WHERE id = ?") or die $dbh->errstr;
 				$sth->execute(params->{'computer_name'}, 
 							findID('networks', params->{'network_select'}),
@@ -1273,6 +1310,8 @@ any ['get', 'post'] => '/computers/edit/:id' => sub {
 									AND computers.id = ?") or die $dbh->errstr;
 				$sth->execute($id) or die $sth->errstr;
 				my $computer = $sth->fetchall_arrayref();
+				$sth->finish();
+				$dbh->disconnect();
 				template 'edit_computer.tt', {
 					'networks' => $networksHash,
 					'computer' => $computer,
@@ -1307,7 +1346,7 @@ any ['get', 'post'] => '/computers/edit/:id' => sub {
 any ['get', 'post'] => '/network_devices/edit/:id' => sub {
 	my $dbh;
 	try {
-		if (session 'logged_in') {
+		if ((session 'logged_in') && ($user_can_read)) {
 			$dbh = connect_db();
 			my $id = params->{'id'};
 			my $sth = $dbh->prepare("SELECT id, name FROM networks") or die $dbh->errstr;
@@ -1315,7 +1354,7 @@ any ['get', 'post'] => '/network_devices/edit/:id' => sub {
 			die if $sth->rows() < 1;
 			my $networksHash = $sth->fetchall_hashref('id');
 			$sth->finish();
-			if (request->method() eq "POST"){
+			if ((request->method() eq "POST") && ($user_can_write)){
 				$sth = $dbh->prepare("UPDATE network_devices SET name = ?, network_id = ? WHERE id = ?") or die $dbh->errstr;
 				$sth->execute(params->{'network_device_name'}, 
 							findID('networks', params->{'network_select'}),
@@ -1333,6 +1372,8 @@ any ['get', 'post'] => '/network_devices/edit/:id' => sub {
 									AND network_devices.id = ?") or die $dbh->errstr;
 				$sth->execute($id) or die $sth->errstr;
 				my $device = $sth->fetchall_arrayref();
+				$sth->finish();
+				$dbh->disconnect();
 				template 'edit_network_device.tt', {
 					'networks' => $networksHash,
 					'device' => $device,
@@ -1367,7 +1408,7 @@ any ['get', 'post'] => '/network_devices/edit/:id' => sub {
 any ['get', 'post'] => '/models/edit/:id' => sub {
 	my $dbh;
 	try {
-		if (session 'logged_in') {
+		if ((session 'logged_in') && ($user_can_read)) {
 			$dbh = connect_db();
 			my $id = params->{'id'};
 			my $sth = $dbh->prepare("SELECT id, name FROM types") or die $dbh->errstr;
@@ -1375,7 +1416,7 @@ any ['get', 'post'] => '/models/edit/:id' => sub {
 			die if $sth->rows() < 1;
 			my $typesHash = $sth->fetchall_hashref('id');
 			$sth->finish();
-			if (request->method() eq "POST"){
+			if ((request->method() eq "POST") && ($user_can_write)){
 				$sth = $dbh->prepare("UPDATE models SET name = ?, type_id = ? WHERE id = ?") or die $dbh->errstr;
 				$sth->execute(params->{'model_name'}, 
 							findID('types', params->{'type_select'}),
@@ -1392,6 +1433,8 @@ any ['get', 'post'] => '/models/edit/:id' => sub {
 									AND models.id = ?") or die $dbh->errstr;
 				$sth->execute($id) or die $sth->errstr;
 				my $model = $sth->fetchall_arrayref();
+				$sth->finish();
+				$dbh->disconnect();
 				template 'edit_model.tt', {
 					'types' => $typesHash,
 					'model' => $model,

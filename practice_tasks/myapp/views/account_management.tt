@@ -36,11 +36,8 @@
                       <select name=new_account_rights_<%accounts.$id.name%>>
                         <option value="0" <%IF accounts.$id.rights == 0%>selected<%END%>>None</option>
                         <option value="1" <%IF accounts.$id.rights == 1%>selected<%END%>>Read</option>
-                        <option value="2" <%IF accounts.$id.rights == 2%>selected<%END%>>Write</option>
                         <option value="3" <%IF accounts.$id.rights == 3%>selected<%END%>>Read/Write</option>
-                        <option value="4" <%IF accounts.$id.rights == 4%>selected<%END%>>Manage</option>
-                        <option value="5" <%IF accounts.$id.rights == 5%>selected<%END%>>Manage/Read</option>
-                        <option value="6" <%IF accounts.$id.rights == 6%>selected<%END%>>Manage/Read/Write</option>
+                        <option value="7" <%IF accounts.$id.rights == 7%>selected<%END%>>Manage/Read/Write</option>
                       </select>
                     </td>
                     <td><input type=submit value=Update class="btn btn-primary"></td>
