@@ -1,0 +1,32 @@
+[9737]  core @0.000021> loading Dancer::Handler::Standalone handler in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 45
+[9737]  core @0.000266> loading handler 'Dancer::Handler::Standalone' in /usr/local/share/perl/5.18.2/Dancer.pm l. 483
+[9737]  core @0.000254> request: GET /register from 127.0.0.1 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 56
+[9737]  core @0.000914> [hit #1]Trying to match 'GET /register' against /^\/$/ (generated from '/') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[9737]  core @0.001141> [hit #1]Trying to match 'GET /register' against /^\/user_panel$/ (generated from '/user_panel') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[9737]  core @0.001303> [hit #1]Trying to match 'GET /register' against /^\/restore_password$/ (generated from '/restore_password') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[9737]  core @0.001464> [hit #1]Trying to match 'GET /register' against /^\/register$/ (generated from '/register') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[9737]  core @0.001613> [hit #1]  --> got 1 in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 101
+[9737]  core @0.053771> [hit #1]response: 200 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 181
+[9737]  core @0.000212> request: POST /register from 127.0.0.1 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 56
+[9737]  core @0.000815> [hit #2]Trying to match 'POST /register' against /^\/$/ (generated from '/') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[9737]  core @0.001034> [hit #2]Trying to match 'POST /register' against /^\/user_panel$/ (generated from '/user_panel') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[9737]  core @0.001242> [hit #2]Trying to match 'POST /register' against /^\/restore_password$/ (generated from '/restore_password') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[9737]  core @0.001446> [hit #2]Trying to match 'POST /register' against /^\/register$/ (generated from '/register') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[9737]  core @0.001630> [hit #2]  --> got 1 in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 101
+[9737] debug @0.006444> [hit #2]Died at /home/martin/Desktop/TUES/practice_tasks/myapp/lib/myapp.pm line 280. in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/myapp.pm l. 319
+[9737]  core @0.013537> [hit #2]response: 200 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 181
+[9737]  core @0.000287> request: POST /register from 127.0.0.1 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 56
+[9737]  core @0.001395> [hit #3]Trying to match 'POST /register' against /^\/$/ (generated from '/') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[9737]  core @0.001920> [hit #3]Trying to match 'POST /register' against /^\/user_panel$/ (generated from '/user_panel') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[9737]  core @0.002398> [hit #3]Trying to match 'POST /register' against /^\/restore_password$/ (generated from '/restore_password') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[9737]  core @0.002829> [hit #3]Trying to match 'POST /register' against /^\/register$/ (generated from '/register') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[9737]  core @0.003138> [hit #3]  --> got 1 in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 101
+[9737]  core @0.106365> [hit #3]response: 200 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 181
+[9737]  core @0.000270> request: GET / from 127.0.0.1 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 56
+[9737]  core @0.001087> [hit #4]Trying to match 'GET /' against /^\/$/ (generated from '/') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[9737]  core @0.001395> [hit #4]  --> got 1 in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 101
+[9737]  core @0.009235> [hit #4]response: 200 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 181
+[9737]  core @0.000175> request: GET / from 127.0.0.1 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 56
+[9737]  core @0.000662> [hit #5]Trying to match 'GET /' against /^\/$/ (generated from '/') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[9737]  core @0.000831> [hit #5]  --> got 1 in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 101
+[9737]  core @0.007073> [hit #5]response: 200 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 181

@@ -277,6 +277,7 @@ any ['post', 'get'] => '/register' => sub {
 			if (request->method() eq "POST"){
 				my $check = (params->{"password_1"} eq params->{"password_2"});
 				die if !$check;
+				die if (!(params->{"mail"} =~ /[-0-9a-zA-Z.+_]+@[-0-9a-zA-Z.+_]+\.[a-zA-Z]{2,4}/) );
 				$check = 1;
 				my $sth = $dbh->prepare("SELECT * FROM accounts WHERE
 										name = ?") or die $dbh->errstr;
