@@ -1,4 +1,5 @@
 # use strict;
+# IS NOT READY !!!
 my $n = 0;
 while (($n < 2 ) || ($n > 3)){
 	$n = <>;
