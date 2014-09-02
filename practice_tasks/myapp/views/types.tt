@@ -1,49 +1,61 @@
 <div class="content panel">
-  <div class="panel panel-primary">
-    <div class=input-group>
-      <form method=post>
-      Type name:<br>
-      <input type=text name=type_name class=form-control><br><br>
-      <input type=submit value=Save class="btn btn-primary">
-      </form>
-    </div>
-  </div>
-  
-  <% IF pages %>
     <div class="panel panel-primary">
-      <form method=get> 
-        <select name=offset value=<%curr_page%>>
-          <% i = 1%>
-          <% WHILE i <= pages%>
-            <% IF i == curr_page%>
-              <option value=<%i%> selected><%i%></option>
-            <% ELSE%>
-              <option value=<%i%>><%i%></option>
-            <% END %>
-            <% i= i+1%>
-          <% END %>
-        </select>
-        <input type=submit value=Get page class="btn btn-primary">
-      </form>
+        <div class=input-group>
+            <form method=post>
+                <%FOREACH field IN tableInfo %>
+                    <% IF field != "id" %>
+                        Type <% field %>:<br>
+                        <input type=text name=type_<% field %> class=form-control><br><br>
+                    <% END %>
+                <% END %>
+                <input type=submit value=Save class="btn btn-primary">
+            </form>
+        </div>
     </div>
-  <% END %>
+  
+    <% IF pages %>
+        <div class="panel panel-primary">
+            <form method=get> 
+                <select name=offset value=<%curr_page%>>
+                <% i = 1 %>
+                <% WHILE i <= pages %>
+                    <% IF i == curr_page %>
+                        <option value=<% i %> selected><% i %></option>
+                    <% ELSE %>
+                        <option value=<% i %>><% i %></option>
+                    <% END %>
+                    <% i = i+1 %>
+                <% END %>
+                </select>
+                <input type=submit value=Get page class="btn btn-primary">
+            </form>
+        </div>
+    <% END %>
 
-  <% IF types %>
-    <table class="table table-bordered">
-      <th>Name</th>
-      <th></th>
-      <th></th>
-      <% FOREACH id IN types.keys.nsort %>
-        <tr>
-          <form method=post action=/types/<%id%>>
-          <td><input type=text name=new_type_name_<%id%> value=<% types.$id.name %> class="form-control field"></td>
-          <td><input type=submit value=Update class="btn btn-primary"></td>
-          </form>
-          <form method=delete action=/types/<%id%>>
-          <td><input type=submit value=Delete class="btn btn-danger"></td>
-          </form>
-        <tr>
-      <% END %>
-    </table>
-  <% END %>
+    <% IF types %>
+        <table class="table table-bordered">
+            <% FOREACH key IN types.values.first.keys.sort%>
+                <% IF key != "id" %>
+                    <th><% key %></th>
+                <% END %>
+            <% END %>
+            <th></th>
+            <th></th>
+            <% FOREACH id IN types.keys.nsort %>
+                <tr>
+                <% FOREACH elem IN types.$id %>  
+                    <% IF elem.key != "id" %>
+                        <form method=post action=/types/<%id%>>
+                            <td><input type=text name=new_type_<% elem.key %>_<%id%> value=<% elem.value %> class="form-control field"></td>
+                            <td><input type=submit value=Update class="btn btn-primary"></td>
+                        </form>
+                    <% END %>
+                <% END %>
+                <form method=delete action=/types/<%id%>>
+                    <td><input type=submit value=Delete class="btn btn-danger"></td>
+                </form>
+                <tr>
+            <% END %>
+        </table>
+    <% END %>
 </div>

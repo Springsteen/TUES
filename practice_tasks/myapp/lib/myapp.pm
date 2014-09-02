@@ -103,10 +103,7 @@ any ['post', 'get'] => '/' => sub {
 				my @rights = checkUserRights($check->{'rights'});
 				session user_can_read => $rights[2];
 				session user_can_write => $rights[1];
-				session user_is_admin => $rights[0];
-				# print STDERR Dumper(session 'user_can_read');
-				# print STDERR Dumper(session 'user_can_write');
-				# print STDERR Dumper(session 'user_is_admin'); 
+				session user_is_admin => $rights[0]; 
 				if ($check->{"active"} == 0){
 					redirect '/confirm_account';
 				}else{
@@ -417,10 +414,13 @@ any ['post', 'get'] => '/types' => sub {
 			$sth = $dbh->prepare("SELECT id,name FROM types LIMIT 10 OFFSET ?") or die $dbh->errstr;
 			$sth->execute(($offset)*10) or die $sth->errstr;
 			my $typesHash = $sth->fetchall_hashref('id');
+			$sth = $dbh->prepare("SELECT * FROM types WHERE 1=0");
+			$sth->execute() or die $sth->errstr;
+			my $tableInfo = $sth->{NAME};
 			$sth->finish();
 			$dbh->disconnect();
-
 			template 'types', {
+				'tableInfo' => $tableInfo,
 				'types' => $typesHash,
 				'pages' => $pages,
 				'curr_page' => $offset+1,

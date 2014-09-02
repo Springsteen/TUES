@@ -1,26 +1,30 @@
 <div class="content panel panel-primary">
-  <% IF msg %>
-    <div class="alert alert-success"><% msg %></div>
-  <% END %>
-  <div class=panel panel-header>
-    <p>Username: <%user%></p>
-    <p>User's email address: <%mail%></p>
-    <% IF active == "no" %>
-      <p>Your email is not active. You can activate it from <a href="<% request.uri_base %>/confirm_account">here</a></p>
-    <% ELSE %>
-      <p>Your mail is active</p>
+    <% IF msg %>
+        <div class="alert alert-success"><% msg %></div>
     <% END %>
-  </div>
-  <div class=input-group>
-    <form method=post action="/user_panel">
-      Current password:<br>
-      <input type=password name=old_pass class=form-control><br><br>
-      New password:<br>
-      <input type=password name=new_pass_1 class=form-control><br><br>
-      Repeat new password:<br>
-      <input type=password name=new_pass_2 class=form-control><br><br>
-      <input type=submit value=Change class="btn btn-primary">
-    </form>
-  </div>
-  <a href="<% request.uri_base %>/account_management">Account Management</a>
+      
+    <div class=panel panel-header>
+        <p>Username: <% user %></p>
+        <p>User's email address: <% mail %></p>
+        <% IF active == "no" %>
+            <p>Your email is not active. You can activate it from <a href="<% request.uri_base %>/confirm_account">here</a></p>
+        <% ELSE %>
+            <p>Your mail is active</p>
+        <% END %>
+    </div>
+
+    <div class=input-group>
+        <form method=post action="/user_panel">
+            Current password:<br>
+            <input type=password name=old_pass class=form-control><br><br>
+            New password:<br>
+            <input type=password name=new_pass_1 class=form-control><br><br>
+            Repeat new password:<br>
+            <input type=password name=new_pass_2 class=form-control><br><br>
+            <input type=submit value=Change class="btn btn-primary">
+        </form>
+    </div>
+
+    <a href="<% request.uri_base %>/account_management">Account Management</a>
+
 </div>
