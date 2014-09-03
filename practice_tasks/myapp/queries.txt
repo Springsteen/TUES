@@ -1,3 +1,9 @@
+CREATE TABLE languages (
+	id serial primary key,
+	abbreviation varchar(2),
+	name_en varchar(50)
+);
+
 CREATE TABLE accounts (
 	id serial primary key,
 	name varchar(50) unique not null,
@@ -5,7 +11,8 @@ CREATE TABLE accounts (
 	mail varchar(100) unique not null,
 	confirm_code varchar(100),
 	active boolean,
-	rights int CHECK(rights >= 0) CHECK(rights<=7) DEFAULT(3)
+	rights int CHECK(rights >= 0) CHECK(rights<=7) DEFAULT(3),
+	interface_language int references languages(id)
 );
 
 CREATE TABLE types (

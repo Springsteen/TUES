@@ -105,8 +105,11 @@ any ['post', 'get'] => '/' => sub {
 					'search_url' => uri_for('/search'),
 				};
 			}else{
-				$sth = $dbh->prepare("SELECT active, rights FROM accounts 
-										WHERE name = ?") or die $dbh->errstr;
+				$sth = $dbh->prepare("SELECT accounts.active, accounts.rights, 
+									languages.abbreviation AS lang 
+									FROM accounts, languages 
+									WHERE accounts.name = ? 
+									AND accounts.interface_language = languages.id") or die $dbh->errstr;
 				$sth->execute(params->{'username'}) or die $sth->errstr;
 				$check = $sth->fetchrow_hashref() or die $sth->errstr;
 				$sth->finish();
@@ -114,7 +117,8 @@ any ['post', 'get'] => '/' => sub {
 				my @rights = checkUserRights($check->{'rights'});
 				session user_can_read => $rights[2];
 				session user_can_write => $rights[1];
-				session user_is_admin => $rights[0]; 
+				session user_is_admin => $rights[0];
+				session user_current_lang => $check->{'lang'};
 				if ($check->{"active"} == 0){
 					redirect '/confirm_account';
 				}else{
@@ -294,10 +298,15 @@ any ['post', 'get'] => '/register' => sub {
 				$sth->finish();
 				if ($check) {
 					my $confirm_code = random_string("..........");
-					$sth = $dbh->prepare("INSERT INTO accounts (name, password, mail, confirm_code, active) 
-										values (?, ?, ?, ?, ?)") or die $sth->errstr;
+					$sth = $dbh->prepare("SELECT id FROM languages WHERE abbreviation = 'en'") or die $sth->errstr;
+					$sth->execute() or die $sth->errstr;
+					my @lang_id = $sth->fetchrow_arrayref();
+					$sth->finish();
+					$sth = $dbh->prepare("INSERT INTO accounts (name, password, mail, confirm_code, 
+																active, interface_language) 
+										values (?, ?, ?, ?, ?, ?)") or die $sth->errstr;
 					$sth->execute(params->{"username"}, md5_base64(params->{"password_1"}, params->{"username"}), 
-								params->{"mail"}, $confirm_code, "FALSE") or die $sth->errstr;
+								params->{"mail"}, $confirm_code, "FALSE", int($lang_id[0][0])) or die $sth->errstr;
 					$sth->finish();
 					$dbh->commit or die $dbh->errstr;
 					$dbh->disconnect();
