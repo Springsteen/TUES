@@ -361,3 +361,279 @@ DETAIL:  Key (interface_language)=(67167496) is not present in table "languages"
 [10420]  core @0.001539> [hit #3]Trying to match 'GET /types' against /^\/types$/ (generated from '/types') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
 [10420]  core @0.001657> [hit #3]  --> got 1 in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 101
 [10420]  core @0.024689> [hit #3]response: 200 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 181
+[10477]  core @0.000015> loading Dancer::Handler::Standalone handler in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 45
+[10477]  core @0.000244> loading handler 'Dancer::Handler::Standalone' in /usr/local/share/perl/5.18.2/Dancer.pm l. 483
+[10477]  core @0.000180> request: GET /user_panel from 127.0.0.1 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 56
+[10477]  core @0.000715> [hit #1]Trying to match 'GET /user_panel' against /^\/$/ (generated from '/') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.000923> [hit #1]Trying to match 'GET /user_panel' against /^\/user_panel$/ (generated from '/user_panel') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.001074> [hit #1]  --> got 1 in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 101
+[10477]  core @0.012031> [hit #1]response: 302 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 181
+[10477]  core @0.000207> request: GET / from 127.0.0.1 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 56
+[10477]  core @0.000777> [hit #2]Trying to match 'GET /' against /^\/$/ (generated from '/') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.000991> [hit #2]  --> got 1 in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 101
+[10477]  core @0.052460> [hit #2]response: 200 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 181
+[10477]  core @0.000260> request: POST / from 127.0.0.1 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 56
+[10477]  core @0.001288> [hit #3]Trying to match 'POST /' against /^\/$/ (generated from '/') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.001879> [hit #3]  --> got 1 in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 101
+[10477]  core @0.013897> [hit #3]response: 302 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 181
+[10477]  core @0.000219> request: GET /types from 127.0.0.1 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 56
+[10477]  core @0.000897> [hit #4]Trying to match 'GET /types' against /^\/$/ (generated from '/') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.001099> [hit #4]Trying to match 'GET /types' against /^\/user_panel$/ (generated from '/user_panel') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.001324> [hit #4]Trying to match 'GET /types' against /^\/restore_password$/ (generated from '/restore_password') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.001509> [hit #4]Trying to match 'GET /types' against /^\/register$/ (generated from '/register') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.001690> [hit #4]Trying to match 'GET /types' against /^\/confirm_account$/ (generated from '/confirm_account') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.001871> [hit #4]Trying to match 'GET /types' against /^\/logout$/ (generated from '/logout') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.002050> [hit #4]Trying to match 'GET /types' against /^\/types$/ (generated from '/types') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.002214> [hit #4]  --> got 1 in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 101
+[10477]  core @0.026332> [hit #4]response: 200 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 181
+[10477]  core @0.000290> request: GET /user_panel from 127.0.0.1 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 56
+[10477]  core @0.001170> [hit #5]Trying to match 'GET /user_panel' against /^\/$/ (generated from '/') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.001569> [hit #5]Trying to match 'GET /user_panel' against /^\/user_panel$/ (generated from '/user_panel') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.001905> [hit #5]  --> got 1 in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 101
+[10477]  core @0.019074> [hit #5]response: 200 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 181
+[10477]  core @0.000211> request: GET /account_management from 127.0.0.1 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 56
+[10477]  core @0.000837> [hit #6]Trying to match 'GET /account_management' against /^\/$/ (generated from '/') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.001062> [hit #6]Trying to match 'GET /account_management' against /^\/user_panel$/ (generated from '/user_panel') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.001246> [hit #6]Trying to match 'GET /account_management' against /^\/restore_password$/ (generated from '/restore_password') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.001416> [hit #6]Trying to match 'GET /account_management' against /^\/register$/ (generated from '/register') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.001596> [hit #6]Trying to match 'GET /account_management' against /^\/confirm_account$/ (generated from '/confirm_account') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.001774> [hit #6]Trying to match 'GET /account_management' against /^\/logout$/ (generated from '/logout') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.001945> [hit #6]Trying to match 'GET /account_management' against /^\/types$/ (generated from '/types') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.002157> [hit #6]Trying to match 'GET /account_management' against /^\/types\/([^\/]+)$/ (generated from '/types/:id') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.002368> [hit #6]Trying to match 'GET /account_management' against /^\/models$/ (generated from '/models') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.002538> [hit #6]Trying to match 'GET /account_management' against /^\/models\/([^\/]+)$/ (generated from '/models/:id') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.002702> [hit #6]Trying to match 'GET /account_management' against /^\/networks$/ (generated from '/networks') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.002859> [hit #6]Trying to match 'GET /account_management' against /^\/networks\/([^\/]+)$/ (generated from '/networks/:id') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.003045> [hit #6]Trying to match 'GET /account_management' against /^\/network_devices$/ (generated from '/network_devices') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.003207> [hit #6]Trying to match 'GET /account_management' against /^\/network_devices\/([^\/]+)$/ (generated from '/network_devices/:id') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.003371> [hit #6]Trying to match 'GET /account_management' against /^\/computers$/ (generated from '/computers') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.003529> [hit #6]Trying to match 'GET /account_management' against /^\/computers\/([^\/]+)$/ (generated from '/computers/:id') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.003688> [hit #6]Trying to match 'GET /account_management' against /^\/parts$/ (generated from '/parts') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.003845> [hit #6]Trying to match 'GET /account_management' against /^\/parts\/([^\/]+)$/ (generated from '/parts/:id') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.004005> [hit #6]Trying to match 'GET /account_management' against /^\/manuals$/ (generated from '/manuals') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.004159> [hit #6]Trying to match 'GET /account_management' against /^\/manuals\/([^\/]+)$/ (generated from '/manuals/:id') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.004318> [hit #6]Trying to match 'GET /account_management' against /^\/search$/ (generated from '/search') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.004473> [hit #6]Trying to match 'GET /account_management' against /^\/parts\/edit\/([^\/]+)$/ (generated from '/parts/edit/:id') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.004634> [hit #6]Trying to match 'GET /account_management' against /^\/computers\/edit\/([^\/]+)$/ (generated from '/computers/edit/:id') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.004799> [hit #6]Trying to match 'GET /account_management' against /^\/network_devices\/edit\/([^\/]+)$/ (generated from '/network_devices/edit/:id') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.004962> [hit #6]Trying to match 'GET /account_management' against /^\/models\/edit\/([^\/]+)$/ (generated from '/models/edit/:id') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.005124> [hit #6]Trying to match 'GET /account_management' against /^\/account_management$/ (generated from '/account_management') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.005266> [hit #6]  --> got 1 in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 101
+[10477]  core @0.016149> [hit #6]response: 200 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 181
+[10477]  core @0.000209> request: GET / from 127.0.0.1 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 56
+[10477]  core @0.000707> [hit #7]Trying to match 'GET /' against /^\/$/ (generated from '/') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.000864> [hit #7]  --> got 1 in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 101
+[10477]  core @0.005552> [hit #7]response: 302 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 181
+[10477]  core @0.000221> request: GET /user_panel from 127.0.0.1 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 56
+[10477]  core @0.000895> [hit #8]Trying to match 'GET /user_panel' against /^\/$/ (generated from '/') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.001179> [hit #8]Trying to match 'GET /user_panel' against /^\/user_panel$/ (generated from '/user_panel') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.001420> [hit #8]  --> got 1 in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 101
+[10477]  core @0.014314> [hit #8]response: 200 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 181
+[10477]  core @0.000294> request: GET /logout from 127.0.0.1 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 56
+[10477]  core @0.001511> [hit #9]Trying to match 'GET /logout' against /^\/$/ (generated from '/') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.002091> [hit #9]Trying to match 'GET /logout' against /^\/user_panel$/ (generated from '/user_panel') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.002588> [hit #9]Trying to match 'GET /logout' against /^\/restore_password$/ (generated from '/restore_password') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.003005> [hit #9]Trying to match 'GET /logout' against /^\/register$/ (generated from '/register') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.003408> [hit #9]Trying to match 'GET /logout' against /^\/confirm_account$/ (generated from '/confirm_account') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.003804> [hit #9]Trying to match 'GET /logout' against /^\/logout$/ (generated from '/logout') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.004179> [hit #9]  --> got 1 in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 101
+[10477]  core @0.006449> [hit #9]response: 302 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 181
+[10477]  core @0.000184> request: GET / from 127.0.0.1 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 56
+[10477]  core @0.000668> [hit #10]Trying to match 'GET /' against /^\/$/ (generated from '/') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.000822> [hit #10]  --> got 1 in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 101
+[10477]  core @0.006516> [hit #10]response: 200 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 181
+[10477]  core @0.000258> request: POST / from 127.0.0.1 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 56
+[10477]  core @0.001001> [hit #11]Trying to match 'POST /' against /^\/$/ (generated from '/') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.001251> [hit #11]  --> got 1 in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 101
+[10477]  core @0.012726> [hit #11]response: 302 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 181
+[10477]  core @0.000173> request: GET /types from 127.0.0.1 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 56
+[10477]  core @0.000630> [hit #12]Trying to match 'GET /types' against /^\/$/ (generated from '/') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.000780> [hit #12]Trying to match 'GET /types' against /^\/user_panel$/ (generated from '/user_panel') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.000928> [hit #12]Trying to match 'GET /types' against /^\/restore_password$/ (generated from '/restore_password') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.001067> [hit #12]Trying to match 'GET /types' against /^\/register$/ (generated from '/register') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.001203> [hit #12]Trying to match 'GET /types' against /^\/confirm_account$/ (generated from '/confirm_account') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.001337> [hit #12]Trying to match 'GET /types' against /^\/logout$/ (generated from '/logout') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.001471> [hit #12]Trying to match 'GET /types' against /^\/types$/ (generated from '/types') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.001661> [hit #12]  --> got 1 in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 101
+[10477]  core @0.015396> [hit #12]response: 200 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 181
+[10477]  core @0.000307> request: GET /user_panel from 127.0.0.1 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 56
+[10477]  core @0.001194> [hit #13]Trying to match 'GET /user_panel' against /^\/$/ (generated from '/') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.001608> [hit #13]Trying to match 'GET /user_panel' against /^\/user_panel$/ (generated from '/user_panel') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.001904> [hit #13]  --> got 1 in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 101
+[10477]  core @0.014507> [hit #13]response: 200 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 181
+[10477]  core @0.000247> request: GET /account_management from 127.0.0.1 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 56
+[10477]  core @0.001026> [hit #14]Trying to match 'GET /account_management' against /^\/$/ (generated from '/') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.001310> [hit #14]Trying to match 'GET /account_management' against /^\/user_panel$/ (generated from '/user_panel') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.001536> [hit #14]Trying to match 'GET /account_management' against /^\/restore_password$/ (generated from '/restore_password') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.001753> [hit #14]Trying to match 'GET /account_management' against /^\/register$/ (generated from '/register') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.001966> [hit #14]Trying to match 'GET /account_management' against /^\/confirm_account$/ (generated from '/confirm_account') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.002173> [hit #14]Trying to match 'GET /account_management' against /^\/logout$/ (generated from '/logout') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.002384> [hit #14]Trying to match 'GET /account_management' against /^\/types$/ (generated from '/types') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.002625> [hit #14]Trying to match 'GET /account_management' against /^\/types\/([^\/]+)$/ (generated from '/types/:id') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.002901> [hit #14]Trying to match 'GET /account_management' against /^\/models$/ (generated from '/models') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.003132> [hit #14]Trying to match 'GET /account_management' against /^\/models\/([^\/]+)$/ (generated from '/models/:id') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.003397> [hit #14]Trying to match 'GET /account_management' against /^\/networks$/ (generated from '/networks') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.003678> [hit #14]Trying to match 'GET /account_management' against /^\/networks\/([^\/]+)$/ (generated from '/networks/:id') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.003902> [hit #14]Trying to match 'GET /account_management' against /^\/network_devices$/ (generated from '/network_devices') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.004104> [hit #14]Trying to match 'GET /account_management' against /^\/network_devices\/([^\/]+)$/ (generated from '/network_devices/:id') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.004316> [hit #14]Trying to match 'GET /account_management' against /^\/computers$/ (generated from '/computers') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.004518> [hit #14]Trying to match 'GET /account_management' against /^\/computers\/([^\/]+)$/ (generated from '/computers/:id') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.004772> [hit #14]Trying to match 'GET /account_management' against /^\/parts$/ (generated from '/parts') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.005051> [hit #14]Trying to match 'GET /account_management' against /^\/parts\/([^\/]+)$/ (generated from '/parts/:id') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.005559> [hit #14]Trying to match 'GET /account_management' against /^\/manuals$/ (generated from '/manuals') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.005877> [hit #14]Trying to match 'GET /account_management' against /^\/manuals\/([^\/]+)$/ (generated from '/manuals/:id') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.006175> [hit #14]Trying to match 'GET /account_management' against /^\/search$/ (generated from '/search') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.006457> [hit #14]Trying to match 'GET /account_management' against /^\/parts\/edit\/([^\/]+)$/ (generated from '/parts/edit/:id') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.006722> [hit #14]Trying to match 'GET /account_management' against /^\/computers\/edit\/([^\/]+)$/ (generated from '/computers/edit/:id') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.007048> [hit #14]Trying to match 'GET /account_management' against /^\/network_devices\/edit\/([^\/]+)$/ (generated from '/network_devices/edit/:id') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.007298> [hit #14]Trying to match 'GET /account_management' against /^\/models\/edit\/([^\/]+)$/ (generated from '/models/edit/:id') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.007512> [hit #14]Trying to match 'GET /account_management' against /^\/account_management$/ (generated from '/account_management') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.007707> [hit #14]  --> got 1 in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 101
+[10477]  core @0.029878> [hit #14]response: 200 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 181
+[10477]  core @0.000216> request: GET /user_panel from 127.0.0.1 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 56
+[10477]  core @0.000833> [hit #15]Trying to match 'GET /user_panel' against /^\/$/ (generated from '/') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.001068> [hit #15]Trying to match 'GET /user_panel' against /^\/user_panel$/ (generated from '/user_panel') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10477]  core @0.001228> [hit #15]  --> got 1 in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 101
+[10477]  core @0.015372> [hit #15]response: 200 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 181
+[10738]  core @0.000015> loading Dancer::Handler::Standalone handler in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 45
+[10738]  core @0.000240> loading handler 'Dancer::Handler::Standalone' in /usr/local/share/perl/5.18.2/Dancer.pm l. 483
+[10767]  core @0.000014> loading Dancer::Handler::Standalone handler in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 45
+[10767]  core @0.000244> loading handler 'Dancer::Handler::Standalone' in /usr/local/share/perl/5.18.2/Dancer.pm l. 483
+[10767]  core @0.000198> request: GET /user_panel from 127.0.0.1 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 56
+[10767]  core @0.001723> [hit #1]Trying to match 'GET /user_panel' against /^\/$/ (generated from '/') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10767]  core @0.005460> [hit #1]Trying to match 'GET /user_panel' against /^\/user_panel$/ (generated from '/user_panel') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10767]  core @0.005751> [hit #1]  --> got 1 in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 101
+[10767]  core @0.013625> [hit #1]response: 302 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 181
+[10767]  core @0.000176> request: GET / from 127.0.0.1 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 56
+[10767]  core @0.000648> [hit #2]Trying to match 'GET /' against /^\/$/ (generated from '/') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10767]  core @0.000799> [hit #2]  --> got 1 in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 101
+[10767]  core @0.047899> [hit #2]response: 200 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 181
+[10767]  core @0.000253> request: POST / from 127.0.0.1 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 56
+[10767]  core @0.001358> [hit #3]Trying to match 'POST /' against /^\/$/ (generated from '/') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10767]  core @0.001809> [hit #3]  --> got 1 in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 101
+[10767]  core @0.013617> [hit #3]response: 302 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 181
+[10767]  core @0.000196> request: GET /types from 127.0.0.1 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 56
+[10767]  core @0.000726> [hit #4]Trying to match 'GET /types' against /^\/$/ (generated from '/') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10767]  core @0.000924> [hit #4]Trying to match 'GET /types' against /^\/user_panel$/ (generated from '/user_panel') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10767]  core @0.001118> [hit #4]Trying to match 'GET /types' against /^\/change_language$/ (generated from '/change_language') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10767]  core @0.001299> [hit #4]Trying to match 'GET /types' against /^\/restore_password$/ (generated from '/restore_password') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10767]  core @0.001479> [hit #4]Trying to match 'GET /types' against /^\/register$/ (generated from '/register') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10767]  core @0.001660> [hit #4]Trying to match 'GET /types' against /^\/confirm_account$/ (generated from '/confirm_account') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10767]  core @0.001840> [hit #4]Trying to match 'GET /types' against /^\/logout$/ (generated from '/logout') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10767]  core @0.002022> [hit #4]Trying to match 'GET /types' against /^\/types$/ (generated from '/types') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10767]  core @0.002233> [hit #4]  --> got 1 in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 101
+[10767]  core @0.024661> [hit #4]response: 200 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 181
+[10767]  core @0.000219> request: GET /user_panel from 127.0.0.1 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 56
+[10767]  core @0.000831> [hit #5]Trying to match 'GET /user_panel' against /^\/$/ (generated from '/') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10767]  core @0.001081> [hit #5]Trying to match 'GET /user_panel' against /^\/user_panel$/ (generated from '/user_panel') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10767]  core @0.001235> [hit #5]  --> got 1 in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 101
+[10767] error @0.021048> [hit #5]request to GET /user_panel crashed: Warning caught during route execution: Argument "name_en" isn't numeric in numeric comparison (<=>) at /usr/local/lib/perl/5.18.2/Template/VMethods.pm line 578. in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 98
+[10767]  core @0.029353> [hit #5]response: 500 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 181
+[10789]  core @0.000015> loading Dancer::Handler::Standalone handler in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 45
+[10789]  core @0.000233> loading handler 'Dancer::Handler::Standalone' in /usr/local/share/perl/5.18.2/Dancer.pm l. 483
+[10789]  core @0.000198> request: GET /user_panel from 127.0.0.1 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 56
+[10789]  core @0.000708> [hit #1]Trying to match 'GET /user_panel' against /^\/$/ (generated from '/') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.000904> [hit #1]Trying to match 'GET /user_panel' against /^\/user_panel$/ (generated from '/user_panel') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.001046> [hit #1]  --> got 1 in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 101
+[10789]  core @0.016022> [hit #1]response: 302 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 181
+[10789]  core @0.000207> request: GET / from 127.0.0.1 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 56
+[10789]  core @0.000939> [hit #2]Trying to match 'GET /' against /^\/$/ (generated from '/') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.001184> [hit #2]  --> got 1 in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 101
+[10789]  core @0.048409> [hit #2]response: 200 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 181
+[10789]  core @0.000213> request: POST / from 127.0.0.1 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 56
+[10789]  core @0.000853> [hit #3]Trying to match 'POST /' against /^\/$/ (generated from '/') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.001059> [hit #3]  --> got 1 in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 101
+[10789]  core @0.011429> [hit #3]response: 302 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 181
+[10789]  core @0.000269> request: GET /types from 127.0.0.1 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 56
+[10789]  core @0.000955> [hit #4]Trying to match 'GET /types' against /^\/$/ (generated from '/') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.001169> [hit #4]Trying to match 'GET /types' against /^\/user_panel$/ (generated from '/user_panel') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.001352> [hit #4]Trying to match 'GET /types' against /^\/change_language$/ (generated from '/change_language') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.001521> [hit #4]Trying to match 'GET /types' against /^\/restore_password$/ (generated from '/restore_password') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.001694> [hit #4]Trying to match 'GET /types' against /^\/register$/ (generated from '/register') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.001866> [hit #4]Trying to match 'GET /types' against /^\/confirm_account$/ (generated from '/confirm_account') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.002026> [hit #4]Trying to match 'GET /types' against /^\/logout$/ (generated from '/logout') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.002195> [hit #4]Trying to match 'GET /types' against /^\/types$/ (generated from '/types') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.002346> [hit #4]  --> got 1 in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 101
+[10789]  core @0.025671> [hit #4]response: 200 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 181
+[10789]  core @0.000215> request: GET /parts from 127.0.0.1 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 56
+[10789]  core @0.001203> [hit #5]Trying to match 'GET /parts' against /^\/$/ (generated from '/') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.001414> [hit #5]Trying to match 'GET /parts' against /^\/user_panel$/ (generated from '/user_panel') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.001574> [hit #5]Trying to match 'GET /parts' against /^\/change_language$/ (generated from '/change_language') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.001726> [hit #5]Trying to match 'GET /parts' against /^\/restore_password$/ (generated from '/restore_password') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.001877> [hit #5]Trying to match 'GET /parts' against /^\/register$/ (generated from '/register') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.002027> [hit #5]Trying to match 'GET /parts' against /^\/confirm_account$/ (generated from '/confirm_account') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.002175> [hit #5]Trying to match 'GET /parts' against /^\/logout$/ (generated from '/logout') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.002323> [hit #5]Trying to match 'GET /parts' against /^\/types$/ (generated from '/types') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.002470> [hit #5]Trying to match 'GET /parts' against /^\/types\/([^\/]+)$/ (generated from '/types/:id') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.002629> [hit #5]Trying to match 'GET /parts' against /^\/models$/ (generated from '/models') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.002803> [hit #5]Trying to match 'GET /parts' against /^\/models\/([^\/]+)$/ (generated from '/models/:id') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.002960> [hit #5]Trying to match 'GET /parts' against /^\/networks$/ (generated from '/networks') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.003110> [hit #5]Trying to match 'GET /parts' against /^\/networks\/([^\/]+)$/ (generated from '/networks/:id') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.003268> [hit #5]Trying to match 'GET /parts' against /^\/network_devices$/ (generated from '/network_devices') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.003419> [hit #5]Trying to match 'GET /parts' against /^\/network_devices\/([^\/]+)$/ (generated from '/network_devices/:id') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.003610> [hit #5]Trying to match 'GET /parts' against /^\/computers$/ (generated from '/computers') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.003765> [hit #5]Trying to match 'GET /parts' against /^\/computers\/([^\/]+)$/ (generated from '/computers/:id') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.003919> [hit #5]Trying to match 'GET /parts' against /^\/parts$/ (generated from '/parts') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.004057> [hit #5]  --> got 1 in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 101
+[10789]  core @0.031352> [hit #5]response: 200 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 181
+[10789]  core @0.000292> request: GET /networks from 127.0.0.1 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 56
+[10789]  core @0.001160> [hit #6]Trying to match 'GET /networks' against /^\/$/ (generated from '/') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.001529> [hit #6]Trying to match 'GET /networks' against /^\/user_panel$/ (generated from '/user_panel') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.001848> [hit #6]Trying to match 'GET /networks' against /^\/change_language$/ (generated from '/change_language') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.002160> [hit #6]Trying to match 'GET /networks' against /^\/restore_password$/ (generated from '/restore_password') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.002468> [hit #6]Trying to match 'GET /networks' against /^\/register$/ (generated from '/register') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.002776> [hit #6]Trying to match 'GET /networks' against /^\/confirm_account$/ (generated from '/confirm_account') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.003078> [hit #6]Trying to match 'GET /networks' against /^\/logout$/ (generated from '/logout') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.003380> [hit #6]Trying to match 'GET /networks' against /^\/types$/ (generated from '/types') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.003728> [hit #6]Trying to match 'GET /networks' against /^\/types\/([^\/]+)$/ (generated from '/types/:id') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.004053> [hit #6]Trying to match 'GET /networks' against /^\/models$/ (generated from '/models') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.004363> [hit #6]Trying to match 'GET /networks' against /^\/models\/([^\/]+)$/ (generated from '/models/:id') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.004686> [hit #6]Trying to match 'GET /networks' against /^\/networks$/ (generated from '/networks') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.004973> [hit #6]  --> got 1 in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 101
+[10789]  core @0.029243> [hit #6]response: 200 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 181
+[10789]  core @0.000289> request: GET /computers from 127.0.0.1 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 56
+[10789]  core @0.001135> [hit #7]Trying to match 'GET /computers' against /^\/$/ (generated from '/') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.001496> [hit #7]Trying to match 'GET /computers' against /^\/user_panel$/ (generated from '/user_panel') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.001814> [hit #7]Trying to match 'GET /computers' against /^\/change_language$/ (generated from '/change_language') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.002126> [hit #7]Trying to match 'GET /computers' against /^\/restore_password$/ (generated from '/restore_password') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.002502> [hit #7]Trying to match 'GET /computers' against /^\/register$/ (generated from '/register') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.002816> [hit #7]Trying to match 'GET /computers' against /^\/confirm_account$/ (generated from '/confirm_account') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.003124> [hit #7]Trying to match 'GET /computers' against /^\/logout$/ (generated from '/logout') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.003428> [hit #7]Trying to match 'GET /computers' against /^\/types$/ (generated from '/types') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.003776> [hit #7]Trying to match 'GET /computers' against /^\/types\/([^\/]+)$/ (generated from '/types/:id') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.004104> [hit #7]Trying to match 'GET /computers' against /^\/models$/ (generated from '/models') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.004486> [hit #7]Trying to match 'GET /computers' against /^\/models\/([^\/]+)$/ (generated from '/models/:id') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.004820> [hit #7]Trying to match 'GET /computers' against /^\/networks$/ (generated from '/networks') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.005132> [hit #7]Trying to match 'GET /computers' against /^\/networks\/([^\/]+)$/ (generated from '/networks/:id') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.005452> [hit #7]Trying to match 'GET /computers' against /^\/network_devices$/ (generated from '/network_devices') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.005762> [hit #7]Trying to match 'GET /computers' against /^\/network_devices\/([^\/]+)$/ (generated from '/network_devices/:id') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.006082> [hit #7]Trying to match 'GET /computers' against /^\/computers$/ (generated from '/computers') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.006388> [hit #7]  --> got 1 in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 101
+[10789]  core @0.038661> [hit #7]response: 200 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 181
+[10789]  core @0.000220> request: GET /parts from 127.0.0.1 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 56
+[10789]  core @0.000824> [hit #8]Trying to match 'GET /parts' against /^\/$/ (generated from '/') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.001069> [hit #8]Trying to match 'GET /parts' against /^\/user_panel$/ (generated from '/user_panel') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.001248> [hit #8]Trying to match 'GET /parts' against /^\/change_language$/ (generated from '/change_language') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.001426> [hit #8]Trying to match 'GET /parts' against /^\/restore_password$/ (generated from '/restore_password') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.001602> [hit #8]Trying to match 'GET /parts' against /^\/register$/ (generated from '/register') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.001811> [hit #8]Trying to match 'GET /parts' against /^\/confirm_account$/ (generated from '/confirm_account') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.001975> [hit #8]Trying to match 'GET /parts' against /^\/logout$/ (generated from '/logout') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.002126> [hit #8]Trying to match 'GET /parts' against /^\/types$/ (generated from '/types') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.002274> [hit #8]Trying to match 'GET /parts' against /^\/types\/([^\/]+)$/ (generated from '/types/:id') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.002431> [hit #8]Trying to match 'GET /parts' against /^\/models$/ (generated from '/models') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.002578> [hit #8]Trying to match 'GET /parts' against /^\/models\/([^\/]+)$/ (generated from '/models/:id') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.002725> [hit #8]Trying to match 'GET /parts' against /^\/networks$/ (generated from '/networks') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.002868> [hit #8]Trying to match 'GET /parts' against /^\/networks\/([^\/]+)$/ (generated from '/networks/:id') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.003018> [hit #8]Trying to match 'GET /parts' against /^\/network_devices$/ (generated from '/network_devices') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.003166> [hit #8]Trying to match 'GET /parts' against /^\/network_devices\/([^\/]+)$/ (generated from '/network_devices/:id') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.003360> [hit #8]Trying to match 'GET /parts' against /^\/computers$/ (generated from '/computers') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.003519> [hit #8]Trying to match 'GET /parts' against /^\/computers\/([^\/]+)$/ (generated from '/computers/:id') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.003673> [hit #8]Trying to match 'GET /parts' against /^\/parts$/ (generated from '/parts') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.003809> [hit #8]  --> got 1 in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 101
+[10789]  core @0.019082> [hit #8]response: 200 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 181
+[10789]  core @0.000327> request: GET /user_panel from 127.0.0.1 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 56
+[10789]  core @0.001531> [hit #9]Trying to match 'GET /user_panel' against /^\/$/ (generated from '/') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.002118> [hit #9]Trying to match 'GET /user_panel' against /^\/user_panel$/ (generated from '/user_panel') in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 83
+[10789]  core @0.002589> [hit #9]  --> got 1 in /usr/local/share/perl/5.18.2/Dancer/Route.pm l. 101
+[10789] debug @0.012879> [hit #9]DBD::Pg::st fetchrow_hashref failed: Can't use attribute 'id' because it doesn't contain a reference to an array (undef) at /home/martin/Desktop/TUES/practice_tasks/myapp/lib/myapp.pm line 165. in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/myapp.pm l. 220
+[10789]  core @0.017819> [hit #9]response: 200 in /usr/local/share/perl/5.18.2/Dancer/Handler.pm l. 181

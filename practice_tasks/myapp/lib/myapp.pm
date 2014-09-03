@@ -160,6 +160,10 @@ any ['post', 'get'] => '/user_panel' => sub {
 			$sth->finish();
 			my $active = "yes";
 			$active = "no" if ($user->{"active"} == 0);
+			$sth = $dbh->prepare("SELECT * FROM languages") or die $dbh->errstr;
+			$sth->execute() or die $sth->errstr;
+			my $languages = $sth->fetchrow_hashref('id') or die $sth->errstr;
+			$sth->finish();
 			if (request->method() eq "POST"){
 				if ((md5_base64(params->{"old_pass"}, session 'current_user') eq $user->{"password"}) &&
 					(params->{"new_pass_1"} eq params->{"new_pass_2"})){
@@ -171,6 +175,7 @@ any ['post', 'get'] => '/user_panel' => sub {
 					$dbh->disconnect();
 
 					template 'user_panel', {
+						'languages' => $languages,
 						'user' => $user->{"name"},
 						'mail' => $user->{"mail"}, 
 						'active' => $active,
@@ -190,6 +195,7 @@ any ['post', 'get'] => '/user_panel' => sub {
 			}else{
 				$dbh->disconnect();
 				template 'user_panel', {
+					'languages' => $languages,
 					'user' => $user->{"name"},
 					'mail' => $user->{"mail"}, 
 					'active' => $active,
@@ -219,6 +225,34 @@ any ['post', 'get'] => '/user_panel' => sub {
 			template 'exception';
 		};
 	};	
+};
+
+any ['post', 'get'] => '/change_language' => sub {
+	my $dbh;
+	try{
+		if (session 'logged_in'){
+			if(request->method() eq "POST"){
+				$dbh = connect_db();
+				# my $sth = $dbh->prepare("");
+				my $sth->finish();
+				$dbh->disconnect();
+				redirect '/user_panel'
+			}else{
+				redirect '/user_panel'
+			}
+		}else{
+			redirect '/';
+		}
+	}catch{
+		try {
+			debug $_;
+			$dbh->disconnect();
+			template 'exception';
+		}catch{
+			debug $_;
+			template 'exception';
+		};	
+	};
 };
 
 any ['post', 'get'] => '/restore_password' => sub {
