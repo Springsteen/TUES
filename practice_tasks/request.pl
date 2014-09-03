@@ -21,11 +21,10 @@ $mech->field("quantity",10);
 my $response = $mech->submit_form();
 
 $mech->get("http://shop.optimalprint.bg/index.php?route=checkout/shipping");
-print Dumper($mech->status());
 $mech->form_id("shipping");
-print Dumper($mech->form_id('shipping'));
-# $mech->set_fields("shipping_method", ["econt.econt", 1]);
-$mech->field( "econt.econt" => 'on' );
+$mech->set_fields("shipping_method", "econt.econt");
+print Dumper($mech->content());
+# $mech->field( "econt.econt" => 'on' );
 sleep 5;
 # TODO - FIND A WAY TO TOOGLE THE econt.econt radio button 
 $mech->form_id('econt_form');

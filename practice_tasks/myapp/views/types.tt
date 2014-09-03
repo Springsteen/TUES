@@ -54,7 +54,7 @@
                 <form method=delete action=/types/<%id%>>
                     <td><input type=submit value=Delete class="btn btn-danger"></td>
                 </form>
-                <tr>
+                </tr>
             <% END %>
         </table>
     <% END %>

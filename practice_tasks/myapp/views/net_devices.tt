@@ -1,66 +1,72 @@
 <div class="content panel ">
-  <div class="panel panel-primary"> 
-    <div class=input-group>
-      <form method=post>
-        Net device's name:<br>
-        <input type=text name=net_device_name class=form-control><br><br>
-        <input type=submit value=Save class="btn btn-primary">
-        <% IF networks %> 
-          <select name=network_select class="selectpicker">
-            <% FOREACH id IN networks.keys.nsort %>  
-              <option value=<%networks.$id.name%>><%networks.$id.name%></option>
-            <% END %>
-          </select>
-        <% ELSE %>
-          <p> There aren't any networks in the database <p>
-        <% END %> 
-      </form>
+    <div class="panel panel-primary"> 
+        <div class=input-group>
+            <form method=post>
+                <% FOREACH field IN tableInfo %>
+                    <% IF field != "id" %>
+                        Network device <% field %>:<br>
+                        <input type=text name=net_device_<% field %> class=form-control><br><br>
+                    <% END %>
+                <% END %>
+                <% IF networks %> 
+                    <select name=network_select class="selectpicker">
+                        <% FOREACH id IN networks.keys.nsort %>  
+                            <option value=<% networks.$id.name %>><% networks.$id.name %></option>
+                        <% END %>
+                    </select>
+                <% ELSE %>
+                    <p> There aren't any networks in the database <p>
+                <% END %> 
+                <input type=submit value=Save class="btn btn-primary">
+            </form>
+        </div>
     </div>
-  </div>
 
-  <% IF pages %>
-    <div class="panel panel-primary">
-      <form method=get> 
-        <select name=offset value=<%curr_page%>>
-          <% i = 1%>
-          <% WHILE i <= pages%>
-            <% IF i == curr_page%>
-              <option value=<%i%> selected><%i%></option>
-            <% ELSE%>
-              <option value=<%i%>><%i%></option>
+    <% IF pages %>
+        <div class="panel panel-primary">
+            <form method=get> 
+                <select name=offset value=<% curr_page %>>
+                    <% i = 1 %>
+                    <% WHILE i <= pages %>
+                        <% IF i == curr_page %>
+                            <option value=<% i %> selected><% i %></option>
+                        <% ELSE %>
+                            <option value=<% i %>><% i %></option>
+                        <% END %>
+                        <% i = i+1 %>
+                    <% END %>
+                </select>
+                <input type=submit value=Get page class="btn btn-primary">
+            </form>
+        </div>
+    <% END %>
+
+    <% IF net_devices %>
+        <table class="table table-bordered">    
+            <tr>
+                <% FOREACH key IN net_devices.values.first.keys.sort %>
+                    <% IF key != "id" %>
+                        <th><% key %></th>
+                    <% END %>
+                <% END %>
+                <th></th>
+                <th></th>
+            </tr>
+            <% FOREACH id IN net_devices.keys.nsort%>        
+                <tr>
+                    <% FOREACH elem in net_devices.$id %>
+                        <% IF elem.key != "id" %>
+                            <td><% elem.value %></td>
+                        <% END %>
+                    <% END %>
+                    <form method=get action=/network_devices/edit/<% id %>>
+                        <td><input type=submit value=Edit class="btn btn-warning"></td>
+                    </form>
+                    <form method=delete action=/network_devices/<% id %>>
+                        <td><input type=submit value=Delete class="btn btn-danger"></td>
+                    </form>
+                </tr>
             <% END %>
-            <% i= i+1%>
-          <% END %>
-        </select>
-        <input type=submit value=Get page class="btn btn-primary">
-      </form>
-    </div>
-  <% END %>
-
-  <% IF net_devices %>
-    <table class="table table-bordered">
-      <tr>
-        <th>Name</th>
-        <th>Network</th>
-        <th></th>
-        <th></th>
-        <th></th>
-      </tr>  
-      <% FOREACH id IN net_devices.keys.nsort%>
-        <tr> 
-          <form method=post action=/network_devices/<%id%>>
-          <td><input type=text name=new_net_device_name_<%id%> value=<% net_devices.$id.d_name %> class="form-control field"></td>
-          <td><% net_devices.$id.n_name %></td>
-          <td><input type=submit value=Update class="btn btn-primary"></td>
-          </form>
-          <form method=get action=/network_devices/edit/<%id%>>
-          <td><input type=submit value=Edit class="btn btn-warning"></td>
-          </form>
-          <form method=delete action=/network_devices/<%id%>>
-          <td><input type=submit value=Delete class="btn btn-danger"></td>
-          </form>
-        </tr>
-      <% END %>
-    </table>
-  <% END %>
+        </table>
+    <% END %>
 </div>

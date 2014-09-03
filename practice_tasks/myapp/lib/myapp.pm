@@ -63,6 +63,17 @@ sub validateDate {
 	return 1
 };
 
+sub getFields {
+	my @fields = $_[0];
+	my (@output, @check);
+	for (my $i = 0; $i < scalar @{$fields[0]}; $i++) {
+		@check = split('_', $fields[0][$i]);
+		push(@output, $fields[0][$i]) if !($check[-1] eq "id");
+		@check = undef; 
+	}
+	return @output;
+}
+
 any ['post', 'get'] => '/' => sub {
 	my $dbh;
 	try {	
@@ -408,19 +419,20 @@ any ['post', 'get'] => '/types' => sub {
 			}
 			$sth = $dbh->prepare("SELECT * FROM types");
 			$sth->execute() or die $sth->errstr;
-			$sth->finish(); 
 			$pages =  int(($sth->rows()) / 10);
 			$pages++ if ($sth->rows % 10) != 0;
+			$sth->finish(); 
 			$sth = $dbh->prepare("SELECT id,name FROM types LIMIT 10 OFFSET ?") or die $dbh->errstr;
 			$sth->execute(($offset)*10) or die $sth->errstr;
 			my $typesHash = $sth->fetchall_hashref('id');
+			$sth->finish();
 			$sth = $dbh->prepare("SELECT * FROM types WHERE 1=0");
 			$sth->execute() or die $sth->errstr;
-			my $tableInfo = $sth->{NAME};
+			my @tableInfo = $sth->{NAME};
 			$sth->finish();
 			$dbh->disconnect();
 			template 'types', {
-				'tableInfo' => $tableInfo,
+				'tableInfo' => @tableInfo,
 				'types' => $typesHash,
 				'pages' => $pages,
 				'curr_page' => $offset+1,
@@ -520,15 +532,20 @@ any ['post', 'get'] => '/models' => sub {
 				$sth->execute(); 
 				$pages =  int(($sth->rows()) / 10);
 				$pages++ if ($sth->rows % 10) != 0;
-				$sth = $dbh->prepare("SELECT models.id, models.name AS m_name, 
-									types.name AS t_name 
+				$sth = $dbh->prepare("SELECT models.id, models.name AS \"Model name\", 
+									types.name AS \"Type name\" 
 									FROM models, types 
 									WHERE models.type_id = types.id LIMIT 10 OFFSET ?");
 				$sth->execute($offset*10);
 				my $modelsHash = $sth->fetchall_hashref('id');
 				$sth->finish();
+				$sth = $dbh->prepare("SELECT * FROM models WHERE 1=0");
+				$sth->execute() or die $sth->errstr;
+				my @tableInfo = getFields($sth->{NAME});
+				$sth->finish();
 				$dbh->disconnect();
 				template 'models', {
+					'tableInfo' => @tableInfo,
 					'types' => $typesHash,
 					'models' => $modelsHash,
 					'pages' => $pages,
@@ -568,12 +585,12 @@ any ['post', 'get'] => '/models/:id' => sub {
 			if (session 'user_can_write'){	
 				$dbh = connect_db();
 				if (request->method() eq "POST"){
-					my $id = params->{'id'};
-					my $sth = $dbh->prepare("UPDATE models SET name = ? WHERE id = $id") or die $dbh->errstr;	
-					$sth->execute(params->{"new_model_name_$id"}) or die $sth->errstr;
-					$sth->finish();
-					$dbh->commit or die	$dbh->errstr;
-					$dbh->disconnect();
+					# my $id = params->{'id'};
+					# my $sth = $dbh->prepare("UPDATE models SET name = ? WHERE id = $id") or die $dbh->errstr;	
+					# $sth->execute(params->{"new_model_name_$id"}) or die $sth->errstr;
+					# $sth->finish();
+					# $dbh->commit or die	$dbh->errstr;
+					# $dbh->disconnect();
 					redirect '/models';
 				}else{
 					my $sth = $dbh->prepare("DELETE FROM models WHERE id = ?") or die $dbh->errstr;	
@@ -629,8 +646,13 @@ any ['post', 'get'] => '/networks' => sub {
 				$sth->execute($offset*10) or die $sth->errstr;
 				my $networksHash = $sth->fetchall_hashref('id');
 				$sth->finish();
+				$sth = $dbh->prepare("SELECT * FROM networks WHERE 1=0");
+				$sth->execute() or die $sth->errstr;
+				my @tableInfo = $sth->{NAME};
+				$sth->finish();
 				$dbh->disconnect();
 				template 'networks', {
+					'tableInfo' => @tableInfo,
 					'networks' => $networksHash,
 					'pages' => $pages,
 					'curr_page' => $offset+1,
@@ -732,15 +754,21 @@ any ['get', 'post'] => '/network_devices' => sub {
 				$pages++ if ($sth->rows % 10) != 0;
 				$sth->finish();
 				$sth = $dbh->prepare("SELECT network_devices.id, 
-											network_devices.name AS d_name, 
-											networks.name AS n_name 
+											network_devices.name AS \"Device name\", 
+											networks.name AS \"Network name\" 
 									FROM network_devices, networks 
 									WHERE network_devices.network_id = networks.id
 									LIMIT 10 OFFSET ?");
 				$sth->execute($offset*10);
 				my $netDevicesHash = $sth->fetchall_hashref('id');
+				$sth->finish();
+				$sth = $dbh->prepare("SELECT * FROM network_devices WHERE 1=0");
+				$sth->execute() or die $sth->errstr;
+				my @tableInfo = getFields($sth->{NAME});
+				$sth->finish();
 				$dbh->disconnect();
 				template 'net_devices.tt', {
+					'tableInfo' => @tableInfo,
 					'net_devices' => $netDevicesHash,
 					'networks' => $networksHash,
 					'pages' => $pages,
@@ -780,12 +808,12 @@ any ['get', 'post'] => '/network_devices/:id' => sub {
 			if (session 'user_can_write'){
 				$dbh = connect_db();
 				if (request->method() eq "POST"){
-					my $id = params->{'id'};
-					my $sth = $dbh->prepare("UPDATE network_devices SET name = ? WHERE id = $id") or die $dbh->errstr;	
-					$sth->execute(params->{"new_net_device_name_$id"}) or die $sth->errstr;
-					$sth->finish();
-					$dbh->commit or die	$dbh->errstr;
-					$dbh->disconnect();
+					# my $id = params->{'id'};
+					# my $sth = $dbh->prepare("UPDATE network_devices SET name = ? WHERE id = $id") or die $dbh->errstr;	
+					# $sth->execute(params->{"new_net_device_name_$id"}) or die $sth->errstr;
+					# $sth->finish();
+					# $dbh->commit or die	$dbh->errstr;
+					# $dbh->disconnect();
 					redirect '/network_devices';
 				}else{
 					my $sth = $dbh->prepare("DELETE FROM network_devices WHERE id = ?") or die $dbh->errstr;	
@@ -843,15 +871,21 @@ any ['get', 'post'] => '/computers' => sub {
 				$pages++ if ($sth->rows % 10) != 0;
 				$sth->finish();
 				$sth = $dbh->prepare("SELECT computers.id, 
-											computers.name AS c_name, 
-											networks.name AS n_name 
+											computers.name AS \"Computer name\", 
+											networks.name AS \"Network name\" 
 									FROM computers, networks 
 									WHERE computers.network_id = networks.id
 									LIMIT 10 OFFSET ?");
 				$sth->execute($offset*10);
 				my $computersHash = $sth->fetchall_hashref('id');
+				$sth->finish();
+				$sth = $dbh->prepare("SELECT * FROM computers WHERE 1=0");
+				$sth->execute() or die $sth->errstr;
+				my @tableInfo = getFields($sth->{NAME});
+				$sth->finish();
 				$dbh->disconnect();
 				template 'computers.tt', {
+					'tableInfo' => @tableInfo,
 					'computers' => $computersHash,
 					'networks' => $networksHash,
 					'pages' => $pages,
@@ -891,12 +925,12 @@ any ['get', 'post'] => '/computers/:id' => sub {
 			if (session 'user_can_write'){	
 				$dbh = connect_db();
 				if (request->method() eq "POST"){
-					my $id = params->{'id'};
-					my $sth = $dbh->prepare("UPDATE computers SET name = ? WHERE id = $id") or die $dbh->errstr;	
-					$sth->execute(params->{"new_computer_name_$id"}) or die $sth->errstr;
-					$sth->finish();
-					$dbh->commit or die	$dbh->errstr;
-					$dbh->disconnect();
+					# my $id = params->{'id'};
+					# my $sth = $dbh->prepare("UPDATE computers SET name = ? WHERE id = $id") or die $dbh->errstr;	
+					# $sth->execute(params->{"new_computer_name_$id"}) or die $sth->errstr;
+					# $sth->finish();
+					# $dbh->commit or die	$dbh->errstr;
+					# $dbh->disconnect();
 					redirect '/computers';
 				}else{
 					my $sth = $dbh->prepare("DELETE FROM computers WHERE id = ?") or die $dbh->errstr;	
@@ -964,17 +998,23 @@ any ['get', 'post'] => '/parts' => sub {
 				$pages++ if ($sth->rows % 10) != 0;
 				$sth->finish();
 				$sth = $dbh->prepare("SELECT parts.id, parts.waranty, 
-									parts.name AS p_name, 
-									models.name AS m_name, 
-									computers.name AS c_name 
+									parts.name AS \"Part name\", 
+									models.name AS \"Model name\", 
+									computers.name AS \"Computer name\" 
 									FROM parts, models, computers 
 									WHERE computers.id = parts.computer_id 
 									AND models.id = parts.model_id
 									LIMIT 10 OFFSET ?") or die $dbh->errstr;
 				$sth->execute($offset*10) or die $sth->errstr;
 				my $partsHash = $sth->fetchall_hashref('id');
+				$sth->finish();
+				$sth = $dbh->prepare("SELECT * FROM parts WHERE 1=0");
+				$sth->execute() or die $sth->errstr;
+				my @tableInfo = getFields($sth->{NAME});
+				$sth->finish();
 				$dbh->disconnect();
 				template 'parts.tt', {
+					'tableInfo' => \@tableInfo,
 					'parts' => $partsHash,
 					'models' => $modelsHash,
 					'computers' => $computersHash,
