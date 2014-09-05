@@ -13,27 +13,45 @@
         <% END %>
     </div>
 
-    <div class=input-group>
-        <form method=post action="/user_panel">
-            Current password:<br>
-            <input type=password name=old_pass class=form-control><br><br>
-            New password:<br>
-            <input type=password name=new_pass_1 class=form-control><br><br>
-            Repeat new password:<br>
-            <input type=password name=new_pass_2 class=form-control><br><br>
-            <input type=submit value=Change class="btn btn-primary">
-        </form>
+    <div class="panel panel-warning">
+        <div class="panel-heading">
+            Change your password
+        </div>
+        <div class="panel-body">    
+            <div class="input-group">
+                <form method=post action="/user_panel">
+                    Current password:<br>
+                    <input type=password name=old_pass class=form-control><br><br>
+                    New password:<br>
+                    <input type=password name=new_pass_1 class=form-control><br><br>
+                    Repeat new password:<br>
+                    <input type=password name=new_pass_2 class=form-control><br><br>
+                    <input type=submit value=Change class="btn btn-primary">
+                </form>
+            </div>
+        </div>
     </div>
 
-    <div class=input-group>
-        <form method=post action="/user_panel">
-            <select name=lang_select>
-                <% FOREACH id IN languages.keys.nsort %>
-                    <option><% languages.$id.en_name %></option>
-                <% END %>
-            </select>
-            <input type=submit value=Change class="btn btn-primary">
-        </form>
+    <div class="panel panel-warning">
+        <div class="panel-heading">
+            Change app language 
+        </div>
+        <div class="panel-body">
+            <div class=input-group>
+                <form method=post action="/change_language">
+                    <select name=lang_select>
+                        <% FOREACH id IN languages.keys.nsort %>
+                            <% IF user_lang == id %>
+                                <option selected><% languages.$id.name_en %></option>
+                            <% ELSE %>
+                                <option><% languages.$id.name_en %></option>
+                            <% END %>
+                        <% END %>
+                    </select>
+                    <input type=submit value=Change class="btn btn-primary">
+                </form>
+            </div>
+        </div>
     </div>
 
     <a href="<% request.uri_base %>/account_management">Account Management</a>

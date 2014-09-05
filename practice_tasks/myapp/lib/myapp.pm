@@ -162,7 +162,7 @@ any ['post', 'get'] => '/user_panel' => sub {
 			$active = "no" if ($user->{"active"} == 0);
 			$sth = $dbh->prepare("SELECT * FROM languages") or die $dbh->errstr;
 			$sth->execute() or die $sth->errstr;
-			my $languages = $sth->fetchrow_hashref('id') or die $sth->errstr;
+			my $languages = $sth->fetchall_hashref('id') or die $sth->errstr;
 			$sth->finish();
 			if (request->method() eq "POST"){
 				if ((md5_base64(params->{"old_pass"}, session 'current_user') eq $user->{"password"}) &&
@@ -173,11 +173,11 @@ any ['post', 'get'] => '/user_panel' => sub {
 					$sth->finish();
 					$dbh->commit or die $dbh->errstr;
 					$dbh->disconnect();
-
 					template 'user_panel', {
 						'languages' => $languages,
 						'user' => $user->{"name"},
-						'mail' => $user->{"mail"}, 
+						'mail' => $user->{"mail"},
+						'user_lang' => $user->{"interface_language"}, 
 						'active' => $active,
 						'msg' => "Your password was changed",
 						'logout_url' => uri_for('/logout'),
@@ -197,7 +197,8 @@ any ['post', 'get'] => '/user_panel' => sub {
 				template 'user_panel', {
 					'languages' => $languages,
 					'user' => $user->{"name"},
-					'mail' => $user->{"mail"}, 
+					'mail' => $user->{"mail"},
+					'user_lang' => $user->{"interface_language"},  
 					'active' => $active,
 					'logout_url' => uri_for('/logout'),
 					'logged' => 'true',
@@ -233,8 +234,14 @@ any ['post', 'get'] => '/change_language' => sub {
 		if (session 'logged_in'){
 			if(request->method() eq "POST"){
 				$dbh = connect_db();
-				# my $sth = $dbh->prepare("");
-				my $sth->finish();
+				my $sth = $dbh->prepare("SELECT id FROM languages WHERE name_en = ?") or die $dbh->errstr;
+				$sth->execute(params->{"lang_select"}) or die $sth->errstr;
+				my $lang_id = $sth->fetchrow_hashref();
+				$sth->finish();
+				$sth = $dbh->prepare("UPDATE accounts SET interface_language = ?") or die $dbh->errstr;
+				$sth->execute($lang_id->{"id"}) or die $sth->errstr;
+				$sth->finish();
+				$dbh->commit or die $dbh->errstr;
 				$dbh->disconnect();
 				redirect '/user_panel'
 			}else{
