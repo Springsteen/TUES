@@ -2,23 +2,23 @@
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-	<meta http-equiv="Content-type" content="text/html; charset=<% settings.charset %>" />
+	<meta http-equiv="Content-type" content="text/html" charset="UTF-8" />
 	<title>myapp</title>
-	<link rel="stylesheet" href="<% request.uri_base %>/css/style.css" />
-	<link rel="stylesheet" href="<% request.uri_base %>/css/bootstrap.min.css" />
+	<link rel="stylesheet" href="css/style.css" />
+	<link rel="stylesheet" href="css/bootstrap.min.css" />
 
 
 	<script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
-	<script type="text/javascript" src="<% request.uri_base %>/javascripts/base.js"></script>
+	<script type="text/javascript" src="javascripts/base.js"></script>
 	<script type="text/javascript">
-	    !window.jQuery && document.write('<script type="text/javascript" src="<% request.uri_base %>/javascripts/jquery.min.js"><\/script>')
+	    !window.jQuery && document.write('<script type="text/javascript" src="javascripts/jquery.min.js"><\/script>')
 	</script>
 
 </head>
 <body>
 		<nav class="navbar navbar-default" role="navigation">
 			<div class="navbar-header">
-			    <a class="navbar-brand" href="/">Products manager</a>
+			    <a class="navbar-brand" href="/">Computers manager</a>
 			</div>
 			<ul class="nav navbar-nav">
 				<% IF logged == 'true' || msg == 1 %>

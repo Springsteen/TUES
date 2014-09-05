@@ -43,14 +43,14 @@
             <th></th>
             <% FOREACH id IN types.keys.nsort %>
                 <tr>
-                <% FOREACH elem IN types.$id %>  
-                    <% IF elem.key != "id" %>
-                        <form method=post action=/types/<%id%>>
+                <form method=post action=/types/<%id%>>
+                    <% FOREACH elem IN types.$id %>  
+                        <% IF elem.key != "id" %>
                             <td><input type=text name=new_type_<% elem.key %>_<%id%> value=<% elem.value %> class="form-control field"></td>
-                            <td><input type=submit value=Update class="btn btn-primary"></td>
-                        </form>
+                        <% END %>
                     <% END %>
-                <% END %>
+                    <td><input type=submit value=Update class="btn btn-primary"></td>
+                </form>
                 <form method=delete action=/types/<%id%>>
                     <td><input type=submit value=Delete class="btn btn-danger"></td>
                 </form>

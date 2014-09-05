@@ -11,7 +11,7 @@
                 <% IF types %> 
                     <select name=type_select class="selectpicker">
                         <% FOREACH id IN types.keys.nsort %>  
-                            <option value=<% types.$id.name %>><% types.$id.name %></option>
+                            <option value=<% types.$id.name_en %>><% types.$id.name_en %></option>
                         <% END %>
                     </select>
                 <% ELSE %>

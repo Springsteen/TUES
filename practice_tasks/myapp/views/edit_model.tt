@@ -13,9 +13,9 @@
             <% FOREACH id IN types.keys.nsort %>
               <%i=2%>  
               <% IF types.$id.name == model.$k.$i %>  
-                <option value=<%types.$id.name%> selected><%types.$id.name%></option>
+                <option value=<%types.$id.name_en%> selected><%types.$id.name_en%></option>
               <% ELSE %>
-                <option value=<%types.$id.name%>><%types.$id.name%></option>
+                <option value=<%types.$id.name_en%>><%types.$id.name_en%></option>
               <% END %>
             <% END %>
           </select>

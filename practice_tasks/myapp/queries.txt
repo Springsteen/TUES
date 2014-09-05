@@ -17,7 +17,8 @@ CREATE TABLE accounts (
 
 CREATE TABLE types (
 	id serial primary key,
-	name varchar(100) unique not null
+	name_en varchar(100) unique not null,
+	name_bg varchar(100) unique not null
 );
 
 CREATE TABLE models (
