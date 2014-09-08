@@ -390,6 +390,25 @@ get '/logout' => sub {
 };
 
 
+sub getColumnNamesInCurrentLanguage ($$) {
+	my $dbh = $_[0];
+	my $table = $_[1];
+	my $curr_lang = session "user_current_lang";
+	
+	my $sth = $dbh->prepare("SELECT * FROM $table WHERE FALSE");
+	$sth->execute();
+	my $columnNames = $sth->{NAME};
+	$sth->finish();
+	my @output;
+	foreach my $columnName (@$columnNames) {
+		if (substr($columnName, -2, 2) eq $curr_lang) {
+			push(@output, $columnName);
+		}
+	}
+	return @output;
+};
+# TODO ::: USE THE METHOD UP THERE TO GET COLUMN NAMES AND CONCAT THEM FOR THE SELECT ON ROW 
+# 436 SO IT WILL DYNAMICALLY GET ALL COLUMNS NEEDED
 any ['post', 'get'] => '/types' => sub {
 	my $dbh;
 	if ((session 'logged_in') && (session 'user_can_read')) {
@@ -413,6 +432,7 @@ any ['post', 'get'] => '/types' => sub {
 		$sth->finish();
 		my $curr_lang = session "user_current_lang";
 		my $pattern = "%" . "_" . $curr_lang;
+		print STDERR Dumper(getColumnNamesInCurrentLanguage($dbh, 'types'));
  		$sth = $dbh->prepare("SELECT types.id, metadata.column_name_$curr_lang, types.name_$curr_lang 
 							FROM types, metadata
 							WHERE metadata.column_name LIKE ?
@@ -420,6 +440,7 @@ any ['post', 'get'] => '/types' => sub {
 							LIMIT 10 OFFSET ?") ;
 		$sth->execute($pattern, (($offset)*10));
 		my $typesHash = $sth->fetchall_hashref('id');
+		# print STDERR Dumper( $typesHash);
 		$sth->finish();
 		$typesHash = decodeDBHash($typesHash, $curr_lang);
 		$sth = $dbh->prepare("SELECT id, column_name_$curr_lang, column_name
