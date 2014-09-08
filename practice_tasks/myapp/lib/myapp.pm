@@ -7,7 +7,7 @@ use Math::Round;
 use Digest::MD5 qw(md5 md5_hex md5_base64);	
 use String::Random qw(random_string);
 use Dancer::Plugin::Email;
-# use Decode qw(decode_utf8);
+use Encode qw(decode_utf8);
 
 sub connect_db {
 	my $dbh;
@@ -36,8 +36,9 @@ sub findIDModel {
 	my $dbh;
 	my $table = $_[0];
 	my $name_pattern = $_[1];
+	my $curr_lang = session "user_current_lang";
 	$dbh = connect_db();
-	my $sth = $dbh->prepare("SELECT id FROM $table WHERE name_en = '$name_pattern'");
+	my $sth = $dbh->prepare("SELECT id FROM $table WHERE name_$curr_lang = '$name_pattern'");
 	$sth->execute() ;
 	if ($sth->rows() == 1){
 		my @a = $sth->fetchrow_array;
@@ -92,9 +93,23 @@ sub getFields {
 	return @output;
 }
 
+sub decodeDBHash ($$) {
+	my $inputHash = $_[0];
+	my $curr_lang = $_[1];
+	foreach my $key ( sort (keys %$inputHash) ) {
+		foreach my $subkey ( sort (keys ${$inputHash}{$key}) ) {
+			if (substr($subkey, -2, 2) eq $curr_lang){
+				${$inputHash}{$key}{$subkey} = decode_utf8(${$inputHash}{$key}{$subkey});
+			}
+		}
+	}
+	return $inputHash;
+};
+
 hook on_route_exception => sub {
 	debug $_;
-	halt ("exception");
+	status 404;
+	return halt template "exception";
 };
 
 get '/exception' => sub {
@@ -374,12 +389,12 @@ get '/logout' => sub {
 	}
 };
 
+
 any ['post', 'get'] => '/types' => sub {
 	my $dbh;
 	if ((session 'logged_in') && (session 'user_can_read')) {
 		$dbh = connect_db();
 		if ((request->method() eq "POST") && (session 'user_can_write')){
-			print STDERR "name before insert: " . Dumper(params->{'type_name_bg'});
 			my $sth = $dbh->prepare("INSERT INTO types (name_en, name_bg) values (?, ?)") ;	
 			$sth->execute(params->{'type_name_en'}, params->{'type_name_bg'});
 			$sth->finish();
@@ -392,21 +407,31 @@ any ['post', 'get'] => '/types' => sub {
 			$offset = int(params->{'offset'})-1;
 		}
 		$sth = $dbh->prepare("SELECT * FROM types");
-		$sth->execute() ;
+		$sth->execute();
 		$pages =  int(($sth->rows()) / 10);
 		$pages++ if ($sth->rows % 10) != 0;
 		$sth->finish();
-		$sth = $dbh->prepare("SELECT id, name_bg, name_en FROM types LIMIT 10 OFFSET ?") ;
-		$sth->execute(($offset)*10);
+		my $curr_lang = session "user_current_lang";
+		my $pattern = "%" . "_" . $curr_lang;
+ 		$sth = $dbh->prepare("SELECT types.id, metadata.column_name_$curr_lang, types.name_$curr_lang 
+							FROM types, metadata
+							WHERE metadata.column_name LIKE ?
+							AND metadata.table_name = 'types'
+							LIMIT 10 OFFSET ?") ;
+		$sth->execute($pattern, (($offset)*10));
 		my $typesHash = $sth->fetchall_hashref('id');
 		$sth->finish();
-		$sth = $dbh->prepare("SELECT * FROM types WHERE 1=0");
+		$typesHash = decodeDBHash($typesHash, $curr_lang);
+		$sth = $dbh->prepare("SELECT id, column_name_$curr_lang, column_name
+							FROM metadata WHERE table_name = 'types' ");
 		$sth->execute() ;
-		my @tableInfo = $sth->{NAME};
+		my $tableInfo = $sth->fetchall_hashref('id');
+		$tableInfo = decodeDBHash($tableInfo, $curr_lang);
 		$sth->finish();
 		$dbh->disconnect();
 		template 'types', {
-			'tableInfo' => @tableInfo,
+			'translated_column' => ("column_name_" . $curr_lang),
+			'tableInfo' => $tableInfo,
 			'types' => $typesHash,
 			'pages' => $pages,
 			'curr_page' => $offset+1,
@@ -425,10 +450,12 @@ any ['post', 'get'] => '/types/:id' => sub {
 			$dbh = connect_db();
 			if (request->method() eq "POST"){
 				my $id = params->{'id'};
+				my $curr_lang = ("name_" . (session "user_current_lang"));
+				my $concat = $curr_lang . "_" . $id;
 				my $sth = $dbh->prepare("UPDATE types 
-										SET name_en = ?, name_bg = ? 
+										SET $curr_lang = ? 
 										WHERE id = $id") ;
-				$sth->execute(params->{"new_type_name_en_$id"},params->{"new_type_name_bg_$id"}) ;
+				$sth->execute(params->{"new_type_$concat"});
 				$sth->finish();
 				$dbh->commit ;
 				$dbh->disconnect();
@@ -454,14 +481,17 @@ any ['post', 'get'] => '/models' => sub {
 	my $dbh;
 	if ((session 'logged_in') && (session 'user_can_read')) {
 		$dbh = connect_db();
-		my $sth = $dbh->prepare("SELECT id, name_en FROM types") ;
+		my $curr_lang = session "user_current_lang"; 
+		my $sth = $dbh->prepare("SELECT id, name_$curr_lang FROM types") ;
 		$sth->execute() ;
 		die if $sth->rows() < 1;
 		my $typesHash = $sth->fetchall_hashref('id');
+		$typesHash = decodeDBHash($typesHash, $curr_lang);
 		$sth->finish();
 		if ((request->method() eq "POST") && (session 'user_can_write')){
-			$sth = $dbh->prepare("INSERT INTO models (name, type_id) values (?, ?)") ;
-			$sth->execute(params->{'model_name'}, findIDModel('types', params->{'type_select'}));
+			$sth = $dbh->prepare("INSERT INTO models (name_en, name_bg, type_id) values (?, ?, ?)") ;
+			$sth->execute(params->{'model_name_en'}, params->{'model_name_bg'}, 
+							findIDModel('types', params->{'type_select'}));
 			$dbh->commit;
 			$sth->finish();
 			$dbh->disconnect();
@@ -477,20 +507,26 @@ any ['post', 'get'] => '/models' => sub {
 			$sth->execute(); 
 			$pages =  int(($sth->rows()) / 10);
 			$pages++ if ($sth->rows % 10) != 0;
-			$sth = $dbh->prepare("SELECT models.id, models.name AS \"Model name\", 
-								types.name_en AS \"Type name\" 
+			$sth = $dbh->prepare("SELECT models.id, models.name_$curr_lang, 
+								types.name_$curr_lang 
 								FROM models, types 
 								WHERE models.type_id = types.id LIMIT 10 OFFSET ?");
 			$sth->execute($offset*10);
 			my $modelsHash = $sth->fetchall_hashref('id');
 			$sth->finish();
-			$sth = $dbh->prepare("SELECT * FROM models WHERE 1=0");
+			$modelsHash = decodeDBHash($modelsHash, $curr_lang);
+			$sth = $dbh->prepare("SELECT id, column_name_$curr_lang, column_name
+							FROM metadata 
+							WHERE table_name = 'types' 
+							OR table_name = 'models' ");
 			$sth->execute() ;
-			my @tableInfo = getFields($sth->{NAME});
+			my $tableInfo = $sth->fetchall_hashref('id');
+			print STDERR Dumper($tableInfo);
 			$sth->finish();
 			$dbh->disconnect();
 			template 'models', {
-				'tableInfo' => @tableInfo,
+				'translated_column' => ("column_name_" . $curr_lang),
+				'tableInfo' => $tableInfo,
 				'types' => $typesHash,
 				'models' => $modelsHash,
 				'pages' => $pages,
@@ -532,42 +568,49 @@ any ['post', 'get'] => '/networks' => sub {
 	if ((session 'logged_in') && (session 'user_can_read')) {
 		$dbh = connect_db();
 		if ((request->method() eq "POST") && (session 'user_can_write')){
-			my $sth = $dbh->prepare("INSERT INTO networks (name) values (?)") ;	
-			$sth->execute(params->{'network_name'}) ;
+			my $sth = $dbh->prepare("INSERT INTO networks (name_en, name_bg) values (?, ?)") ;	
+			$sth->execute(params->{'network_name_en'}, params->{'network_name_bg'});
 			$sth->finish();
 			$dbh->commit ;
-			$dbh->disconnect();
-			redirect '/networks';
-		}else{
-			my ($pages, $offset, $sth);
-			if (!params->{'offset'}){
-				$offset = 0;
-			}else{
-				$offset = int(params->{'offset'})-1;
-			}
-			$sth = $dbh->prepare("SELECT * FROM networks");
-			$sth->execute() ; 
-			$pages = int(($sth->rows()) / 10);
-			$pages++ if ($sth->rows % 10) != 0;
-			$sth->finish();
-			$sth = $dbh->prepare("SELECT id, name FROM networks LIMIT 10 OFFSET ?") ;
-			$sth->execute($offset*10) ;
-			my $networksHash = $sth->fetchall_hashref('id');
-			$sth->finish();
-			$sth = $dbh->prepare("SELECT * FROM networks WHERE 1=0");
-			$sth->execute() ;
-			my @tableInfo = $sth->{NAME};
-			$sth->finish();
-			$dbh->disconnect();
-			template 'networks', {
-				'tableInfo' => @tableInfo,
-				'networks' => $networksHash,
-				'pages' => $pages,
-				'curr_page' => $offset+1,
-				'logged' => 'true',
-				'user' => session 'current_user'
-			};
 		}
+		my ($pages, $offset, $sth);
+		if (!params->{'offset'}){
+			$offset = 0;
+		}else{
+			$offset = int(params->{'offset'})-1;
+		}
+		$sth = $dbh->prepare("SELECT * FROM networks");
+		$sth->execute();
+		$pages =  int(($sth->rows()) / 10);
+		$pages++ if ($sth->rows % 10) != 0;
+		$sth->finish();
+		my $curr_lang = session "user_current_lang";
+		my $pattern = "%" . "_" . $curr_lang;
+ 		$sth = $dbh->prepare("SELECT networks.id, metadata.column_name_$curr_lang, networks.name_$curr_lang 
+							FROM networks, metadata
+							WHERE metadata.column_name LIKE ?
+							AND metadata.table_name = 'networks'
+							LIMIT 10 OFFSET ?") ;
+		$sth->execute($pattern, (($offset)*10));
+		my $networksHash = $sth->fetchall_hashref('id');
+		$sth->finish();
+		$networksHash = decodeDBHash($networksHash, $curr_lang);
+		$sth = $dbh->prepare("SELECT id, column_name_$curr_lang, column_name
+							FROM metadata WHERE table_name = 'networks' ");
+		$sth->execute() ;
+		my $tableInfo = $sth->fetchall_hashref('id');
+		$tableInfo = decodeDBHash($tableInfo, $curr_lang);
+		$sth->finish();
+		$dbh->disconnect();
+		template 'networks', {
+			'translated_column' => ("column_name_" . $curr_lang),
+			'tableInfo' => $tableInfo,
+			'networks' => $networksHash,
+			'pages' => $pages,
+			'curr_page' => $offset+1,
+			'logged' => 'true',
+			'user' => session 'current_user'
+		};
 	}else{
 		redirect '/';
 	} 
@@ -580,8 +623,10 @@ any ['get', 'post'] => '/networks/:id' => sub {
 			$dbh = connect_db();
 			if (request->method() eq "POST"){
 				my $id = params->{'id'};
-				my $sth = $dbh->prepare("UPDATE networks SET name = ? WHERE id = $id") ;	
-				$sth->execute(params->{"new_network_name_$id"}) ;
+				my $curr_lang = ("name_" . (session "user_current_lang"));
+				my $sth = $dbh->prepare("UPDATE networks SET $curr_lang = ? WHERE id = $id");
+				my $concat = $curr_lang . "_" . $id;
+				$sth->execute(params->{"new_network_$concat"}) ;
 				$sth->finish();
 				$dbh->commit ;
 				$dbh->disconnect();
@@ -606,14 +651,14 @@ any ['get', 'post'] => '/network_devices' => sub {
 	my $dbh;
 	if ((session 'logged_in') && (session 'user_can_read')) {
 		$dbh = connect_db();
-		my $sth = $dbh->prepare("SELECT id, name FROM networks") ;
+		my $sth = $dbh->prepare("SELECT id, name_en FROM networks") ;
 		$sth->execute() ;
 		die if $sth->rows() < 1;
 		my $networksHash = $sth->fetchall_hashref('id');
 		$sth->finish();
 		if ((request->method() eq "POST") && (session 'user_can_write')){
 			my $sth = $dbh->prepare("INSERT INTO network_devices (name, network_id) values (?, ?)") ;
-			$sth->execute(params->{'net_device_name'}, findID('networks', params->{'network_select'}));
+			$sth->execute(params->{'net_device_name'}, findIDModel('networks', params->{'network_select'}));
 			$sth->finish();
 			$dbh->commit ;
 			$dbh->disconnect();
@@ -632,7 +677,7 @@ any ['get', 'post'] => '/network_devices' => sub {
 			$sth->finish();
 			$sth = $dbh->prepare("SELECT network_devices.id, 
 										network_devices.name AS \"Device name\", 
-										networks.name AS \"Network name\" 
+										networks.name_en AS \"Network name\" 
 								FROM network_devices, networks 
 								WHERE network_devices.network_id = networks.id
 								LIMIT 10 OFFSET ?");
@@ -686,14 +731,14 @@ any ['get', 'post'] => '/computers' => sub {
 	my $dbh;
 	if ((session 'logged_in') && (session 'user_can_read')) {
 		$dbh = connect_db();
-		my $sth = $dbh->prepare("SELECT id, name FROM networks") ;
+		my $sth = $dbh->prepare("SELECT id, name_en FROM networks") ;
 		$sth->execute() ;
 		die if $sth->rows() < 1;
 		my $networksHash = $sth->fetchall_hashref('id');
 		$sth->finish();
 		if ((request->method() eq "POST") && (session 'user_can_write')){
 			my $sth = $dbh->prepare("INSERT INTO computers (name, network_id) values (?, ?)") ;
-			$sth->execute(params->{'computer_name'}, findID('networks', params->{'network_select'}));
+			$sth->execute(params->{'computer_name'}, findIDModel('networks', params->{'network_select'}));
 			$sth->finish();
 			$dbh->commit ;
 			$dbh->disconnect();
@@ -712,7 +757,7 @@ any ['get', 'post'] => '/computers' => sub {
 			$sth->finish();
 			$sth = $dbh->prepare("SELECT computers.id, 
 										computers.name AS \"Computer name\", 
-										networks.name AS \"Network name\" 
+										networks.name_en AS \"Network name\" 
 								FROM computers, networks 
 								WHERE computers.network_id = networks.id
 								LIMIT 10 OFFSET ?");

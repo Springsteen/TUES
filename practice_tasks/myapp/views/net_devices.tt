@@ -11,7 +11,7 @@
                 <% IF networks %> 
                     <select name=network_select class="selectpicker">
                         <% FOREACH id IN networks.keys.nsort %>  
-                            <option value=<% networks.$id.name %>><% networks.$id.name %></option>
+                            <option value=<% networks.$id.name_en %>><% networks.$id.name_en %></option>
                         <% END %>
                     </select>
                 <% ELSE %>

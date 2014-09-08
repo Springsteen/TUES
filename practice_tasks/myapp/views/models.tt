@@ -10,8 +10,12 @@
                 <% END %>
                 <% IF types %> 
                     <select name=type_select class="selectpicker">
-                        <% FOREACH id IN types.keys.nsort %>  
-                            <option value=<% types.$id.name_en %>><% types.$id.name_en %></option>
+                        <% FOREACH id IN types.keys.nsort %>
+                            <% FOREACH elem IN types.$id %>
+                                <% IF elem.key != "id" %>
+                                    <option value=<% elem.value %>><% elem.value %></option>
+                                <% END %>
+                            <% END %>  
                         <% END %>
                     </select>
                 <% ELSE %>

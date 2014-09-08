@@ -15,6 +15,14 @@ CREATE TABLE accounts (
 	interface_language int references languages(id)
 );
 
+CREATE TABLE metadata (
+	id serial primary key,
+	column_name varchar(100) not null,
+	table_name varchar(100) not null,
+	column_name_en varchar(100) not null,
+	column_name_bg varchar(100) not null
+);
+
 CREATE TABLE types (
 	id serial primary key,
 	name_en varchar(100) unique not null,
@@ -23,13 +31,15 @@ CREATE TABLE types (
 
 CREATE TABLE models (
 	id serial primary key,
-	name varchar(100) unique not null,
+	name_en varchar(100) unique not null,
+	name_bg varchar(100) unique not null,
 	type_id int references types(id)
 );
 
 CREATE TABLE networks (
 	id serial primary key,
-	name varchar(100) unique not null
+	name_en varchar(100) unique not null,
+	name_bg varchar(100) unique not null
 );
 
 CREATE TABLE manuals (
