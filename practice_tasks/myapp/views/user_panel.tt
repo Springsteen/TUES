@@ -54,6 +54,6 @@
         </div>
     </div>
 
-    <a href="<% request.uri_base %>/account_management">Account Management</a>
+    <a href="/account_management">Account Management</a>
 
 </div>

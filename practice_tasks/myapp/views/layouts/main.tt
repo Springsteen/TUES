@@ -22,20 +22,20 @@
 			</div>
 			<ul class="nav navbar-nav">
 				<% IF logged == 'true' || msg == 1 %>
-					<li><a href="<% types_url %>"> Types </a></li>
-					<li><a href="<% models_url %>"> Models </a></li>
-					<li><a href="<% networks_url %>"> Networks </a></li>
-					<li><a href="<% net_devices_url %>"> Network devices </a></li>
-					<li><a href="<% computers_url %>"> Computers </a></li>
-					<li><a href="<% parts_url %>"> Parts </a></li>
-					<li><a href="<% manuals_url %>"> Manuals </a></li>
-					<li><a href="<% search_url %>"> Search </a></li>
+					<li><a href="/types"> Types </a></li>
+					<li><a href="/models"> Models </a></li>
+					<li><a href="/networks"> Networks </a></li>
+					<li><a href="/network_devices"> Network devices </a></li>
+					<li><a href="/computers"> Computers </a></li>
+					<li><a href="/parts"> Parts </a></li>
+					<li><a href="/manuals"> Manuals </a></li>
+					<li><a href="/search"> Search </a></li>
 				<% END %>
 			</ul>
 			<ul class="nav navbar-nav navbar-right">
 				<% IF logged == 'true' || msg == 1 %>
-					<li><a href="<% request.uri_base %>/user_panel"> Logged as: <%user%></a></li>
-					<li><a href="<% logout_url %>"> Logout </a></li>
+					<li><a href="/user_panel"> Logged as: <%user%></a></li>
+					<li><a href="/logout"> Logout </a></li>
 				<% END %>
 			</ul>
 		</nav>
