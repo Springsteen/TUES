@@ -106,6 +106,54 @@ sub decodeDBHash ($$) {
 	return $inputHash;
 };
 
+sub getColumnNamesInCurrentLanguage ($$) {
+	my $dbh = $_[0];
+	my $table = $_[1];
+	my $curr_lang = session "user_current_lang";
+	
+	my $sth = $dbh->prepare("SELECT * FROM $table WHERE FALSE");
+	$sth->execute();
+	my $columnNames = $sth->{NAME};
+	$sth->finish();
+	my @output;
+	foreach my $columnName (@$columnNames) {
+		if (substr($columnName, -2, 2) eq $curr_lang) {
+			push(@output, $columnName);
+		}
+	}
+	return @output;
+};
+
+sub associateColumnNamesWithTables ($$){
+	my $columnNames = $_[0];
+	my $table = $_[1];
+	my $output = "";
+	foreach my $column (@$columnNames) {
+		$output .= ("$table." . $column . ", ");
+	}
+	substr ($output, -2) = "";
+	return $output;
+};
+
+sub buildINSERTQuery ($$){
+	my $columns = $_[0];
+	my $table = $_[1];
+	my $query = "INSERT INTO $table (";
+	foreach my $column (@$columns) {
+		$query .= ($column . ", ") if $column ne "id";
+	}
+	substr ($query, -2) = "";
+	$query .= ") values ("; 
+	chop($table); 
+	foreach my $column (@$columns){
+		$query .= ("'" . (params->{$table. "_". "$column"}) ."', ") if $column ne "id";
+	}
+	$query .= ")";
+	substr ($query, -3, 2) = "";
+	print STDERR Dumper($query);
+	return $query;
+};
+
 hook on_route_exception => sub {
 	debug $_;
 	status 404;
@@ -389,35 +437,50 @@ get '/logout' => sub {
 	}
 };
 
+sub buildSimpleSELECTQuery ($;$$){
+	my $table = $_[0];
+	my ($columns, $limit);
+	defined $_[1] ? $columns = $_[1] : $columns = "*";
+	defined $_[2] ? $limit = $_[2] : $limit = 20;
+	my $query = "SELECT ";
+	if (ref($columns) eq "ARRAY"){
+		foreach my $column (@$columns) {
+			$query .= $column . ", ";
+		}
+		substr($query, -2) = "";
+	}else{
+		$query .= "*";
+	}
+	$query .= (" FROM " . $table . " LIMIT " . $limit);
+	print STDERR Dumper($query);
+	return $query;
+};
 
-sub getColumnNamesInCurrentLanguage ($$) {
+sub countTableRows($$) {
 	my $dbh = $_[0];
 	my $table = $_[1];
-	my $curr_lang = session "user_current_lang";
-	
-	my $sth = $dbh->prepare("SELECT * FROM $table WHERE FALSE");
+	my $sth = $dbh->prepare("SELECT COUNT(*) FROM $table");
 	$sth->execute();
-	my $columnNames = $sth->{NAME};
+	my @tableRows = $sth->fetchrow_array;
 	$sth->finish();
-	my @output;
-	foreach my $columnName (@$columnNames) {
-		if (substr($columnName, -2, 2) eq $curr_lang) {
-			push(@output, $columnName);
-		}
-	}
-	return @output;
-};
-# TODO ::: USE THE METHOD UP THERE TO GET COLUMN NAMES AND CONCAT THEM FOR THE SELECT ON ROW 
-# 436 SO IT WILL DYNAMICALLY GET ALL COLUMNS NEEDED
+	my $tableRowsCounted = int($tableRows[0]);
+	print STDERR Dumper($tableRowsCounted);
+	return $tableRowsCounted;
+}
+
 any ['post', 'get'] => '/types' => sub {
 	my $dbh;
 	if ((session 'logged_in') && (session 'user_can_read')) {
 		$dbh = connect_db();
 		if ((request->method() eq "POST") && (session 'user_can_write')){
-			my $sth = $dbh->prepare("INSERT INTO types (name_en, name_bg) values (?, ?)") ;	
-			$sth->execute(params->{'type_name_en'}, params->{'type_name_bg'});
+			my $sth = $dbh->prepare("SELECT * FROM types WHERE FALSE");
+			$sth->execute();
+			my $names = $sth->{NAME};
 			$sth->finish();
-			$dbh->commit ;
+			$sth = $dbh->prepare(buildINSERTQuery($names, 'types'));	
+			$sth->execute();
+			$sth->finish();
+			$dbh->commit;
 		}
 		my ($pages, $offset, $sth);
 		if (!params->{'offset'}){
@@ -425,6 +488,7 @@ any ['post', 'get'] => '/types' => sub {
 		}else{
 			$offset = int(params->{'offset'})-1;
 		}
+		countTableRows($dbh, 'metadata');
 		$sth = $dbh->prepare("SELECT * FROM types");
 		$sth->execute();
 		$pages =  int(($sth->rows()) / 10);
@@ -432,16 +496,15 @@ any ['post', 'get'] => '/types' => sub {
 		$sth->finish();
 		my $curr_lang = session "user_current_lang";
 		my $pattern = "%" . "_" . $curr_lang;
-		print STDERR Dumper(getColumnNamesInCurrentLanguage($dbh, 'types'));
- 		$sth = $dbh->prepare("SELECT types.id, metadata.column_name_$curr_lang, types.name_$curr_lang 
-							FROM types, metadata
-							WHERE metadata.column_name LIKE ?
-							AND metadata.table_name = 'types'
+		my @output = getColumnNamesInCurrentLanguage($dbh, 'types');
+		my $columnsNeeded = associateColumnNamesWithTables(\@output, 'types');
+ 		$sth = $dbh->prepare("SELECT types.id, $columnsNeeded
+ 							FROM types
 							LIMIT 10 OFFSET ?") ;
-		$sth->execute($pattern, (($offset)*10));
+		$sth->execute(($offset)*10);
 		my $typesHash = $sth->fetchall_hashref('id');
-		# print STDERR Dumper( $typesHash);
 		$sth->finish();
+		# print STDERR Dumper( $typesHash);
 		$typesHash = decodeDBHash($typesHash, $curr_lang);
 		$sth = $dbh->prepare("SELECT id, column_name_$curr_lang, column_name
 							FROM metadata WHERE table_name = 'types' ");
@@ -450,6 +513,7 @@ any ['post', 'get'] => '/types' => sub {
 		$tableInfo = decodeDBHash($tableInfo, $curr_lang);
 		$sth->finish();
 		$dbh->disconnect();
+		# print STDERR Dumper( $tableInfo	);
 		template 'types', {
 			'translated_column' => ("column_name_" . $curr_lang),
 			'tableInfo' => $tableInfo,

@@ -26,7 +26,9 @@ CREATE TABLE metadata (
 CREATE TABLE types (
 	id serial primary key,
 	name_en varchar(100) unique not null,
-	name_bg varchar(100) unique not null
+	name_bg varchar(100) unique not null,
+	test_bg varchar(1),
+	test_en varchar(1)
 );
 
 CREATE TABLE models (
@@ -40,11 +42,6 @@ CREATE TABLE networks (
 	id serial primary key,
 	name_en varchar(100) unique not null,
 	name_bg varchar(100) unique not null
-);
-
-CREATE TABLE manuals (
-	id serial primary key,
-	name varchar(100) unique not null
 );
 
 CREATE TABLE network_devices (
@@ -68,3 +65,17 @@ CREATE TABLE parts (
 	model_id int references models(id),
 	computer_id int references computers(id)
 );
+
+CREATE TABLE manuals (
+	id serial primary key,
+	name varchar(100) unique not null
+);
+
+SELECT types.id, types.name_en, types.test_en, metadata.column_name_en
+FROM types, metadata
+WHERE metadata.table_name = 'types'
+AND metadata.column_name LIKE '%_en'
+metadata.column_name_$curr_lang, $columnsNeeded
+ 							FROM types, metadata
+							WHERE metadata.column_name LIKE ?
+							AND metadata.table_name = 'types'

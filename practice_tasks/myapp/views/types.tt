@@ -49,13 +49,6 @@
 
     <% IF types %>
         <table class="table table-bordered">
-            <% FOREACH key IN types.values.first.keys.sort%>
-                <% IF key == translated_column %>
-                    <th><% types.values.first.$key %></th>
-                <% END %>
-            <% END %>
-            <th></th>
-            <th></th>
             <% FOREACH id IN types.keys.nsort %>
                 <tr>
                 <form method=post action=/types/<%id%>>
