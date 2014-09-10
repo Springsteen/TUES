@@ -2,12 +2,17 @@
     <div class="panel panel-primary">	
         <div class=input-group>
             <form method=post>
-                <%FOREACH field IN tableInfo %>
-                    <% IF field != "id" %>
-                        Model <% field %>:<br>
-                        <input type=text name=model_<% field %> class=form-control><br><br>
+                <%FOREACH key IN tableInfo.keys.nsort %>
+                    <% FOREACH subkey IN tableInfo.$key.keys.sort.reverse %>
+                        <% IF subkey == translated_column %>
+                            <% tableInfo.$key.$subkey %>
+                        <% END %>
+                            <% IF subkey == "column_name" %>
+                                <input type=text name=model_<% tableInfo.$key.$subkey %> class=form-control><br><br>
+                            <% END %>
                     <% END %>
                 <% END %>
+                <br><br>Select model's type:<br>
                 <% IF types %> 
                     <select name=type_select class="selectpicker">
                         <% FOREACH id IN types.keys.nsort %>
@@ -21,7 +26,7 @@
                 <% ELSE %>
                     <p> There aren't any types in the database <p>
                 <% END %> 
-                <input type=submit value=Save class="btn btn-primary">
+                <br><br><input type=submit value=Save class="btn btn-primary">
             </form>
         </div>
     </div>
@@ -47,7 +52,7 @@
 
     <% IF models %>
         <table class="table table-bordered">	
-            <tr>
+            <!-- <tr>
                 <% FOREACH key IN models.values.first.keys.sort%>
                     <% IF key != "id" %>
                         <th><% key %></th>
@@ -55,7 +60,7 @@
                 <% END %>
                 <th></th>
                 <th></th>
-            </tr>
+            </tr> -->
             <% FOREACH id IN models.keys.nsort%>		
                 <tr>
                     <% FOREACH elem in models.$id %>
