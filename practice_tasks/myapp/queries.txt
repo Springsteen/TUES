@@ -20,7 +20,11 @@ CREATE TABLE metadata (
 	column_name varchar(100) not null,
 	table_name varchar(100) not null,
 	column_name_en varchar(100) not null,
-	column_name_bg varchar(100) not null
+	column_name_bg varchar(100) not null,
+	column_data_type varchar(30) not null,
+	column_is_input boolean,
+	is_reference boolean DEFAULT FALSE,
+	refered_table varchar(100) DEFAULT NULL
 );
 
 CREATE TABLE types (
@@ -70,12 +74,3 @@ CREATE TABLE manuals (
 	id serial primary key,
 	name varchar(100) unique not null
 );
-
-SELECT types.id, types.name_en, types.test_en, metadata.column_name_en
-FROM types, metadata
-WHERE metadata.table_name = 'types'
-AND metadata.column_name LIKE '%_en'
-metadata.column_name_$curr_lang, $columnsNeeded
- 							FROM types, metadata
-							WHERE metadata.column_name LIKE ?
-							AND metadata.table_name = 'types'

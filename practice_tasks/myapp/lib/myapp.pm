@@ -8,6 +8,7 @@ use Digest::MD5 qw(md5 md5_hex md5_base64);
 use String::Random qw(random_string);
 use Dancer::Plugin::Email;
 use Encode qw(decode_utf8);
+use Scalar::Util::Numeric qw(isint);
 
 sub connect_db {
 	my $dbh;
@@ -146,7 +147,13 @@ sub buildINSERTQuery ($$){
 	$query .= ") values ("; 
 	chop($table); 
 	foreach my $column (@$columns){
-		$query .= ("'" . (params->{$table. "_". "$column"}) ."', ") if $column ne "id";
+		if ($column ne "id") {
+			if (isint(params->{$table. "_". "$column"})){
+				$query .= ((params->{$table. "_". "$column"}) .", ");
+			}else{
+				$query .= ("'" . (params->{$table. "_". "$column"}) ."', ");
+			}
+		}
 	}
 	$query .= ")";
 	substr ($query, -3, 2) = "";
@@ -200,12 +207,13 @@ sub makeINSERTByGivenQuery ($$) {
 	$dbh->commit;
 };
 
-sub fetchTableColumnNames ($$) {
+sub fetchTableColumnNames ($$;$) {
 	my ($dbh, $table) = ($_[0], $_[1]);
 	my $sth = $dbh->prepare("SELECT * FROM $table WHERE FALSE");
 	$sth->execute();
 	my $columnNames = $sth->{NAME};
 	$sth->finish();
+	shift($columnNames) if ((defined $_[2]) && ($_[2] == 1));
 	return $columnNames;  
 };
 
@@ -511,10 +519,11 @@ any ['post', 'get'] => '/types' => sub {
 											FROM metadata WHERE table_name = 'types' ");
 		$tableInfo = decodeDBHash($tableInfo, $curr_lang);
 		$dbh->disconnect();
-		template 'types', {
+		template 'template', {
 			'translated_column' => ("column_name_" . $curr_lang),
 			'tableInfo' => $tableInfo,
-			'types' => $typesHash,
+			'fetchedEntries' => $typesHash,
+			'currentType' => 'type',	
 			'pages' => $pages,
 			'curr_page' => $offset+1,
 			'logged' => 'true',
@@ -565,9 +574,10 @@ any ['post', 'get'] => '/models' => sub {
 		my $typesHash = fetchHashSortedById($dbh, buildSimpleSELECTQuery('types', ["id" ,"name_$curr_lang"], 100, 0)); 
 		$typesHash = decodeDBHash($typesHash, $curr_lang);
 		if ((request->method() eq "POST") && (session 'user_can_write')){
+			params->{"model_type_id"} = findIDModel('types',params->{"model_type_id"});
+			# print STDERR params->{"model_type_id"};
+			# TRQBVA DA SE GLEDA :D
 			makeINSERTByGivenQuery($dbh, buildINSERTQuery(fetchTableColumnNames($dbh, 'models'), 'models'));
-			# FIX buildInsertQuery so it checks the datatype ...
-			# FIX the template ...
 			$dbh->disconnect();
 			redirect '/models';
 		}else{
@@ -576,14 +586,14 @@ any ['post', 'get'] => '/models' => sub {
 			my $rows = countTableRows($dbh, 'networks');
 			my $pages =  int($rows / 10);
 			$pages++ if ($rows % 10) != 0;
-			my $query = "SELECT models.id, models.name_$curr_lang, types.name_$curr_lang 
+			my $query = "SELECT models.id, models.name_$curr_lang, types.name_$curr_lang AS type_name_en 
 						FROM models, types 
 						WHERE models.type_id = types.id LIMIT 10 OFFSET " . ($offset*10);
+			# print STDERR Dumper($query);
 			my $modelsHash = fetchHashSortedById($dbh, $query);
-			print STDERR Dumper($modelsHash);
+			print STDERR "Models hash: " . Dumper($modelsHash);
 			$modelsHash = decodeDBHash($modelsHash, $curr_lang);
-			$query = "SELECT id, column_name_$curr_lang, column_name
-					FROM metadata 
+			$query = "SELECT * FROM metadata 
 					WHERE table_name = 'models' ";
 			my $tableInfo = fetchHashSortedById($dbh, $query);
 			print STDERR Dumper($tableInfo);
@@ -650,10 +660,11 @@ any ['post', 'get'] => '/networks' => sub {
 											FROM metadata WHERE table_name = 'networks' ");
 		$tableInfo = decodeDBHash($tableInfo, $curr_lang);
 		$dbh->disconnect();
-		template 'networks', {
+		template 'template', {
 			'translated_column' => ("column_name_" . $curr_lang),
+			'currentType' => 'network',
 			'tableInfo' => $tableInfo,
-			'networks' => $networksHash,
+			'fetchedEntries' => $networksHash,
 			'pages' => $pages,
 			'curr_page' => $offset+1,
 			'logged' => 'true',

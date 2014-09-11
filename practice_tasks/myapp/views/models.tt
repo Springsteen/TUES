@@ -14,7 +14,7 @@
                 <% END %>
                 <br><br>Select model's type:<br>
                 <% IF types %> 
-                    <select name=type_select class="selectpicker">
+                    <select name=model_type_id class="selectpicker">
                         <% FOREACH id IN types.keys.nsort %>
                             <% FOREACH elem IN types.$id %>
                                 <% IF elem.key != "id" %>
