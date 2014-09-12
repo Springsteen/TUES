@@ -7,8 +7,9 @@ use Math::Round;
 use Digest::MD5 qw(md5 md5_hex md5_base64);	
 use String::Random qw(random_string);
 use Dancer::Plugin::Email;
-use Encode qw(decode_utf8);
 use Scalar::Util::Numeric qw(isint);
+
+use helpers;
 
 sub connect_db {
 	my $dbh;
@@ -23,14 +24,6 @@ sub connect_db {
 		}
 	) or die;
 	return $dbh;
-};
-
-sub checkUserRights {
-	my $rights = $_[0];
-	my $admin = 1 if $rights & 4;
-	my $write = 1 if $rights & 2;
-	my $read = 1 if $rights & 1;
-	return ($admin, $write, $read); 
 };
 
 sub findIDModel {
@@ -72,41 +65,6 @@ sub findID {
 	}
 };
 
-sub validateDate {
-	my $str = $_[0];
-	my $year = int(substr $str, 0, 4);
-	my $month = int(substr $str, 5, 2);
-	my $day = int(substr $str, 8, 2);
-	return -1 if ($year < 2014 or $year > 2030);
-	return -1 if ($month < 1 or $month > 12);
-	return -1 if ($day < 1 or $day > 31);
-	return 1
-};
-
-sub getFields {
-	my @fields = $_[0];
-	my (@output, @check);
-	for (my $i = 0; $i < scalar @{$fields[0]}; $i++) {
-		@check = split('_', $fields[0][$i]);
-		push(@output, $fields[0][$i]) if !($check[-1] eq "id");
-		@check = undef; 
-	}
-	return @output;
-};
-
-sub decodeDBHash ($$) {
-	my $inputHash = $_[0];
-	my $curr_lang = $_[1];
-	foreach my $key ( sort (keys %$inputHash) ) {
-		foreach my $subkey ( sort (keys ${$inputHash}{$key}) ) {
-			if (substr($subkey, -2, 2) eq $curr_lang){
-				${$inputHash}{$key}{$subkey} = decode_utf8(${$inputHash}{$key}{$subkey});
-			}
-		}
-	}
-	return $inputHash;
-};
-
 sub getColumnNamesInCurrentLanguage ($$) {
 	my $dbh = $_[0];
 	my $table = $_[1];
@@ -123,17 +81,6 @@ sub getColumnNamesInCurrentLanguage ($$) {
 		}
 	}
 	return @output;
-};
-
-sub associateColumnNamesWithTables ($$){
-	my $columnNames = $_[0];
-	my $table = $_[1];
-	my $output = "";
-	foreach my $column (@$columnNames) {
-		$output .= ("$table." . $column . ", ");
-	}
-	substr ($output, -2) = "";
-	return $output;
 };
 
 sub buildINSERTQuery ($$){
@@ -160,71 +107,6 @@ sub buildINSERTQuery ($$){
 	return $query;
 };
 
-sub buildSimpleSELECTQuery ($;$$$){
-	my $table = $_[0];
-	my ($columns, $limit, $offset) = ("*", 20, 0);
-	$columns = $_[1] if (defined $_[1]);
-	$limit = $_[2] if (defined $_[2]);
-	$offset = $_[3] if (defined $_[3]);
-	my $query = "SELECT ";
-	if (ref($columns) eq "ARRAY"){
-		foreach my $column (@$columns) {
-			$query .= $column . ", ";
-		}
-		substr($query, -2) = "";
-	}else{
-		$query .= "*";
-	}
-	$query .= (" FROM " . $table . " LIMIT " . $limit . " OFFSET " . $offset);
-	return $query;
-};
-
-sub countTableRows($$) {
-	my $dbh = $_[0];
-	my $table = $_[1];
-	my $sth = $dbh->prepare("SELECT COUNT(*) FROM $table");
-	$sth->execute();
-	my @tableRows = $sth->fetchrow_array;
-	$sth->finish();
-	my $tableRowsCounted = int($tableRows[0]);
-	return $tableRowsCounted;
-};
-
-sub fetchHashSortedById($$){
-	my ($dbh, $query) = ($_[0], $_[1]);
-	my $sth = $dbh->prepare($query);
-	$sth->execute();
-	my $fetchedHash = $sth->fetchall_hashref('id');
-	$sth->finish();
-	return $fetchedHash;
-};
-
-sub makeINSERTByGivenQuery ($$) {
-	my ($dbh, $query) = ($_[0], $_[1]);
-	my $sth = $dbh->prepare($query);
-	$sth->execute();
-	$sth->finish();
-	$dbh->commit;
-};
-
-sub fetchTableColumnNames ($$;$) {
-	my ($dbh, $table) = ($_[0], $_[1]);
-	my $sth = $dbh->prepare("SELECT * FROM $table WHERE FALSE");
-	$sth->execute();
-	my $columnNames = $sth->{NAME};
-	$sth->finish();
-	shift($columnNames) if ((defined $_[2]) && ($_[2] == 1));
-	return $columnNames;  
-};
-
-sub makeDELETEQuery ($$$) {
-	my ($dbh, $table, $id) = ($_[0], $_[1], $_[2]);
-	my $sth = $dbh->prepare("DELETE FROM $table WHERE id = $id");
-	$sth->execute();
-	$sth->finish();
-	$dbh->commit();
-};
-
 hook on_route_exception => sub {
 	debug $_;
 	status 404;
@@ -235,13 +117,6 @@ get '/exception' => sub {
 	template 'exception.tt';
 };
 
-sub ASSERT ($;$) {
-	if ($_[0] == 0){
-		debug $_[1] if (defined $_[1]);
-		die; 
-	}
-};
-
 any ['post', 'get'] => '/' => sub {
 	my $dbh;
 	if (request->method() eq "POST"){
@@ -250,7 +125,7 @@ any ['post', 'get'] => '/' => sub {
 		my $sth = $dbh->prepare("SELECT id,name,password FROM accounts 
 								WHERE name = ? AND password = ?") ;
 		$sth->execute(params->{'username'}, md5_base64(params->{"password"}, params->{"username"}));
-		ASSERT(($sth->rows == 1), ("Died on line: " . __LINE__ ));
+		helpers::ASSERT(($sth->rows == 1), ("Died on line: " . __LINE__ ));
 		session 'logged_in' => true;
 		session current_user => params->{'username'};
 		$check = 1;
@@ -268,11 +143,11 @@ any ['post', 'get'] => '/' => sub {
 								WHERE accounts.name = ? 
 								AND accounts.interface_language = languages.id") ;
 			$sth->execute(params->{'username'});
-			ASSERT(($sth->rows == 1), ("Died on line: " . __LINE__ ));
+			helpers::ASSERT(($sth->rows == 1), ("Died on line: " . __LINE__ ));
 			$check = $sth->fetchrow_hashref() ;
 			$sth->finish();
 			$dbh->disconnect();
-			my @rights = checkUserRights($check->{'rights'});
+			my @rights = helpers::checkUserRights($check->{'rights'});
 			session user_can_read => $rights[2];
 			session user_can_write => $rights[1];
 			session user_is_admin => $rights[0];
@@ -294,14 +169,14 @@ any ['post', 'get'] => '/user_panel' => sub {
 		$dbh = connect_db();
 		my $sth = $dbh->prepare("SELECT * FROM accounts 
 								WHERE name = ?") ;
-		ASSERT((defined(session 'current_user')), ("Died on line: " . __LINE__ ));
+		helpers::ASSERT((defined(session 'current_user')), ("Died on line: " . __LINE__ ));
 		$sth->execute(session 'current_user') ;
 		my $user = $sth->fetchrow_hashref() ;
-		ASSERT(($sth->rows() == 1), ("Died on line: " . __LINE__ ));
+		helpers::ASSERT(($sth->rows() == 1), ("Died on line: " . __LINE__ ));
 		$sth->finish();
 		my $active = "yes";
 		$active = "no" if ($user->{"active"} == 0);
-		my $languages = fetchHashSortedById($dbh, buildSimpleSELECTQuery('languages', "*", 100, 0));
+		my $languages = helpers::fetchHashSortedById($dbh, helpers::buildSimpleSELECTQuery('languages', "*", 100, 0));
 		if (request->method() eq "POST"){
 			if ((md5_base64(params->{"old_pass"}, session 'current_user') eq $user->{"password"}) &&
 				(params->{"new_pass_1"} eq params->{"new_pass_2"})){
@@ -309,7 +184,7 @@ any ['post', 'get'] => '/user_panel' => sub {
 							md5_base64(params->{"new_pass_1"}, session 'current_user') .
 				   			"' WHERE name = '" .
 				   			(session 'current_user') . "'";
-				makeINSERTByGivenQuery($dbh, $query);
+				helpers::makeINSERTByGivenQuery($dbh, $query);
 				$dbh->disconnect();
 				template 'user_panel', {
 					'languages' => $languages,
@@ -344,11 +219,11 @@ any ['post', 'get'] => '/change_language' => sub {
 			$dbh = connect_db();
 			my $sth = $dbh->prepare("SELECT id, abbreviation FROM languages WHERE name_en = ?") ;
 			$sth->execute(params->{"lang_select"}) ;
-			ASSERT(($sth->rows == 1), ("Died on line: " . __LINE__ ));
+			helpers::ASSERT(($sth->rows == 1), ("Died on line: " . __LINE__ ));
 			my $lang_data= $sth->fetchrow_hashref();
 			$sth->finish();
 			my $query = "UPDATE accounts SET interface_language = '" . $lang_data->{"id"} . "'";
-			makeINSERTByGivenQuery($dbh, $query);
+			helpers::makeINSERTByGivenQuery($dbh, $query);
 			session user_current_lang => $lang_data->{"abbreviation"};
 			$dbh->disconnect();
 			redirect '/user_panel'
@@ -370,7 +245,7 @@ any ['post', 'get'] => '/restore_password' => sub {
 			my $sth = $dbh->prepare("SELECT name, active FROM accounts
 									WHERE mail = ?") ;
 			$sth->execute(params->{"mail"}) ;
-			ASSERT(($sth->rows == 1), ("Died on line: " . __LINE__ ));
+			helpers::ASSERT(($sth->rows == 1), ("Died on line: " . __LINE__ ));
 			my $row = $sth->fetchrow_hashref();
 			my $user = $row->{"name"};
 			$sth->finish();
@@ -383,7 +258,7 @@ any ['post', 'get'] => '/restore_password' => sub {
 				my $new_pass = random_string("..........");
 				my $query = "UPDATE accounts SET password = '" . md5_base64($new_pass,$user) .   
 							"' WHERE mail = '" . params->{"mail"} . "'";
-				makeINSERTByGivenQuery($dbh, $query);
+				helpers::makeINSERTByGivenQuery($dbh, $query);
 				$dbh->disconnect();
 				email {
 					to => params->{"mail"},
@@ -408,19 +283,19 @@ any ['post', 'get'] => '/register' => sub {
 	}else{
 		if (request->method() eq "POST"){
 			$dbh = connect_db();
-			ASSERT((params->{"password_1"} eq params->{"password_2"}), ("Died on line: " . __LINE__ ));
-			ASSERT((params->{"mail"} =~ /[-0-9a-zA-Z.+_]+@[-0-9a-zA-Z.+_]+\.[a-zA-Z]{2,4}/), ("Died on line: " . __LINE__ ));
-			ASSERT((length(params->{"username"}) > 3), ("Died on line: " . __LINE__ ));
-			ASSERT((length(params->{"password_1"}) > 3), ("Died on line: " . __LINE__ ));
+			helpers::ASSERT((params->{"password_1"} eq params->{"password_2"}), ("Died on line: " . __LINE__ ));
+			helpers::ASSERT((params->{"mail"} =~ /[-0-9a-zA-Z.+_]+@[-0-9a-zA-Z.+_]+\.[a-zA-Z]{2,4}/), ("Died on line: " . __LINE__ ));
+			helpers::ASSERT((length(params->{"username"}) > 3), ("Died on line: " . __LINE__ ));
+			helpers::ASSERT((length(params->{"password_1"}) > 3), ("Died on line: " . __LINE__ ));
 			my $sth = $dbh->prepare("SELECT * FROM accounts WHERE
 									name = ?");
 			$sth->execute(params->{"username"});
-			ASSERT(($sth->rows() == 0), ("Died on line: " . __LINE__ ));
+			helpers::ASSERT(($sth->rows() == 0), ("Died on line: " . __LINE__ ));
 			$sth->finish();	
 			my $confirm_code = random_string("..........");
 			$sth = $dbh->prepare("SELECT id FROM languages WHERE abbreviation = 'en'") ;
 			$sth->execute();
-			ASSERT(($sth->rows() == 1), ("Died on line: " . __LINE__ ));
+			helpers::ASSERT(($sth->rows() == 1), ("Died on line: " . __LINE__ ));
 			my @lang_id = $sth->fetchrow_arrayref();
 			$sth->finish();
 			$sth = $dbh->prepare("INSERT INTO accounts (name, password, mail, confirm_code, 
@@ -463,12 +338,12 @@ any ['post', 'get'] => '/confirm_account' => sub {
 			my $sth = $dbh->prepare("SELECT confirm_code FROM accounts WHERE
 									name = ? AND active = FALSE") ;
 			$sth->execute(session 'current_user');
-			ASSERT(($sth->rows() == 1), ("Died on line: " . __LINE__ ));
+			helpers::ASSERT(($sth->rows() == 1), ("Died on line: " . __LINE__ ));
 			my $code = $sth->fetchrow_hashref();
 			$sth->finish();
 			if ($code->{"confirm_code"} eq params->{"code"}){
 				my $query = "UPDATE accounts SET active = TRUE WHERE name = '" . (session 'current_user') . "'";
-				makeINSERTByGivenQuery($dbh, $query);
+				helpers::makeINSERTByGivenQuery($dbh, $query);
 				$dbh->disconnect();
 				redirect "/"
 			}else{
@@ -502,22 +377,22 @@ any ['post', 'get'] => '/types' => sub {
 	if ((session 'logged_in') && (session 'user_can_read')) {
 		$dbh = connect_db();
 		if ((request->method() eq "POST") && (session 'user_can_write')){
-			makeINSERTByGivenQuery($dbh, buildINSERTQuery(fetchTableColumnNames($dbh, 'types'), 'types'));	
+			helpers::makeINSERTByGivenQuery($dbh, buildINSERTQuery(helpers::fetchTableColumnNames($dbh, 'types'), 'types'));	
 		}
 		my $offset = 0;
 		$offset = int(params->{'offset'})-1 if params->{'offset'};
-		my $rows = countTableRows($dbh, 'types');
+		my $rows = helpers::countTableRows($dbh, 'types');
 		my $pages =  int($rows / 10);
 		$pages++ if ($rows % 10) != 0;
 		my @output = getColumnNamesInCurrentLanguage($dbh, 'types');
 		push(@output, "id");
- 		my $typesHash = fetchHashSortedById($dbh, buildSimpleSELECTQuery('types', \@output, 10, ($offset)*10));
+ 		my $typesHash = helpers::fetchHashSortedById($dbh, helpers::buildSimpleSELECTQuery('types', \@output, 10, ($offset)*10));
 		my $curr_lang = session "user_current_lang";
-		$typesHash = decodeDBHash($typesHash, $curr_lang);
-		my $tableInfo = fetchHashSortedById($dbh, 
+		$typesHash = helpers::decodeDBHash($typesHash, $curr_lang);
+		my $tableInfo = helpers::fetchHashSortedById($dbh, 
 											"SELECT id, column_name_$curr_lang, column_name
 											FROM metadata WHERE table_name = 'types' ");
-		$tableInfo = decodeDBHash($tableInfo, $curr_lang);
+		$tableInfo = helpers::decodeDBHash($tableInfo, $curr_lang);
 		$dbh->disconnect();
 		template 'template', {
 			'translated_column' => ("column_name_" . $curr_lang),
@@ -553,7 +428,7 @@ any ['post', 'get'] => '/types/:id' => sub {
 				$dbh->disconnect();
 				redirect '/types';
 			}else{
-				makeDELETEQuery($dbh, 'types', params->{'id'});
+				helpers::makeDELETEQuery($dbh, 'types', params->{'id'});
 				redirect '/types';
 			}
 		}else{
@@ -571,31 +446,31 @@ any ['post', 'get'] => '/models' => sub {
 		$dbh = connect_db();
 		my $sth;
 		my $curr_lang = session "user_current_lang";
-		my $typesHash = fetchHashSortedById($dbh, buildSimpleSELECTQuery('types', ["id" ,"name_$curr_lang"], 100, 0)); 
-		$typesHash = decodeDBHash($typesHash, $curr_lang);
+		my $typesHash = helpers::fetchHashSortedById($dbh, helpers::buildSimpleSELECTQuery('types', ["id" ,"name_$curr_lang"], 100, 0)); 
+		$typesHash = helpers::decodeDBHash($typesHash, $curr_lang);
 		if ((request->method() eq "POST") && (session 'user_can_write')){
 			params->{"model_type_id"} = findIDModel('types',params->{"model_type_id"});
 			# print STDERR params->{"model_type_id"};
 			# TRQBVA DA SE GLEDA :D
-			makeINSERTByGivenQuery($dbh, buildINSERTQuery(fetchTableColumnNames($dbh, 'models'), 'models'));
+			helpers::makeINSERTByGivenQuery($dbh, buildINSERTQuery(helpers::fetchTableColumnNames($dbh, 'models'), 'models'));
 			$dbh->disconnect();
 			redirect '/models';
 		}else{
 			my $offset = 0;
 			$offset = int(params->{'offset'})-1 if (params->{'offset'});
-			my $rows = countTableRows($dbh, 'networks');
+			my $rows = helpers::countTableRows($dbh, 'networks');
 			my $pages =  int($rows / 10);
 			$pages++ if ($rows % 10) != 0;
 			my $query = "SELECT models.id, models.name_$curr_lang, types.name_$curr_lang AS type_name_en 
 						FROM models, types 
 						WHERE models.type_id = types.id LIMIT 10 OFFSET " . ($offset*10);
 			# print STDERR Dumper($query);
-			my $modelsHash = fetchHashSortedById($dbh, $query);
+			my $modelsHash = helpers::fetchHashSortedById($dbh, $query);
 			print STDERR "Models hash: " . Dumper($modelsHash);
-			$modelsHash = decodeDBHash($modelsHash, $curr_lang);
+			$modelsHash = helpers::decodeDBHash($modelsHash, $curr_lang);
 			$query = "SELECT * FROM metadata 
 					WHERE table_name = 'models' ";
-			my $tableInfo = fetchHashSortedById($dbh, $query);
+			my $tableInfo = helpers::fetchHashSortedById($dbh, $query);
 			print STDERR Dumper($tableInfo);
 			$dbh->disconnect();
 			template 'models', {
@@ -642,23 +517,23 @@ any ['post', 'get'] => '/networks' => sub {
 	if ((session 'logged_in') && (session 'user_can_read')) {
 		$dbh = connect_db();
 		if ((request->method() eq "POST") && (session 'user_can_write')){
-			makeINSERTByGivenQuery($dbh, buildINSERTQuery(fetchTableColumnNames($dbh, 'networks'), 'networks'));
+			helpers::makeINSERTByGivenQuery($dbh, buildINSERTQuery(helpers::fetchTableColumnNames($dbh, 'networks'), 'networks'));
 		}
 		my ($pages, $offset, $sth);
 		$offset = 0;
 		$offset = int(params->{'offset'})-1 if (params->{'offset'});
-		my $rows = countTableRows($dbh, 'networks');
+		my $rows = helpers::countTableRows($dbh, 'networks');
 		$pages =  int($rows / 10);
 		$pages++ if ($rows % 10) != 0;
 		my @output = getColumnNamesInCurrentLanguage($dbh, 'networks');
 		push(@output, "id");
- 		my $networksHash = fetchHashSortedById($dbh, buildSimpleSELECTQuery('networks', \@output, 10, ($offset)*10));
+ 		my $networksHash = helpers::fetchHashSortedById($dbh, helpers::buildSimpleSELECTQuery('networks', \@output, 10, ($offset)*10));
 		my $curr_lang = session "user_current_lang";
-		$networksHash = decodeDBHash($networksHash, $curr_lang);
-		my $tableInfo = fetchHashSortedById($dbh, 
+		$networksHash = helpers::decodeDBHash($networksHash, $curr_lang);
+		my $tableInfo = helpers::fetchHashSortedById($dbh, 
 											"SELECT id, column_name_$curr_lang, column_name
 											FROM metadata WHERE table_name = 'networks' ");
-		$tableInfo = decodeDBHash($tableInfo, $curr_lang);
+		$tableInfo = helpers::decodeDBHash($tableInfo, $curr_lang);
 		$dbh->disconnect();
 		template 'template', {
 			'translated_column' => ("column_name_" . $curr_lang),
@@ -691,7 +566,7 @@ any ['get', 'post'] => '/networks/:id' => sub {
 				$dbh->disconnect();
 				redirect '/networks';
 			}else{
-				makeDELETEQuery($dbh, 'networks', params->{'id'});
+				helpers::makeDELETEQuery($dbh, 'networks', params->{'id'});
 				redirect '/networks';
 			}
 		}else{
@@ -741,7 +616,7 @@ any ['get', 'post'] => '/network_devices' => sub {
 			$sth->finish();
 			$sth = $dbh->prepare("SELECT * FROM network_devices WHERE 1=0");
 			$sth->execute() ;
-			my @tableInfo = getFields($sth->{NAME});
+			my @tableInfo = helpers::getFields($sth->{NAME});
 			$sth->finish();
 			$dbh->disconnect();
 			template 'net_devices.tt', {
@@ -821,7 +696,7 @@ any ['get', 'post'] => '/computers' => sub {
 			$sth->finish();
 			$sth = $dbh->prepare("SELECT * FROM computers WHERE 1=0");
 			$sth->execute() ;
-			my @tableInfo = getFields($sth->{NAME});
+			my @tableInfo = helpers::getFields($sth->{NAME});
 			$sth->finish();
 			$dbh->disconnect();
 			template 'computers.tt', {
@@ -877,7 +752,7 @@ any ['get', 'post'] => '/parts' => sub {
 		my $computersHash = $sth->fetchall_hashref('id');
 		$sth->finish();
 		if ((request->method() eq "POST") && (session 'user_can_write')){
-			die if (validateDate(params->{'part_waranty'}) != 1);
+			die if (helpers::validateDate(params->{'part_waranty'}) != 1);
 			$sth = $dbh->prepare("INSERT INTO parts (name, model_id, computer_id, waranty) 
 									values (?, ?, ?, ?)") ;
 			$sth->execute(params->{'part_name'}, 
@@ -913,7 +788,7 @@ any ['get', 'post'] => '/parts' => sub {
 			$sth->finish();
 			$sth = $dbh->prepare("SELECT * FROM parts WHERE 1=0");
 			$sth->execute() ;
-			my @tableInfo = getFields($sth->{NAME});
+			my @tableInfo = helpers::getFields($sth->{NAME});
 			$sth->finish();
 			$dbh->disconnect();
 			template 'parts.tt', {
