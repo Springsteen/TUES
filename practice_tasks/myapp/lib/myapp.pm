@@ -1,13 +1,19 @@
 package myapp;
 use Dancer ':syntax';
+use Dancer::Plugin::Ajax;
+use Dancer::Plugin::Email;
+
 use DBI;
 use Data::Dumper;
 use Try::Tiny;
+
 use Math::Round;
 use Digest::MD5 qw(md5 md5_hex md5_base64);	
 use String::Random qw(random_string);
-use Dancer::Plugin::Email;
 use Scalar::Util::Numeric qw(isint);
+use Encode qw(decode_utf8 decode encode_utf8);
+
+use JSON;
 
 use helpers;
 
@@ -440,6 +446,21 @@ any ['post', 'get'] => '/types/:id' => sub {
 };
 
 
+ajax '/get_types' => sub {
+	my $dbh = connect_db();
+	my $curr_lang = session 'user_current_lang';
+	my $pattern = $dbh->quote(params->{"input"});
+	my $typesHash = helpers::fetchHashSortedById($dbh, "SELECT * FROM types WHERE name_$curr_lang ~ $pattern");
+	$typesHash = helpers::decodeDBHash($typesHash, $curr_lang);
+	$dbh->disconnect();
+	print STDERR Dumper($typesHash);
+	my $str = to_json($typesHash);
+	# $str = encode_utf8($str);
+	print STDERR Dumper($str);
+	
+	return $str;
+};
+
 any ['post', 'get'] => '/models' => sub {
 	my $dbh;
 	if ((session 'logged_in') && (session 'user_can_read')) {
@@ -466,12 +487,12 @@ any ['post', 'get'] => '/models' => sub {
 						WHERE models.type_id = types.id LIMIT 10 OFFSET " . ($offset*10);
 			# print STDERR Dumper($query);
 			my $modelsHash = helpers::fetchHashSortedById($dbh, $query);
-			print STDERR "Models hash: " . Dumper($modelsHash);
+			# print STDERR "Models hash: " . Dumper($modelsHash);
 			$modelsHash = helpers::decodeDBHash($modelsHash, $curr_lang);
 			$query = "SELECT * FROM metadata 
 					WHERE table_name = 'models' ";
 			my $tableInfo = helpers::fetchHashSortedById($dbh, $query);
-			print STDERR Dumper($tableInfo);
+			# print STDERR Dumper($tableInfo);
 			$dbh->disconnect();
 			template 'models', {
 				'translated_column' => ("column_name_" . $curr_lang),

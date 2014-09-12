@@ -1,31 +1,26 @@
 <div class="content panel ">
+    <% rf = "refered_table" %>
+    <% is_rf = "is_reference" %>
+
     <div class="panel panel-primary">	
         <div class=input-group>
             <form method=post>
                 <%FOREACH key IN tableInfo.keys.nsort %>
                     <% FOREACH subkey IN tableInfo.$key.keys.sort.reverse %>
                         <% IF subkey == translated_column %>
-                            <% tableInfo.$key.$subkey %>
+                            <% tableInfo.$key.$subkey %><br>
                         <% END %>
-                            <% IF subkey == "column_name" %>
+                        <% IF subkey == "column_name" %>
+                            <% IF tableInfo.$key.$is_rf %>
+                            <input type=search value=<% tableInfo.$key.$translated_column %> id="ajax_types" class="ajax">
+                            <br><br>
+                            <div class="ajax-output"></div>
+                            <% ELSE %>
                                 <input type=text name=model_<% tableInfo.$key.$subkey %> class=form-control><br><br>
                             <% END %>
+                        <% END %>
                     <% END %>
                 <% END %>
-                <br><br>Select model's type:<br>
-                <% IF types %> 
-                    <select name=model_type_id class="selectpicker">
-                        <% FOREACH id IN types.keys.nsort %>
-                            <% FOREACH elem IN types.$id %>
-                                <% IF elem.key != "id" %>
-                                    <option value=<% elem.value %>><% elem.value %></option>
-                                <% END %>
-                            <% END %>  
-                        <% END %>
-                    </select>
-                <% ELSE %>
-                    <p> There aren't any types in the database <p>
-                <% END %> 
                 <br><br><input type=submit value=Save class="btn btn-primary">
             </form>
         </div>

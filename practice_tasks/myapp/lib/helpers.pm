@@ -1,5 +1,6 @@
 package helpers;
-    use Encode qw(decode_utf8);
+    use Encode qw(decode_utf8 decode);
+    use Data::Dumper;
 
     sub ASSERT ($;$) {
         if ($_[0] == 0){
@@ -90,10 +91,13 @@ package helpers;
         foreach my $key ( sort (keys %$inputHash) ) {
             foreach my $subkey ( sort (keys ${$inputHash}{$key}) ) {
                 if (substr($subkey, -2, 2) eq $curr_lang){
-                ${$inputHash}{$key}{$subkey} = decode_utf8(${$inputHash}{$key}{$subkey});
+                    # print STDERR "BEFORE:".${$inputHash}{$key}{$subkey}."\n";
+                    ${$inputHash}{$key}{$subkey} = decode_utf8(${$inputHash}{$key}{$subkey});
+                    # print STDERR "AFTER:".${$inputHash}{$key}{$subkey}."\n";
                 }
             }
         }
+        # print STDERR Dumper($inputHash);
         return $inputHash;
     };
 
