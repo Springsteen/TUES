@@ -26,7 +26,6 @@ $(document).on('keyup', '#ajax_types', function(){
                     if(response.hasOwnProperty(id)){
                         var option = "<option value=\"";
                         for (var property in response[id]){
-                            // console.log(property);
                             if(response[id].hasOwnProperty(property)){
                                 if(property != "id"){
                                     option += response[id][property];

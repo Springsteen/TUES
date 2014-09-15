@@ -466,9 +466,8 @@ any ['post', 'get'] => '/models' => sub {
 		my $typesHash = helpers::fetchHashSortedById($dbh, helpers::buildSimpleSELECTQuery('types', ["id" ,"name_$curr_lang"], 100, 0)); 
 		$typesHash = helpers::decodeDBHash($typesHash, $curr_lang);
 		if ((request->method() eq "POST") && (session 'user_can_write')){
+			# print STDERR Dumper(params);
 			params->{"model_type_id"} = findIDModel('types',params->{"model_type_id"});
-			# print STDERR params->{"model_type_id"};
-			# TRQBVA DA SE GLEDA :D
 			helpers::makeINSERTByGivenQuery($dbh, buildINSERTQuery(helpers::fetchTableColumnNames($dbh, 'models'), 'models'));
 			$dbh->disconnect();
 			redirect '/models';
@@ -478,23 +477,24 @@ any ['post', 'get'] => '/models' => sub {
 			my $rows = helpers::countTableRows($dbh, 'networks');
 			my $pages =  int($rows / 10);
 			$pages++ if ($rows % 10) != 0;
-			my $query = "SELECT models.id, models.name_$curr_lang, types.name_$curr_lang AS type_name_en 
+			my $query = "SELECT models.id, models.name_$curr_lang, types.name_$curr_lang AS type_name_$curr_lang 
 						FROM models, types 
 						WHERE models.type_id = types.id LIMIT 10 OFFSET " . ($offset*10);
 			# print STDERR Dumper($query);
 			my $modelsHash = helpers::fetchHashSortedById($dbh, $query);
-			# print STDERR "Models hash: " . Dumper($modelsHash);
 			$modelsHash = helpers::decodeDBHash($modelsHash, $curr_lang);
+			print STDERR "Models hash: " . Dumper($modelsHash);
 			$query = "SELECT * FROM metadata 
 					WHERE table_name = 'models' ";
 			my $tableInfo = helpers::fetchHashSortedById($dbh, $query);
+			$tableInfo = helpers::decodeDBHash($tableInfo, $curr_lang);
 			# print STDERR Dumper($tableInfo);
 			$dbh->disconnect();
-			template 'models', {
+			template 'template', {
 				'translated_column' => ("column_name_" . $curr_lang),
 				'tableInfo' => $tableInfo,
-				'types' => $typesHash,
-				'models' => $modelsHash,
+				'currentType' => 'model',
+				'fetchedEntries' => $modelsHash,
 				'pages' => $pages,
 				'curr_page' => $offset+1,
 				'logged' => 'true',
