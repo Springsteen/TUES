@@ -450,14 +450,10 @@ ajax '/get_types' => sub {
 	my $dbh = connect_db();
 	my $curr_lang = session 'user_current_lang';
 	my $pattern = $dbh->quote(params->{"input"});
-	my $typesHash = helpers::fetchHashSortedById($dbh, "SELECT * FROM types WHERE name_$curr_lang ~ $pattern");
-	$typesHash = helpers::decodeDBHash($typesHash, $curr_lang);
+	my $typesHash = helpers::fetchHashSortedById($dbh, "SELECT id, name_$curr_lang FROM types WHERE name_$curr_lang ~ $pattern");
 	$dbh->disconnect();
-	print STDERR Dumper($typesHash);
-	my $str = to_json($typesHash);
-	# $str = encode_utf8($str);
-	print STDERR Dumper($str);
-	
+	my $str = JSON->new->encode($typesHash);
+	$str = decode_utf8($str);
 	return $str;
 };
 

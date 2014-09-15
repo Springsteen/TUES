@@ -13,9 +13,31 @@ $(document).on('keyup', '#ajax_types', function(){
     $.getJSON(
         "/get_types", 
         {input : input},
-        function(result){
-            // result = JSON.parse(result);
-            console.log(result);
+        function(response){
+            if(response){
+                var selectBoxExists = document.getElementById("type_select");
+                if (selectBoxExists == null){
+                    $("<select id=\"type_select\" name=\"model_type_id\"></select>").insertAfter("#ajax_types");
+                }else{
+                    $("#type_select").remove();
+                    $("<select id=\"type_select\" name=\"model_type_id\"></select>").insertAfter("#ajax_types");
+                }
+                for (var id in response) {
+                    if(response.hasOwnProperty(id)){
+                        var option = "<option value=\"";
+                        for (var property in response[id]){
+                            // console.log(property);
+                            if(response[id].hasOwnProperty(property)){
+                                if(property != "id"){
+                                    option += response[id][property];
+                                    console.log(option + "\" ></option>");
+                                    $("#type_select").append(option + "\" >" + response[id][property] + "</option>");
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     );
 });
