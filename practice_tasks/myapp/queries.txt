@@ -50,7 +50,8 @@ CREATE TABLE networks (
 
 CREATE TABLE network_devices (
 	id serial primary key,
-	name varchar(100) unique not null,
+	name_en varchar(100) unique not null,
+	name_bg varchar(100) unique not null,
 	network_id int references networks(id),
 	manual_id int references manuals(id)
 );

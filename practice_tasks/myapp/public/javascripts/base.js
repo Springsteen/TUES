@@ -8,10 +8,12 @@ $(document).on('click', '.ajax', function(){
     $(this).val("");
 });
 
-$(document).on('keyup', '#ajax_types', function(){
+$(document).on('keyup', '.ajax', function(){
     var input = $(this).val();
+    var id = $(this).attr("id");
+    console.log(id);
     $.getJSON(
-        "/get_types", 
+        "/" + id, 
         {input : input},
         function(response){
             if(response){

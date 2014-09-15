@@ -474,18 +474,21 @@ any ['post', 'get'] => '/models' => sub {
 		}else{
 			my $offset = 0;
 			$offset = int(params->{'offset'})-1 if (params->{'offset'});
-			my $rows = helpers::countTableRows($dbh, 'networks');
+			my $rows = helpers::countTableRows($dbh, 'models');
 			my $pages =  int($rows / 10);
 			$pages++ if ($rows % 10) != 0;
 			my $query = "SELECT models.id, models.name_$curr_lang, types.name_$curr_lang AS type_name_$curr_lang 
 						FROM models, types 
 						WHERE models.type_id = types.id LIMIT 10 OFFSET " . ($offset*10);
-			# print STDERR Dumper($query);
 			my $modelsHash = helpers::fetchHashSortedById($dbh, $query);
 			$modelsHash = helpers::decodeDBHash($modelsHash, $curr_lang);
-			print STDERR "Models hash: " . Dumper($modelsHash);
+			# print STDERR "Models hash: " . Dumper($modelsHash);
 			$query = "SELECT * FROM metadata 
-					WHERE table_name = 'models' ";
+					WHERE table_name = 'models'
+					UNION
+					SELECT * FROM metadata 
+					WHERE table_name = 'types' AND column_name = 'name_$curr_lang'";
+			# print STDERR Dumper($query);
 			my $tableInfo = helpers::fetchHashSortedById($dbh, $query);
 			$tableInfo = helpers::decodeDBHash($tableInfo, $curr_lang);
 			# print STDERR Dumper($tableInfo);
@@ -494,6 +497,7 @@ any ['post', 'get'] => '/models' => sub {
 				'translated_column' => ("column_name_" . $curr_lang),
 				'tableInfo' => $tableInfo,
 				'currentType' => 'model',
+				'currentTable' => 'models',
 				'fetchedEntries' => $modelsHash,
 				'pages' => $pages,
 				'curr_page' => $offset+1,
@@ -594,52 +598,56 @@ any ['get', 'post'] => '/networks/:id' => sub {
 	}
 };
 
+ajax '/get_networks' => sub {
+	my $dbh = connect_db();
+	my $curr_lang = session 'user_current_lang';
+	my $pattern = $dbh->quote(params->{"input"});
+	my $typesHash = helpers::fetchHashSortedById($dbh, "SELECT id, name_$curr_lang FROM networks WHERE name_$curr_lang ~ $pattern");
+	$dbh->disconnect();
+	my $str = JSON->new->encode($typesHash);
+	$str = decode_utf8($str);
+	return $str;
+};
+
 any ['get', 'post'] => '/network_devices' => sub {
 	my $dbh;
 	if ((session 'logged_in') && (session 'user_can_read')) {
 		$dbh = connect_db();
-		my $sth = $dbh->prepare("SELECT id, name_en FROM networks") ;
-		$sth->execute() ;
-		die if $sth->rows() < 1;
-		my $networksHash = $sth->fetchall_hashref('id');
-		$sth->finish();
+		my $sth;
+		my $curr_lang = session "user_current_lang";
 		if ((request->method() eq "POST") && (session 'user_can_write')){
-			my $sth = $dbh->prepare("INSERT INTO network_devices (name, network_id) values (?, ?)") ;
-			$sth->execute(params->{'net_device_name'}, findIDModel('networks', params->{'network_select'}));
-			$sth->finish();
-			$dbh->commit ;
+			# print STDERR Dumper(params);
+			params->{"network_device_network_id"} = findIDModel('networks',params->{"network_device_network_id"});
+			helpers::makeINSERTByGivenQuery($dbh, buildINSERTQuery(helpers::fetchTableColumnNames($dbh, 'network_devices'), 'network_devices'));
 			$dbh->disconnect();
 			redirect '/network_devices';
 		}else{
-			my ($pages, $offset);
-			if (!params->{'offset'}){
-				$offset = 0;
-			}else{
-				$offset = int(params->{'offset'})-1;
-			}
-			$sth = $dbh->prepare("SELECT * FROM network_devices");
-			$sth->execute() ; 
-			$pages = int(($sth->rows()) / 10);
-			$pages++ if ($sth->rows % 10) != 0;
-			$sth->finish();
-			$sth = $dbh->prepare("SELECT network_devices.id, 
-										network_devices.name AS \"Device name\", 
-										networks.name_en AS \"Network name\" 
-								FROM network_devices, networks 
-								WHERE network_devices.network_id = networks.id
-								LIMIT 10 OFFSET ?");
-			$sth->execute($offset*10);
-			my $netDevicesHash = $sth->fetchall_hashref('id');
-			$sth->finish();
-			$sth = $dbh->prepare("SELECT * FROM network_devices WHERE 1=0");
-			$sth->execute() ;
-			my @tableInfo = helpers::getFields($sth->{NAME});
-			$sth->finish();
+			my $offset = 0;
+			$offset = int(params->{'offset'})-1 if (params->{'offset'});
+			my $rows = helpers::countTableRows($dbh, 'network_devices');
+			my $pages =  int($rows / 10);
+			$pages++ if ($rows % 10) != 0;
+			my $query = "SELECT network_devices.id, network_devices.name_$curr_lang, networks.name_$curr_lang AS network_name_$curr_lang 
+						FROM network_devices, networks
+						WHERE network_devices.network_id = networks.id LIMIT 10 OFFSET " . ($offset*10);
+			my $netDevsHash = helpers::fetchHashSortedById($dbh, $query);
+			$netDevsHash = helpers::decodeDBHash($netDevsHash, $curr_lang);
+			$query = "SELECT * FROM metadata 
+					WHERE table_name = 'network_devices'
+					UNION
+					SELECT * FROM metadata 
+					WHERE table_name = 'networks' AND column_name = 'name_$curr_lang'";
+			# print STDERR Dumper($query);
+			my $tableInfo = helpers::fetchHashSortedById($dbh, $query);
+			$tableInfo = helpers::decodeDBHash($tableInfo, $curr_lang);
+			print STDERR Dumper($tableInfo);
 			$dbh->disconnect();
-			template 'net_devices.tt', {
-				'tableInfo' => @tableInfo,
-				'net_devices' => $netDevicesHash,
-				'networks' => $networksHash,
+			template 'template', {
+				'translated_column' => ("column_name_" . $curr_lang),
+				'tableInfo' => $tableInfo,
+				'currentType' => 'network_device',
+				'currentTable' => 'network_devices',
+				'fetchedEntries' => $netDevsHash,
 				'pages' => $pages,
 				'curr_page' => $offset+1,
 				'logged' => 'true',

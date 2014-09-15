@@ -5,20 +5,20 @@
         </div>
         <% refered_table = "refered_table" %>
         <% is_reference = "is_reference" %>
+        <% table_name = "table_name"%>
         <div class=input-group>
             <br><br>
             <form method=post>
                 <%FOREACH id IN tableInfo.keys.nsort %>
                     <% FOREACH elem IN tableInfo.$id %>
-                        <% IF elem.key == translated_column %>
+                        <% IF elem.key == translated_column AND currentTable == tableInfo.$id.table_name %>
                             <% elem.value %> :
                         <% END %>
                     <% END %>
                     <% FOREACH elem IN tableInfo.$id %>
-                        <% IF elem.key == "column_name" %>
+                        <% IF elem.key == "column_name" AND currentTable == tableInfo.$id.table_name %>
                             <% IF tableInfo.$id.is_reference == 1 %>
-                                REFERENCE<br>
-                                <input type=text id="ajax_<% tableInfo.$id.refered_table %>" class="ajax"><br>
+                                <input type=text id="ajax_<% tableInfo.$id.refered_table %>" class="ajax form-control"><br><br><br>
                             <% ELSE %>
                                 <input type=text name=<% currentType %>_<% elem.value %> class=form-control><br><br>
                             <% END %>
@@ -60,14 +60,14 @@
                 <% id =  fetchedEntries.keys.first %>
                 <% cn = "column_name" %>
                 <% FOREACH key IN fetchedEntries.$id.keys.sort %>
-                    <% FOREACH i IN tableInfo.keys %>
+                    <% FOREACH i IN tableInfo.keys.sort.reverse %>
                         <% IF tableInfo.$i.$cn == key %>
                             <th><% tableInfo.$i.$translated_column %></th>
                         <% END %>
                     <% END %>
                 <% END %>
             </tr>
-            <% FOREACH id IN fetchedEntries.keys.nsort %>
+            <% FOREACH id IN fetchedEntries.keys.sort %>
                 <tr>
                 <form method=post action=/<%currentType%>s/<%id%>>
                     <% FOREACH elem IN fetchedEntries.$id %>  
