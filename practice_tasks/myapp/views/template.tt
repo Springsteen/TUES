@@ -19,6 +19,7 @@
                         <% IF elem.key == "column_name" AND currentTable == tableInfo.$id.table_name %>
                             <% IF tableInfo.$id.is_reference == 1 %>
                                 <input type=text id="ajax_<% tableInfo.$id.refered_table %>" class="ajax form-control"><br><br><br>
+                                <input type=hidden id=form_for name=<% currentType %>>
                             <% ELSE %>
                                 <input type=text name=<% currentType %>_<% elem.value %> class=form-control><br><br>
                             <% END %>

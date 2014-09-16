@@ -445,18 +445,6 @@ any ['post', 'get'] => '/types/:id' => sub {
 	}
 };
 
-
-ajax '/get_types' => sub {
-	my $dbh = connect_db();
-	my $curr_lang = session 'user_current_lang';
-	my $pattern = $dbh->quote(params->{"input"});
-	my $typesHash = helpers::fetchHashSortedById($dbh, "SELECT id, name_$curr_lang FROM types WHERE name_$curr_lang ~ $pattern");
-	$dbh->disconnect();
-	my $str = JSON->new->encode($typesHash);
-	$str = decode_utf8($str);
-	return $str;
-};
-
 any ['post', 'get'] => '/models' => sub {
 	my $dbh;
 	if ((session 'logged_in') && (session 'user_can_read')) {
@@ -598,13 +586,19 @@ any ['get', 'post'] => '/networks/:id' => sub {
 	}
 };
 
-ajax '/get_networks' => sub {
+ajax '/ajax_search' => sub {
 	my $dbh = connect_db();
-	my $curr_lang = session 'user_current_lang';
+	my $curr_lang = session 'user_current_lang' || "en";
 	my $pattern = $dbh->quote(params->{"input"});
-	my $typesHash = helpers::fetchHashSortedById($dbh, "SELECT id, name_$curr_lang FROM networks WHERE name_$curr_lang ~ $pattern");
+	my $table = params->{"table"};
+	my $currentFormType = params->{"current_type"};
+	print STDERR Dumper($currentFormType);
+	my $networksHash = helpers::fetchHashSortedById($dbh, "SELECT id, name_$curr_lang FROM $table WHERE name_$curr_lang ~ $pattern");
+	chop($table);
+	print STDERR Dumper($table);
 	$dbh->disconnect();
-	my $str = JSON->new->encode($typesHash);
+	$networksHash->{"select_tag_info"} = {"id" => $table . "select", "name" => $currentFormType . "_" . $table . "_id"};
+	my $str = JSON->new->encode($networksHash);
 	$str = decode_utf8($str);
 	return $str;
 };
@@ -618,6 +612,7 @@ any ['get', 'post'] => '/network_devices' => sub {
 		if ((request->method() eq "POST") && (session 'user_can_write')){
 			# print STDERR Dumper(params);
 			params->{"network_device_network_id"} = findIDModel('networks',params->{"network_device_network_id"});
+			print STDERR Dumper(buildINSERTQuery(helpers::fetchTableColumnNames($dbh, 'network_devices'), 'network_devices'));
 			helpers::makeINSERTByGivenQuery($dbh, buildINSERTQuery(helpers::fetchTableColumnNames($dbh, 'network_devices'), 'network_devices'));
 			$dbh->disconnect();
 			redirect '/network_devices';
@@ -640,7 +635,7 @@ any ['get', 'post'] => '/network_devices' => sub {
 			# print STDERR Dumper($query);
 			my $tableInfo = helpers::fetchHashSortedById($dbh, $query);
 			$tableInfo = helpers::decodeDBHash($tableInfo, $curr_lang);
-			print STDERR Dumper($tableInfo);
+			# print STDERR Dumper($tableInfo);
 			$dbh->disconnect();
 			template 'template', {
 				'translated_column' => ("column_name_" . $curr_lang),
@@ -686,48 +681,42 @@ any ['get', 'post'] => '/computers' => sub {
 	my $dbh;
 	if ((session 'logged_in') && (session 'user_can_read')) {
 		$dbh = connect_db();
-		my $sth = $dbh->prepare("SELECT id, name_en FROM networks") ;
-		$sth->execute() ;
-		die if $sth->rows() < 1;
-		my $networksHash = $sth->fetchall_hashref('id');
-		$sth->finish();
+		my $sth;
+		my $curr_lang = session "user_current_lang";
 		if ((request->method() eq "POST") && (session 'user_can_write')){
-			my $sth = $dbh->prepare("INSERT INTO computers (name, network_id) values (?, ?)") ;
-			$sth->execute(params->{'computer_name'}, findIDModel('networks', params->{'network_select'}));
-			$sth->finish();
-			$dbh->commit ;
+			# print STDERR Dumper(params);
+			params->{"computer_network_id"} = findIDModel('networks',params->{"computer_network_id"});
+			print STDERR Dumper(buildINSERTQuery(helpers::fetchTableColumnNames($dbh, 'computers'), 'computers'));
+			helpers::makeINSERTByGivenQuery($dbh, buildINSERTQuery(helpers::fetchTableColumnNames($dbh, 'computers'), 'computers'));
 			$dbh->disconnect();
 			redirect '/computers';
 		}else{
-			my ($pages, $offset);
-			if (!params->{'offset'}){
-				$offset = 0;
-			}else{
-				$offset = int(params->{'offset'})-1;
-			}
-			$sth = $dbh->prepare("SELECT * FROM computers");
-			$sth->execute() ; 
-			$pages = int(($sth->rows()) / 10);
-			$pages++ if ($sth->rows % 10) != 0;
-			$sth->finish();
-			$sth = $dbh->prepare("SELECT computers.id, 
-										computers.name AS \"Computer name\", 
-										networks.name_en AS \"Network name\" 
-								FROM computers, networks 
-								WHERE computers.network_id = networks.id
-								LIMIT 10 OFFSET ?");
-			$sth->execute($offset*10);
-			my $computersHash = $sth->fetchall_hashref('id');
-			$sth->finish();
-			$sth = $dbh->prepare("SELECT * FROM computers WHERE 1=0");
-			$sth->execute() ;
-			my @tableInfo = helpers::getFields($sth->{NAME});
-			$sth->finish();
+			my $offset = 0;
+			$offset = int(params->{'offset'})-1 if (params->{'offset'});
+			my $rows = helpers::countTableRows($dbh, 'computers');
+			my $pages =  int($rows / 10);
+			$pages++ if ($rows % 10) != 0;
+			my $query = "SELECT computers.id, computers.name_$curr_lang, networks.name_$curr_lang AS network_name_$curr_lang 
+						FROM computers, networks
+						WHERE computers.network_id = networks.id LIMIT 10 OFFSET " . ($offset*10);
+			my $computersHash = helpers::fetchHashSortedById($dbh, $query);
+			$computersHash = helpers::decodeDBHash($computersHash, $curr_lang);
+			$query = "SELECT * FROM metadata 
+					WHERE table_name = 'computers'
+					UNION
+					SELECT * FROM metadata 
+					WHERE table_name = 'networks' AND column_name = 'name_$curr_lang'";
+			# print STDERR Dumper($query);
+			my $tableInfo = helpers::fetchHashSortedById($dbh, $query);
+			$tableInfo = helpers::decodeDBHash($tableInfo, $curr_lang);
+			# print STDERR Dumper($tableInfo);
 			$dbh->disconnect();
-			template 'computers.tt', {
-				'tableInfo' => @tableInfo,
-				'computers' => $computersHash,
-				'networks' => $networksHash,
+			template 'template', {
+				'translated_column' => ("column_name_" . $curr_lang),
+				'tableInfo' => $tableInfo,
+				'currentType' => 'computer',
+				'currentTable' => 'computers',
+				'fetchedEntries' => $computersHash,
 				'pages' => $pages,
 				'curr_page' => $offset+1,
 				'logged' => 'true',
@@ -764,68 +753,56 @@ any ['get', 'post'] => '/computers/:id' => sub {
 
 any ['get', 'post'] => '/parts' => sub {
 	my $dbh;
-	if ((session 'logged_in') && (session 'user_can_read')){
+	if ((session 'logged_in') && (session 'user_can_read')) {
 		$dbh = connect_db();
-		my $sth = $dbh->prepare("SELECT id, name FROM models") ;
-		$sth->execute() ;
-		die if $sth->rows() < 1;
-		my $modelsHash = $sth->fetchall_hashref('id');
-		$sth->finish();
-		$sth = $dbh->prepare("SELECT id, name FROM computers") ;
-		$sth->execute ;
-		die if $sth->rows() < 1;
-		my $computersHash = $sth->fetchall_hashref('id');
-		$sth->finish();
+		my $sth;
+		my $curr_lang = session "user_current_lang";
 		if ((request->method() eq "POST") && (session 'user_can_write')){
-			die if (helpers::validateDate(params->{'part_waranty'}) != 1);
-			$sth = $dbh->prepare("INSERT INTO parts (name, model_id, computer_id, waranty) 
-									values (?, ?, ?, ?)") ;
-			$sth->execute(params->{'part_name'}, 
-						findID('models', params->{'model_select'}), 
-						findID('computers', params->{'computer_select'}),
-						params->{'part_waranty'});
-			$sth->finish();
-			$dbh->commit ;
-			$dbh->disconnect(); 
+			# print STDERR Dumper(params);
+			params->{"part_model_id"} = findIDModel('models',params->{"part_model_id"});
+			params->{"part_computer_id"} = findIDModel('computers',params->{"part_computer_id"});
+			print STDERR Dumper(buildINSERTQuery(helpers::fetchTableColumnNames($dbh, 'parts'), 'parts'));
+			helpers::makeINSERTByGivenQuery($dbh, buildINSERTQuery(helpers::fetchTableColumnNames($dbh, 'parts'), 'parts'));
+			$dbh->disconnect();
 			redirect '/parts';
 		}else{
-			my ($pages, $offset);
-			if (!params->{'offset'}){
-				$offset = 0;
-			}else{
-				$offset = int(params->{'offset'})-1;
-			}
-			$sth = $dbh->prepare("SELECT * FROM parts");
-			$sth->execute() ; 
-			$pages = int(($sth->rows()) / 10);
-			$pages++ if ($sth->rows % 10) != 0;
-			$sth->finish();
-			$sth = $dbh->prepare("SELECT parts.id, parts.waranty, 
-								parts.name AS \"Part name\", 
-								models.name AS \"Model name\", 
-								computers.name AS \"Computer name\" 
-								FROM parts, models, computers 
-								WHERE computers.id = parts.computer_id 
-								AND models.id = parts.model_id
-								LIMIT 10 OFFSET ?") ;
-			$sth->execute($offset*10) ;
-			my $partsHash = $sth->fetchall_hashref('id');
-			$sth->finish();
-			$sth = $dbh->prepare("SELECT * FROM parts WHERE 1=0");
-			$sth->execute() ;
-			my @tableInfo = helpers::getFields($sth->{NAME});
-			$sth->finish();
+			my $offset = 0;
+			$offset = int(params->{'offset'})-1 if (params->{'offset'});
+			my $rows = helpers::countTableRows($dbh, 'parts');
+			my $pages =  int($rows / 10);
+			$pages++ if ($rows % 10) != 0;
+			my $query = "SELECT parts.id, parts.name_$curr_lang, models.name_$curr_lang AS model_name_$curr_lang,
+						computers.name_$curr_lang AS computer_name_$curr_lang
+						FROM computers, models, parts
+						WHERE parts.computer_id = computers.id 
+						AND parts.model_id = models.id
+						LIMIT 10 OFFSET " . ($offset*10);
+			my $partsHash = helpers::fetchHashSortedById($dbh, $query);
+			$partsHash = helpers::decodeDBHash($partsHash, $curr_lang);
+			$query = "SELECT * FROM metadata 
+					WHERE table_name = 'parts'
+					UNION
+					SELECT * FROM metadata 
+					WHERE table_name = 'models' AND column_name = 'name_$curr_lang'
+					UNION
+					SELECT * FROM metadata 
+					WHERE table_name = 'computers' AND column_name = 'name_$curr_lang'";
+			# print STDERR Dumper($query);
+			my $tableInfo = helpers::fetchHashSortedById($dbh, $query);
+			$tableInfo = helpers::decodeDBHash($tableInfo, $curr_lang);
+			# print STDERR Dumper($tableInfo);
 			$dbh->disconnect();
-			template 'parts.tt', {
-				'tableInfo' => \@tableInfo,
-				'parts' => $partsHash,
-				'models' => $modelsHash,
-				'computers' => $computersHash,
+			template 'template', {
+				'translated_column' => ("column_name_" . $curr_lang),
+				'tableInfo' => $tableInfo,
+				'currentType' => 'part',
+				'currentTable' => 'parts',
+				'fetchedEntries' => $partsHash,
 				'pages' => $pages,
 				'curr_page' => $offset+1,
 				'logged' => 'true',
 				'user' => session 'current_user'
-			};	
+			};
 		}
 	}else{
 		redirect '/';

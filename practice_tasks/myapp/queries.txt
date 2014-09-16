@@ -58,14 +58,16 @@ CREATE TABLE network_devices (
 
 CREATE TABLE computers (
 	id serial primary key,
-	name varchar(100) unique not null,
+	name_en varchar(100) unique not null,
+	name_bg varchar(100) unique not null,
 	network_id int references networks(id),
 	manual_id int references manuals(id)
 );
 
 CREATE TABLE parts (
 	id serial primary key,
-	name varchar(100) unique not null,
+	name_en varchar(100) unique not null,
+	name_bg varchar(100) unique not null,
 	waranty date,
 	model_id int references models(id),
 	computer_id int references computers(id)

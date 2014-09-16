@@ -10,29 +10,41 @@ $(document).on('click', '.ajax', function(){
 
 $(document).on('keyup', '.ajax', function(){
     var input = $(this).val();
-    var id = $(this).attr("id");
-    console.log(id);
+    var searchBoxId = $(this).attr("id");
+    var referedTable = searchBoxId.replace("ajax_", "");
+    var currentType = $("#form_for").attr("name");
+    console.log(" current search refered table: " + referedTable + ", current form type: " + currentType);
     $.getJSON(
-        "/" + id, 
-        {input : input},
+        "/ajax_search", 
+        {input : input, table: referedTable, current_type: currentType},
         function(response){
             if(response){
-                var selectBoxExists = document.getElementById("type_select");
+                if(response.hasOwnProperty("select_tag_info")){
+                    if(response["select_tag_info"].hasOwnProperty("name")){
+                        var selectBoxName = response["select_tag_info"]["name"]; 
+                    }
+                    if(response["select_tag_info"].hasOwnProperty("id")){
+                        var selectBoxId = response["select_tag_info"]["id"];
+                    }
+                }
+                var selectBoxExists = document.getElementById(selectBoxId);
                 if (selectBoxExists == null){
-                    $("<select id=\"type_select\" name=\"model_type_id\"></select>").insertAfter("#ajax_types");
+                    $("<select id=\"" + selectBoxId + "\" name=\"" + selectBoxName + "\"></select>").insertAfter("#" + searchBoxId);
                 }else{
-                    $("#type_select").remove();
-                    $("<select id=\"type_select\" name=\"model_type_id\"></select>").insertAfter("#ajax_types");
+                    $("#" + searchBoxId).remove();
+                    $("<select id=\"" + selectBoxId + "\" name=\"" + selectBoxName + "\"></select>").insertAfter("#" + searchBoxId);
                 }
                 for (var id in response) {
                     if(response.hasOwnProperty(id)){
-                        var option = "<option value=\"";
-                        for (var property in response[id]){
-                            if(response[id].hasOwnProperty(property)){
-                                if(property != "id"){
-                                    option += response[id][property];
-                                    console.log(option + "\" ></option>");
-                                    $("#type_select").append(option + "\" >" + response[id][property] + "</option>");
+                        if(id != "select_tag_info"){
+                            var option = "<option value=\"";
+                            for (var property in response[id]){
+                                if(response[id].hasOwnProperty(property)){
+                                    if(property != "id"){
+                                        option += response[id][property];
+                                        console.log(option + "\" ></option>");
+                                        $("#" + selectBoxId).append(option + "\" >" + response[id][property] + "</option>");
+                                    }
                                 }
                             }
                         }
