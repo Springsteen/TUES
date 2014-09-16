@@ -421,22 +421,8 @@ any ['post', 'get'] => '/types/:id' => sub {
 	if (session 'logged_in'){
 		if (session 'user_can_write'){
 			$dbh = connect_db();
-			if (request->method() eq "POST"){
-				my $id = params->{'id'};
-				my $curr_lang = ("name_" . (session "user_current_lang"));
-				my $concat = $curr_lang . "_" . $id;
-				my $sth = $dbh->prepare("UPDATE types 
-										SET $curr_lang = ? 
-										WHERE id = $id") ;
-				$sth->execute(params->{"new_type_$concat"});
-				$sth->finish();
-				$dbh->commit;
-				$dbh->disconnect();
-				redirect '/types';
-			}else{
-				helpers::makeDELETEQuery($dbh, 'types', params->{'id'});
-				redirect '/types';
-			}
+			helpers::makeDELETEQuery($dbh, 'types', params->{'id'});
+			redirect '/types';
 		}else{
 			redirect '/types';
 		}
@@ -503,16 +489,8 @@ any ['post', 'get'] => '/models/:id' => sub {
 	if (session 'logged_in'){
 		if (session 'user_can_write'){	
 			$dbh = connect_db();
-			if (request->method() eq "POST"){
-				redirect '/models';
-			}else{
-				my $sth = $dbh->prepare("DELETE FROM models WHERE id = ?") ;	
-				$sth->execute(params->{'id'}) ;
-				$sth->finish();
-				$dbh->commit ;
-				$dbh->disconnect();
-				redirect '/models';
-			}
+			helpers::makeDELETEQuery($dbh, 'models', params->{'id'});
+			redirect '/models';
 		}else{
 			redirect '/models';
 		}
@@ -564,20 +542,8 @@ any ['get', 'post'] => '/networks/:id' => sub {
 	if (session 'logged_in'){
 		if (session 'user_can_write'){
 			$dbh = connect_db();
-			if (request->method() eq "POST"){
-				my $id = params->{'id'};
-				my $curr_lang = ("name_" . (session "user_current_lang"));
-				my $sth = $dbh->prepare("UPDATE networks SET $curr_lang = ? WHERE id = $id");
-				my $concat = $curr_lang . "_" . $id;
-				$sth->execute(params->{"new_network_$concat"}) ;
-				$sth->finish();
-				$dbh->commit ;
-				$dbh->disconnect();
-				redirect '/networks';
-			}else{
-				helpers::makeDELETEQuery($dbh, 'networks', params->{'id'});
-				redirect '/networks';
-			}
+			helpers::makeDELETEQuery($dbh, 'networks', params->{'id'});
+			redirect '/networks';
 		}else{
 			redirect '/networks';
 		}
@@ -659,16 +625,8 @@ any ['get', 'post'] => '/network_devices/:id' => sub {
 	if (session 'logged_in'){	
 		if (session 'user_can_write'){
 			$dbh = connect_db();
-			if (request->method() eq "POST"){
-				redirect '/network_devices';
-			}else{
-				my $sth = $dbh->prepare("DELETE FROM network_devices WHERE id = ?") ;	
-				$sth->execute(params->{'id'}) ;
-				$sth->finish();
-				$dbh->commit ;
-				$dbh->disconnect();
-				redirect '/network_devices';
-			}
+			helpers::makeDELETEQuery($dbh, 'network_devices', params->{'id'});
+			redirect '/network_devices';
 		}else{
 			redirect '/network_devices';
 		}
@@ -733,16 +691,8 @@ any ['get', 'post'] => '/computers/:id' => sub {
 	if (session 'logged_in'){	
 		if (session 'user_can_write'){	
 			$dbh = connect_db();
-			if (request->method() eq "POST"){
-				redirect '/computers';
-			}else{
-				my $sth = $dbh->prepare("DELETE FROM computers WHERE id = ?") ;	
-				$sth->execute(params->{'id'}) ;
-				$sth->finish();
-				$dbh->commit ;
-				$dbh->disconnect();
-				redirect '/computers';
-			}
+			helpers::makeDELETEQuery($dbh, 'computers', params->{'id'});
+			redirect '/computers';
 		}else{
 			redirect '/computers';
 		}
@@ -814,22 +764,8 @@ any ['get', 'post'] => '/parts/:id' => sub {
 	if (session 'logged_in'){	
 		if (session 'user_can_write'){	
 			$dbh = connect_db();
-			if (request->method() eq "POST"){
-				my $id = params->{'id'};
-				my $sth = $dbh->prepare("UPDATE parts SET name = ?, waranty = ? WHERE id = $id") ;	
-				$sth->execute(params->{"new_part_name_$id"}, params->{"new_part_waranty_$id"}) ;
-				$sth->finish();
-				$dbh->commit ;
-				$dbh->disconnect();
-				redirect '/parts';
-			}else{
-				my $sth = $dbh->prepare("DELETE FROM parts WHERE id = ?") ;	
-				$sth->execute(params->{'id'}) ;
-				$sth->finish();
-				$dbh->commit ;
-				$dbh->disconnect();
-				redirect '/parts';
-			}
+			helpers::makeDELETEQuery($dbh, 'parts', params->{'id'});
+			redirect '/parts';
 		}else{
 			redirect '/parts';
 		}
