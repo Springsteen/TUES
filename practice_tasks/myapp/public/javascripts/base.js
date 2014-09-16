@@ -13,7 +13,6 @@ $(document).on('keyup', '.ajax', function(){
     var searchBoxId = $(this).attr("id");
     var referedTable = searchBoxId.replace("ajax_", "");
     var currentType = $("#form_for").attr("name");
-    console.log(" current search refered table: " + referedTable + ", current form type: " + currentType);
     $.getJSON(
         "/ajax_search", 
         {input : input, table: referedTable, current_type: currentType},
@@ -31,7 +30,7 @@ $(document).on('keyup', '.ajax', function(){
                 if (selectBoxExists == null){
                     $("<select id=\"" + selectBoxId + "\" name=\"" + selectBoxName + "\"></select>").insertAfter("#" + searchBoxId);
                 }else{
-                    $("#" + searchBoxId).remove();
+                    $("#" + selectBoxId).remove();
                     $("<select id=\"" + selectBoxId + "\" name=\"" + selectBoxName + "\"></select>").insertAfter("#" + searchBoxId);
                 }
                 for (var id in response) {
@@ -42,7 +41,6 @@ $(document).on('keyup', '.ajax', function(){
                                 if(response[id].hasOwnProperty(property)){
                                     if(property != "id"){
                                         option += response[id][property];
-                                        console.log(option + "\" ></option>");
                                         $("#" + selectBoxId).append(option + "\" >" + response[id][property] + "</option>");
                                     }
                                 }
