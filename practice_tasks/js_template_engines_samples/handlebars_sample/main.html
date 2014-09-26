@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>
+            Handlebars sample
+        </title>
+            <script type="text/javascript" src="jquery.js"></script>
+            <script type="text/javascript" src="handlebars.js"></script>
+            <script type="text/javascript" src="main.js"></script>
+    </head>
+    
+    <body>
+
+        <button id="get_template_1">Render Template 1</button>
+
+        <div id="content">
+            
+        </div>
+
+        <script id="template_1" type="text/x-handlebars-template">
+
+            <div id="template_1_div" class="entry">
+                <h1>
+                    {{title}}
+                </h1>
+                
+                <div class="body">
+                    {{body}}
+                </div>
+            </div>
+
+        </script>
+
+    </body>
+</html>
