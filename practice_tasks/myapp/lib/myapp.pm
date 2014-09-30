@@ -848,12 +848,15 @@ any ['get', 'post'] => '/search' => sub {
 		$dbh = connect_db();
 		if (request->method() eq "POST"){
 			my $db = params->{'select_db'};
+			$db = $dbh->quote_identifier( $db );
+			my $curr_lang = session 'user_current_lang';
 			redirect '/search' if (params->{'search_pattern'} =~ /\s/) or (params->{'search_pattern'} eq "");
-			my $sth = $dbh->prepare("SELECT * FROM  $db
-									WHERE name ~ ?
-									LIMIT 200 OFFSET 0") ;
-			$sth->execute("^".params->{'search_pattern'}) ;
-			die if $sth->rows() < 1;
+			my $pattern = $dbh->quote("^" . params->{'search_pattern'});
+			my $stat = "SELECT * FROM  $db WHERE name_$curr_lang ~ $pattern LIMIT 200 OFFSET 0";
+			my $sth = $dbh->prepare($stat);
+			print STDERR "Statement => " . $stat . "\n";
+			$sth->execute() ;
+			helpers::ASSERT($sth->rows() > 0);
 			my $searchHash = $sth->fetchall_arrayref();
 			$sth = $dbh->column_info('','',$db,'');
 			my $columnNames = $sth->fetchall_arrayref();
