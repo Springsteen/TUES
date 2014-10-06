@@ -2,6 +2,7 @@ package myapp;
 use Dancer ':syntax';
 use Dancer::Plugin::Ajax;
 use Dancer::Plugin::Email;
+use Dancer::Plugin::I18N;
 
 use DBI;
 use Data::Dumper;
@@ -114,7 +115,7 @@ sub buildINSERTQuery ($$){
 };
 
 hook on_route_exception => sub {
-	debug $_;
+	helpers::printToLog($_);
 	status 404;
 	return halt template "exception";
 };
@@ -158,6 +159,7 @@ any ['post', 'get'] => '/' => sub {
 			session user_can_write => $rights[1];
 			session user_is_admin => $rights[0];
 			session user_current_lang => $check->{'lang'};
+			helpers::printToLog((session 'current_user') . " logged in at " . scalar localtime);
 			redirect '/confirm_account' if ($check->{"active"} == 0);
 			redirect '/types';	
 		}
@@ -172,6 +174,7 @@ any ['post', 'get'] => '/' => sub {
 any ['post', 'get'] => '/user_panel' => sub {
 	my $dbh;
 	if (session 'logged_in'){
+		helpers::printToLog((session 'current_user') . " requested user_panel view at " . scalar localtime);
 		$dbh = connect_db();
 		my $sth = $dbh->prepare("SELECT * FROM accounts 
 								WHERE name = ?") ;
@@ -182,7 +185,7 @@ any ['post', 'get'] => '/user_panel' => sub {
 		$sth->finish();
 		my $active = "yes";
 		$active = "no" if ($user->{"active"} == 0);
-		my $languages = helpers::fetchHashSortedById($dbh, helpers::buildSimpleSELECTQuery('languages', "*", 100, 0));
+		my $langs = helpers::fetchHashSortedById($dbh, helpers::buildSimpleSELECTQuery('languages', "*", 100, 0));
 		if (request->method() eq "POST"){
 			if ((md5_base64(params->{"old_pass"}, session 'current_user') eq $user->{"password"}) &&
 				(params->{"new_pass_1"} eq params->{"new_pass_2"})){
@@ -191,9 +194,10 @@ any ['post', 'get'] => '/user_panel' => sub {
 				   			"' WHERE name = '" .
 				   			(session 'current_user') . "'";
 				helpers::makeINSERTByGivenQuery($dbh, $query);
+				helpers::printToLog((session 'current_user') . " changed his password at " . scalar localtime);
 				$dbh->disconnect();
 				template 'user_panel', {
-					'languages' => $languages,
+					'langs' => $langs,
 					'user' => $user->{"name"},
 					'mail' => $user->{"mail"},
 					'user_lang' => $user->{"interface_language"}, 
@@ -204,8 +208,10 @@ any ['post', 'get'] => '/user_panel' => sub {
 			}
 		}else{
 			$dbh->disconnect();
+			my $curr_lang = session "user_current_lang";
+			languages( [$curr_lang] );
 			template 'user_panel', {
-				'languages' => $languages,
+				'langs' => $langs,
 				'user' => $user->{"name"},
 				'mail' => $user->{"mail"},
 				'user_lang' => $user->{"interface_language"},  
@@ -232,6 +238,7 @@ any ['post', 'get'] => '/change_language' => sub {
 			helpers::makeINSERTByGivenQuery($dbh, $query);
 			session user_current_lang => $lang_data->{"abbreviation"};
 			$dbh->disconnect();
+			helpers::printToLog((session 'current_user') . " changed his language at " . scalar localtime);
 			redirect '/user_panel'
 		}else{
 			redirect '/user_panel'
@@ -272,6 +279,8 @@ any ['post', 'get'] => '/restore_password' => sub {
 					subject => 'new password',
 					message => $new_pass
 				};
+				my $mail = params->{"mail"};
+				helpers::printToLog(" password recovery code was sent at " . scalar localtime . " to $mail");
 				template 'restore_password', {
 					'success' => 1 
 				};
@@ -318,6 +327,8 @@ any ['post', 'get'] => '/register' => sub {
 				subject => 'email confirmation code',
 				message => $confirm_code
 			};
+			my $name = params->{"username"};
+			helpers::printToLog(" account -> $name , has been created at" . scalar localtime);
 			template 'home', {
 				'success' => "You're account has been created"
 			};
@@ -351,6 +362,7 @@ any ['post', 'get'] => '/confirm_account' => sub {
 				my $query = "UPDATE accounts SET active = TRUE WHERE name = '" . (session 'current_user') . "'";
 				helpers::makeINSERTByGivenQuery($dbh, $query);
 				$dbh->disconnect();
+				helpers::printToLog((session 'current_user') . " confirmed his account at " . scalar localtime);
 				redirect "/"
 			}else{
 				$dbh->disconnect();
@@ -372,6 +384,7 @@ any ['post', 'get'] => '/confirm_account' => sub {
 };
 
 get '/logout' => sub {
+	helpers::printToLog((session 'current_user') . " logged out at" . scalar localtime);
 	session->destroy() if (session 'logged_in');
 	redirect '/';
 };
@@ -381,18 +394,20 @@ get '/logout' => sub {
 any ['post', 'get'] => '/types' => sub {
 	my $dbh;
 	if ((session 'logged_in') && (session 'user_can_read')) {
+		helpers::printToLog((session 'current_user') . " requested types view at " . scalar localtime);
 		$dbh = connect_db();
 		if ((request->method() eq "POST") && (session 'user_can_write')){
 			helpers::makeINSERTByGivenQuery($dbh, buildINSERTQuery(helpers::fetchTableColumnNames($dbh, 'types'), 'types'));	
+			helpers::printToLog((session 'current_user') . " created type at" . scalar localtime);
 		}
 		my $offset = 0;
 		$offset = int(params->{'offset'})-1 if params->{'offset'};
 		my $rows = helpers::countTableRows($dbh, 'types');
-		my $pages =  int($rows / 10);
-		$pages++ if ($rows % 10) != 0;
+		my $pages =  int($rows / 250);
+		$pages++ if ($rows % 250) != 0;
 		my @output = getColumnNamesInCurrentLanguage($dbh, 'types');
 		push(@output, "id");
- 		my $typesHash = helpers::fetchHashSortedById($dbh, helpers::buildSimpleSELECTQuery('types', \@output, 10, ($offset)*10));
+ 		my $typesHash = helpers::fetchHashSortedById($dbh, helpers::buildSimpleSELECTQuery('types', \@output, 250, ($offset)*250));
 		my $curr_lang = session "user_current_lang";
 		$typesHash = helpers::decodeDBHash($typesHash, $curr_lang);
 		my $tableInfo = helpers::fetchHashSortedById($dbh, 
@@ -400,6 +415,7 @@ any ['post', 'get'] => '/types' => sub {
 											FROM metadata WHERE table_name = 'types' ");
 		$tableInfo = helpers::decodeDBHash($tableInfo, $curr_lang);
 		$dbh->disconnect();
+		languages( [$curr_lang] );
 		template 'template', {
 			'translated_column' => ("column_name_" . $curr_lang),
 			'tableInfo' => $tableInfo,
@@ -422,6 +438,7 @@ any ['post', 'get'] => '/types/:id' => sub {
 		if (session 'user_can_write'){
 			$dbh = connect_db();
 			helpers::makeDELETEQuery($dbh, 'types', params->{'id'});
+			helpers::printToLog((session 'current_user') . " deleted type with id " . params->{'id'} . scalar localtime);
 			redirect '/types';
 		}else{
 			redirect '/types';
@@ -434,16 +451,17 @@ any ['post', 'get'] => '/types/:id' => sub {
 any ['post', 'get'] => '/models' => sub {
 	my $dbh;
 	if ((session 'logged_in') && (session 'user_can_read')) {
+		helpers::printToLog((session 'current_user') . " requested models view at " . scalar localtime);
 		$dbh = connect_db();
 		my $sth;
 		my $curr_lang = session "user_current_lang";
 		my $typesHash = helpers::fetchHashSortedById($dbh, helpers::buildSimpleSELECTQuery('types', ["id" ,"name_$curr_lang"], 100, 0)); 
 		$typesHash = helpers::decodeDBHash($typesHash, $curr_lang);
 		if ((request->method() eq "POST") && (session 'user_can_write')){
-			# print STDERR Dumper(params);
 			params->{"model_type_id"} = findIDModel('types',params->{"model_type_id"});
 			helpers::makeINSERTByGivenQuery($dbh, buildINSERTQuery(helpers::fetchTableColumnNames($dbh, 'models'), 'models'));
-			$dbh->disconnect();
+			$dbh->disconnect();		
+			helpers::printToLog((session 'current_user') . " created model at" . scalar localtime);
 			redirect '/models';
 		}else{
 			my $offset = 0;
@@ -456,17 +474,15 @@ any ['post', 'get'] => '/models' => sub {
 						WHERE models.type_id = types.id LIMIT 10 OFFSET " . ($offset*10);
 			my $modelsHash = helpers::fetchHashSortedById($dbh, $query);
 			$modelsHash = helpers::decodeDBHash($modelsHash, $curr_lang);
-			# print STDERR "Models hash: " . Dumper($modelsHash);
 			$query = "SELECT * FROM metadata 
 					WHERE table_name = 'models'
 					UNION
 					SELECT * FROM metadata 
 					WHERE table_name = 'types' AND column_name = 'name_$curr_lang'";
-			# print STDERR Dumper($query);
 			my $tableInfo = helpers::fetchHashSortedById($dbh, $query);
 			$tableInfo = helpers::decodeDBHash($tableInfo, $curr_lang);
-			# print STDERR Dumper($tableInfo);
 			$dbh->disconnect();
+			languages( [$curr_lang] );
 			template 'template', {
 				'translated_column' => ("column_name_" . $curr_lang),
 				'tableInfo' => $tableInfo,
@@ -490,6 +506,7 @@ any ['post', 'get'] => '/models/:id' => sub {
 		if (session 'user_can_write'){	
 			$dbh = connect_db();
 			helpers::makeDELETEQuery($dbh, 'models', params->{'id'});
+			helpers::printToLog((session 'current_user') . " deleted model with id " . params->{'id'} . scalar localtime);
 			redirect '/models';
 		}else{
 			redirect '/models';
@@ -502,19 +519,21 @@ any ['post', 'get'] => '/models/:id' => sub {
 any ['post', 'get'] => '/networks' => sub {
 	my $dbh;
 	if ((session 'logged_in') && (session 'user_can_read')) {
+		helpers::printToLog((session 'current_user') . " requested networks view at " . scalar localtime);
 		$dbh = connect_db();
 		if ((request->method() eq "POST") && (session 'user_can_write')){
 			helpers::makeINSERTByGivenQuery($dbh, buildINSERTQuery(helpers::fetchTableColumnNames($dbh, 'networks'), 'networks'));
+			helpers::printToLog((session 'current_user') . " created network at" . scalar localtime);
 		}
 		my ($pages, $offset, $sth);
 		$offset = 0;
 		$offset = int(params->{'offset'})-1 if (params->{'offset'});
 		my $rows = helpers::countTableRows($dbh, 'networks');
-		$pages =  int($rows / 10);
-		$pages++ if ($rows % 10) != 0;
+		$pages =  int($rows / 250);
+		$pages++ if ($rows % 250) != 0;
 		my @output = getColumnNamesInCurrentLanguage($dbh, 'networks');
 		push(@output, "id");
- 		my $networksHash = helpers::fetchHashSortedById($dbh, helpers::buildSimpleSELECTQuery('networks', \@output, 10, ($offset)*10));
+ 		my $networksHash = helpers::fetchHashSortedById($dbh, helpers::buildSimpleSELECTQuery('networks', \@output, 250, ($offset)*250));
 		my $curr_lang = session "user_current_lang";
 		$networksHash = helpers::decodeDBHash($networksHash, $curr_lang);
 		my $tableInfo = helpers::fetchHashSortedById($dbh, 
@@ -522,6 +541,7 @@ any ['post', 'get'] => '/networks' => sub {
 											FROM metadata WHERE table_name = 'networks' ");
 		$tableInfo = helpers::decodeDBHash($tableInfo, $curr_lang);
 		$dbh->disconnect();
+		languages( [$curr_lang] );
 		template 'template', {
 			'translated_column' => ("column_name_" . $curr_lang),
 			'currentType' => 'network',
@@ -543,6 +563,7 @@ any ['get', 'post'] => '/networks/:id' => sub {
 		if (session 'user_can_write'){
 			$dbh = connect_db();
 			helpers::makeDELETEQuery($dbh, 'networks', params->{'id'});
+			helpers::printToLog((session 'current_user') . " deleted network with id " . params->{'id'} . scalar localtime);
 			redirect '/networks';
 		}else{
 			redirect '/networks';
@@ -572,15 +593,15 @@ ajax '/ajax_search' => sub {
 any ['get', 'post'] => '/network_devices' => sub {
 	my $dbh;
 	if ((session 'logged_in') && (session 'user_can_read')) {
+		helpers::printToLog((session 'current_user') . " requested network_devices view at " . scalar localtime);
 		$dbh = connect_db();
 		my $sth;
 		my $curr_lang = session "user_current_lang";
 		if ((request->method() eq "POST") && (session 'user_can_write')){
-			# print STDERR Dumper(params);
 			params->{"network_device_network_id"} = findIDModel('networks',params->{"network_device_network_id"});
-			print STDERR Dumper(buildINSERTQuery(helpers::fetchTableColumnNames($dbh, 'network_devices'), 'network_devices'));
 			helpers::makeINSERTByGivenQuery($dbh, buildINSERTQuery(helpers::fetchTableColumnNames($dbh, 'network_devices'), 'network_devices'));
 			$dbh->disconnect();
+			helpers::printToLog((session 'current_user') . " created network_device at" . scalar localtime);
 			redirect '/network_devices';
 		}else{
 			my $offset = 0;
@@ -598,11 +619,10 @@ any ['get', 'post'] => '/network_devices' => sub {
 					UNION
 					SELECT * FROM metadata 
 					WHERE table_name = 'networks' AND column_name = 'name_$curr_lang'";
-			# print STDERR Dumper($query);
 			my $tableInfo = helpers::fetchHashSortedById($dbh, $query);
 			$tableInfo = helpers::decodeDBHash($tableInfo, $curr_lang);
-			# print STDERR Dumper($tableInfo);
 			$dbh->disconnect();
+			languages( [$curr_lang] );			
 			template 'template', {
 				'translated_column' => ("column_name_" . $curr_lang),
 				'tableInfo' => $tableInfo,
@@ -626,6 +646,7 @@ any ['get', 'post'] => '/network_devices/:id' => sub {
 		if (session 'user_can_write'){
 			$dbh = connect_db();
 			helpers::makeDELETEQuery($dbh, 'network_devices', params->{'id'});
+			helpers::printToLog((session 'current_user') . " deleted network_device with id " . params->{'id'} . scalar localtime);
 			redirect '/network_devices';
 		}else{
 			redirect '/network_devices';
@@ -638,15 +659,15 @@ any ['get', 'post'] => '/network_devices/:id' => sub {
 any ['get', 'post'] => '/computers' => sub {
 	my $dbh;
 	if ((session 'logged_in') && (session 'user_can_read')) {
+		helpers::printToLog((session 'current_user') . " requested computers view at " . scalar localtime);
 		$dbh = connect_db();
 		my $sth;
 		my $curr_lang = session "user_current_lang";
 		if ((request->method() eq "POST") && (session 'user_can_write')){
-			# print STDERR Dumper(params);
 			params->{"computer_network_id"} = findIDModel('networks',params->{"computer_network_id"});
-			print STDERR Dumper(buildINSERTQuery(helpers::fetchTableColumnNames($dbh, 'computers'), 'computers'));
 			helpers::makeINSERTByGivenQuery($dbh, buildINSERTQuery(helpers::fetchTableColumnNames($dbh, 'computers'), 'computers'));
 			$dbh->disconnect();
+			helpers::printToLog((session 'current_user') . " created computer at" . scalar localtime);
 			redirect '/computers';
 		}else{
 			my $offset = 0;
@@ -664,11 +685,10 @@ any ['get', 'post'] => '/computers' => sub {
 					UNION
 					SELECT * FROM metadata 
 					WHERE table_name = 'networks' AND column_name = 'name_$curr_lang'";
-			# print STDERR Dumper($query);
 			my $tableInfo = helpers::fetchHashSortedById($dbh, $query);
 			$tableInfo = helpers::decodeDBHash($tableInfo, $curr_lang);
-			# print STDERR Dumper($tableInfo);
 			$dbh->disconnect();
+			languages( [$curr_lang] );
 			template 'template', {
 				'translated_column' => ("column_name_" . $curr_lang),
 				'tableInfo' => $tableInfo,
@@ -692,6 +712,7 @@ any ['get', 'post'] => '/computers/:id' => sub {
 		if (session 'user_can_write'){	
 			$dbh = connect_db();
 			helpers::makeDELETEQuery($dbh, 'computers', params->{'id'});
+			helpers::printToLog((session 'current_user') . " deleted computer with id " . params->{'id'} . scalar localtime);
 			redirect '/computers';
 		}else{
 			redirect '/computers';
@@ -704,16 +725,16 @@ any ['get', 'post'] => '/computers/:id' => sub {
 any ['get', 'post'] => '/parts' => sub {
 	my $dbh;
 	if ((session 'logged_in') && (session 'user_can_read')) {
+		helpers::printToLog((session 'current_user') . " requested parts view at " . scalar localtime);
 		$dbh = connect_db();
 		my $sth;
 		my $curr_lang = session "user_current_lang";
 		if ((request->method() eq "POST") && (session 'user_can_write')){
-			# print STDERR Dumper(params);
 			params->{"part_model_id"} = findIDModel('models',params->{"part_model_id"});
 			params->{"part_computer_id"} = findIDModel('computers',params->{"part_computer_id"});
-			print STDERR Dumper(buildINSERTQuery(helpers::fetchTableColumnNames($dbh, 'parts'), 'parts'));
 			helpers::makeINSERTByGivenQuery($dbh, buildINSERTQuery(helpers::fetchTableColumnNames($dbh, 'parts'), 'parts'));
 			$dbh->disconnect();
+			helpers::printToLog((session 'current_user') . " created part at " . scalar localtime);
 			redirect '/parts';
 		}else{
 			my $offset = 0;
@@ -737,11 +758,10 @@ any ['get', 'post'] => '/parts' => sub {
 					UNION
 					SELECT * FROM metadata 
 					WHERE table_name = 'computers' AND column_name = 'name_$curr_lang'";
-			# print STDERR Dumper($query);
 			my $tableInfo = helpers::fetchHashSortedById($dbh, $query);
 			$tableInfo = helpers::decodeDBHash($tableInfo, $curr_lang);
-			# print STDERR Dumper($tableInfo);
 			$dbh->disconnect();
+			languages( [$curr_lang] );
 			template 'template', {
 				'translated_column' => ("column_name_" . $curr_lang),
 				'tableInfo' => $tableInfo,
@@ -765,6 +785,7 @@ any ['get', 'post'] => '/parts/:id' => sub {
 		if (session 'user_can_write'){	
 			$dbh = connect_db();
 			helpers::makeDELETEQuery($dbh, 'parts', params->{'id'});
+			helpers::printToLog((session 'current_user') . " deleted part with id " . params->{'id'} . scalar localtime);
 			redirect '/parts';
 		}else{
 			redirect '/parts';
@@ -774,9 +795,32 @@ any ['get', 'post'] => '/parts/:id' => sub {
 	}
 };
 
+get '/download/:id' => sub {
+	my $dbh;
+	if ((session 'logged_in') && (session 'user_can_read')){
+		$dbh = connect_db();
+		my $sth = $dbh->prepare("SELECT id, name FROM manuals WHERE id = ?");
+		$sth->execute(params->{"id"});
+		helpers::ASSERT($sth->rows() >= 0);
+		if ($sth->rows() == 0) {
+			$sth->finish();
+			$dbh->disconnect();
+			redirect "/manuals";
+		}else{
+			helpers::printToLog((session 'current_user') . " downloaded manual at " . scalar localtime);
+			my $file_name = $sth->fetchrow_hashref();
+			$file_name = $$file_name{"name"};
+			$sth->finish();
+			$dbh->disconnect();
+			return send_file("/uploads/" . $file_name);
+		}
+	}
+};
+
 any ['get', 'post'] => '/manuals' => sub {
 	my $dbh;
 	if ((session 'logged_in') && (session 'user_can_read')){
+		helpers::printToLog((session 'current_user') . " requested manuals view at " . scalar localtime);
 		$dbh = connect_db();
 		if ((request->method() eq "POST") && (session 'user_can_write')){
 			my $public_dir = "/" . config->{"public"} . "/uploads";
@@ -792,6 +836,7 @@ any ['get', 'post'] => '/manuals' => sub {
 			$sth->finish();
 			$dbh->commit;
 			$dbh->disconnect();
+			helpers::printToLog((session 'current_user') . " created new manual " . scalar localtime);
   			redirect '/manuals';
 		}else{
 			my ($pages, $offset);
@@ -810,6 +855,8 @@ any ['get', 'post'] => '/manuals' => sub {
 			$sth->execute($offset*10) ;
 			my $manualsHash = $sth->fetchall_hashref('id');
 			$dbh->disconnect();
+			my $curr_lang = session 'user_current_lang';
+			languages( [$curr_lang] );
 			template 'manuals', {
 				'manuals' => $manualsHash,
 				'pages' => $pages,
@@ -835,6 +882,7 @@ any ['get', 'post'] => '/manuals/:id' => sub {
 			$dbh->commit ;
 			$sth->finish();
 			$dbh->disconnect();
+			helpers::printToLog((session 'current_user') . " deleted manual with id " . $id . scalar localtime);
 		}
 		redirect '/manuals';
 	}else{
@@ -842,32 +890,44 @@ any ['get', 'post'] => '/manuals/:id' => sub {
 	}
 };
 
-any ['get', 'post'] => '/search' => sub {
+any ['get', 'post'] => '/search' => sub {	
 	my $dbh;
 	if ((session 'logged_in') && (session 'user_can_read')) {
+		helpers::printToLog((session 'current_user') . " requested search view at " . scalar localtime);
 		$dbh = connect_db();
+		my $curr_lang = session 'user_current_lang';
 		if (request->method() eq "POST"){
 			my $db = params->{'select_db'};
 			$db = $dbh->quote_identifier( $db );
-			my $curr_lang = session 'user_current_lang';
 			redirect '/search' if (params->{'search_pattern'} =~ /\s/) or (params->{'search_pattern'} eq "");
 			my $pattern = $dbh->quote("^" . params->{'search_pattern'});
-			my $stat = "SELECT * FROM  $db WHERE name_$curr_lang ~ $pattern LIMIT 200 OFFSET 0";
+			my $stat = "SELECT id, name_$curr_lang FROM  $db 
+						WHERE name_$curr_lang ~ $pattern OR name_en ~ $pattern 
+						LIMIT 200 OFFSET 0";
 			my $sth = $dbh->prepare($stat);
-			print STDERR "Statement => " . $stat . "\n";
 			$sth->execute() ;
-			helpers::ASSERT($sth->rows() > 0);
-			my $searchHash = $sth->fetchall_arrayref();
-			$sth = $dbh->column_info('','',$db,'');
-			my $columnNames = $sth->fetchall_arrayref();
+			# helpers::ASSERT($sth->rows() > 0);
+			# my $hasResult = 1;
+			# $hasResult = 0 if ($sth->rows() == 0 );
+			my $searchHash = $sth->fetchall_hashref("id");
+			$searchHash = helpers::decodeDBHash($searchHash, $curr_lang);
+			$sth = $dbh->prepare("SELECT column_name_$curr_lang FROM metadata 
+									WHERE table_name = ? AND column_name = ?");
+			$sth->execute(params->{'select_db'}, "name_$curr_lang");
+			my $columnName = $sth->fetchall_arrayref();
+			
+			$$columnName[0][0] = decode_utf8($$columnName[0][0]);
 			$dbh->disconnect();
-			template 'search.tt', {
+			helpers::printToLog((session 'current_user') . " used search at " . scalar localtime);
+			template 'search', {
 				'query' => $searchHash,
-				'column_names' => $columnNames,
+				'column_name' => $$columnName[0][0],
+				# 'has_result' => $hasResult,
 				'logged' => 'true',
 				'user' => session 'current_user'
 			};
 		}else{
+			languages( [$curr_lang] );
 			template 'search.tt', {
 				'logged' => 'true',
 				'user' => session 'current_user'
@@ -1090,6 +1150,8 @@ any ['get', 'post'] => '/account_management' => sub {
 				my $accountsHash = $sth->fetchall_hashref('id');
 				$sth->finish();
 				$dbh->disconnect();
+				my $curr_lang = session "user_current_lang";
+				languages( [$curr_lang] );
 				template 'account_management', {
 					'accounts' => $accountsHash,
 					'pages' => $pages,

@@ -13,24 +13,24 @@
 <body>
 		<nav class="navbar navbar-default" role="navigation">
 			<div class="navbar-header">
-			    <a class="navbar-brand" href="/">Computers manager</a>
+			    <a class="navbar-brand" href="/"><% l("Computers manager") %></a>
 			</div>
 			<ul class="nav navbar-nav">
 				<% IF logged == 'true' || msg == 1 %>
-					<li><a href="/types"> Types </a></li>
-					<li><a href="/models"> Models </a></li>
-					<li><a href="/networks"> Networks </a></li>
-					<li><a href="/network_devices"> Network devices </a></li>
-					<li><a href="/computers"> Computers </a></li>
-					<li><a href="/parts"> Parts </a></li>
-					<li><a href="/manuals"> Manuals </a></li>
-					<li><a href="/search"> Search </a></li>
+					<li><a href="/types"> <% l("Types") %> </a></li>
+					<li><a href="/models"> <% l("Models") %> </a></li>
+					<li><a href="/networks"> <% l("Networks") %> </a></li>
+					<li><a href="/network_devices"> <% l("Network devices") %> </a></li>
+					<li><a href="/computers"> <% l("Computers") %> </a></li>
+					<li><a href="/parts"> <% l("Parts") %> </a></li>
+					<li><a href="/manuals"> <% l("Manuals") %> </a></li>
+					<li><a href="/search"> <% l("Search") %> </a></li>
 				<% END %>
 			</ul>
 			<ul class="nav navbar-nav navbar-right">
 				<% IF logged == 'true' || msg == 1 %>
-					<li><a href="/user_panel"> Logged as: <%user%></a></li>
-					<li><a href="/logout"> Logout </a></li>
+					<li><a href="/user_panel"> <% l("Logged as") %>: <%user%></a></li>
+					<li><a href="/logout"> <% l("Logout") %> </a></li>
 				<% END %>
 			</ul>
 		</nav>

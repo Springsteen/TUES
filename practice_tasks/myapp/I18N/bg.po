@@ -1,0 +1,95 @@
+msgid "Types"
+msgstr "Tipove"
+
+msgid "Models"
+msgstr "Modeli"
+
+msgid "Networks"
+msgstr "Mreji"
+
+msgid "Network devices"
+msgstr "Mrejovi ustroistva"
+
+msgid "Computers"
+msgstr "Kompiutri"
+
+msgid "Parts"
+msgstr "Chasti"
+
+msgid "Manuals"
+msgstr "Spravochnici"
+
+msgid "Search"
+msgstr "Tursene"
+
+msgid "Logged as"
+msgstr "Lognat kato"
+
+msgid "Logout"
+msgstr "Izhod"
+
+msgid "Select page"
+msgstr "Izberete stranica"
+
+msgid "Save"
+msgstr "Zapazi"
+
+msgid "Get"
+msgstr "Zaredi"
+
+msgid "Delete"
+msgstr "Iztrii"
+
+msgid "Download"
+msgstr "Svali"
+
+msgid "Name"
+msgstr "Ime"
+
+msgid "Upload"
+msgstr "Kachi"
+
+msgid "Computers manager"
+msgstr "Mlad Merindjei"
+
+msgid "Username"
+msgstr "Potrebitelsko ime"
+
+msgid "User's email address"
+msgstr "Meil na potrebitelq"
+
+msgid "Your email is not active. You can activate it from"
+msgstr "Vashiat meil ne e aktiven. Mojete da go aktivirate ot"
+
+msgid "here"
+msgstr "tyk"
+
+msgid "Your mail is active"
+msgstr "Meilat vi e aktiven"
+
+msgid "Change your password"
+msgstr "Promqna na vashata parola"
+
+msgid "Current password"
+msgstr "Tekushta parola"
+
+msgid "New password"
+msgstr "Nova parola"
+
+msgid "Repeat new password"
+msgstr "Povtorete novata parola"
+
+msgid "Change"
+msgstr "Promeni"
+
+msgid "Change app language"
+msgstr "Promenete tekushita ezik"
+
+msgid "Account Management"
+msgstr "Podrujka na akaunti"
+
+msgid "Rights"
+msgstr "Prava"
+
+msgid "Update"
+msgstr "Promeni"

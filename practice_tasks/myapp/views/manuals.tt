@@ -3,7 +3,7 @@
             <div class=input-group>
             <form action="/manuals" method="POST" enctype="multipart/form-data">
                 <input type="file" name="filename" id="filename">
-                <input type="submit" value="Upload" class="btn btn-primary">
+                <input type="submit" value=<% l("Upload") %> class="btn btn-primary">
             </form>
         </div>
     </div>
@@ -22,14 +22,15 @@
             <% i= i+1%>
           <% END %>
         </select>
-        <input type=submit value=Get page class="btn btn-primary">
+        <input type=submit value=<% l("Get") %> page class="btn btn-primary">
       </form>
     </div>
   <% END %>
 
   <% IF manuals %>
     <table class="table table-bordered">
-      <th>Name</th>
+      <th><% l("Name") %></th>
+      <th></th>
       <th></th>
       <% FOREACH id IN manuals.keys.nsort %>
         <tr>
@@ -37,7 +38,10 @@
           <td><% manuals.$id.name %></td>
           </form>
           <form method=delete action=/manuals/<%id%>>
-          <td><input type=submit value=Delete class="btn btn-danger"></td>
+          <td><input type=submit value=<% l("Delete") %> class="btn btn-danger"></td>
+          </form>
+          <form method=get action=/download/<%id%>>
+          <td><input type=submit value=<% l("Download") %> class="btn btn-success"></td>
           </form>
         <tr>
       <% END %>

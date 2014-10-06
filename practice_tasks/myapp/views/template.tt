@@ -26,7 +26,7 @@
                         <% END %>
                     <% END %>
                 <% END %>
-                <br><input type=submit value=Save class="btn btn-primary">
+                <br><input type=submit value=<% l("Save") %> class="btn btn-primary">
             </form>
         </div>
     </div>
@@ -34,7 +34,7 @@
     <% IF pages %>
         <div class="panel panel-primary">
             <div class="panel-heading">
-                Select page
+                <% l("Select page") %>
             </div>
             <form method=get>
                 <br><br> 
@@ -50,7 +50,7 @@
                 <% END %>
                 </select>
                 <br><br>
-                <input type=submit value=Get page class="btn btn-primary">
+                <input type=submit value=<% l("Get") %> page class="btn btn-primary">
             </form>
         </div>
     <% END %>
@@ -76,10 +76,10 @@
                             <td><input type=text name=new_<% currentType %>_<% elem.key %>_<%id%> value=<% elem.value %> class="form-control field"></td>
                         <% END %>
                     <% END %>
-                    <td><input type=submit value=Update class="btn btn-primary"></td>
+                    <!-- <td><input type=submit value=Update class="btn btn-primary"></td> -->
                 </form>
                 <form method=delete action=/<%currentType%>s/<%id%>>
-                    <td><input type=submit value=Delete class="btn btn-danger"></td>
+                    <td><input type=submit value=<% l("Delete") %> class="btn btn-danger"></td>
                 </form>
                 </tr>
             <% END %>

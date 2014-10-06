@@ -1,6 +1,7 @@
 package helpers;
     use Encode qw(decode_utf8 decode);
     use Data::Dumper;
+    use Dancer ':syntax';
 
     sub ASSERT ($;$) {
         if ($_[0] == 0){
@@ -8,6 +9,11 @@ package helpers;
             die; 
         }
     };
+
+    sub printToLog($) {
+        my $msg = $_[0] if defined $_[0];
+        debug $msg;
+    }
 
     sub makeDELETEQuery ($$$) {
         my ($dbh, $table, $id) = ($_[0], $_[1], $_[2]);

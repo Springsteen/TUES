@@ -15,7 +15,7 @@
                                 <% i= i+1%>
                             <% END %>
                         </select>
-                        <input type=submit value=Get page class="btn btn-primary">
+                        <input type=submit value=<% l("Get") %> page class="btn btn-primary">
                     </form>
                 </div>
             <% END %>
@@ -23,8 +23,8 @@
             <% IF accounts %>
                 <table class="table table-bordered">  
                     <tr>
-                        <th>Name</th>
-                        <th>Rights</th>
+                        <th><% l("Name") %></th>
+                        <th><% l("Rights") %></th>
                         <th></th>
                     </tr>
                     <% FOREACH id IN accounts.keys.nsort%>    
@@ -40,7 +40,7 @@
                                         <option value="7" <%IF accounts.$id.rights == 7%>selected<%END%>>Manage/Read/Write</option>
                                     </select>
                                 </td>
-                                <td><input type=submit value=Update class="btn btn-primary"></td>
+                                <td><input type=submit value=<% l("Update") %> class="btn btn-primary"></td>
                             </form>
                         </tr>
                     <% END %>

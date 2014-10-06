@@ -4,29 +4,29 @@
     <% END %>
       
     <div class=panel panel-header>
-        <p>Username: <% user %></p>
-        <p>User's email address: <% mail %></p>
+        <p><% l("Username") %>: <% user %></p>
+        <p><% l("User's email address") %>: <% mail %></p>
         <% IF active == "no" %>
-            <p>Your email is not active. You can activate it from <a href="<% request.uri_base %>/confirm_account">here</a></p>
+            <p><% l("Your email is not active. You can activate it from") %> <a href="<% request.uri_base %>/confirm_account"><% l("here") %></a></p>
         <% ELSE %>
-            <p>Your mail is active</p>
+            <p><% l("Your mail is active") %></p>
         <% END %>
     </div>
 
     <div class="panel panel-warning">
         <div class="panel-heading">
-            Change your password
+            <% l("Change your password") %>
         </div>
         <div class="panel-body">    
             <div class="input-group">
                 <form method=post action="/user_panel">
-                    Current password:<br>
+                    <% l("Current password") %>:<br>
                     <input type=password name=old_pass class=form-control><br><br>
-                    New password:<br>
+                    <% l("New password") %>:<br>
                     <input type=password name=new_pass_1 class=form-control><br><br>
-                    Repeat new password:<br>
+                    <% l("Repeat new password") %>:<br>
                     <input type=password name=new_pass_2 class=form-control><br><br>
-                    <input type=submit value=Change class="btn btn-primary">
+                    <input type=submit value=<% l("Change") %> class="btn btn-primary">
                 </form>
             </div>
         </div>
@@ -34,26 +34,26 @@
 
     <div class="panel panel-warning">
         <div class="panel-heading">
-            Change app language 
+            <% l("Change app language") %>
         </div>
         <div class="panel-body">
             <div class=input-group>
                 <form method=post action="/change_language">
                     <select name=lang_select>
-                        <% FOREACH id IN languages.keys.nsort %>
+                        <% FOREACH id IN langs.keys.nsort %>
                             <% IF user_lang == id %>
-                                <option selected><% languages.$id.name_en %></option>
+                                <option selected><% langs.$id.name_en %></option>
                             <% ELSE %>
-                                <option><% languages.$id.name_en %></option>
+                                <option><% langs.$id.name_en %></option>
                             <% END %>
                         <% END %>
                     </select>
-                    <input type=submit value=Change class="btn btn-primary">
+                    <input type=submit value=<% l("Change") %> class="btn btn-primary">
                 </form>
             </div>
         </div>
     </div>
 
-    <a href="/account_management">Account Management</a>
+    <a href="/account_management"><% l("Account Management") %></a>
 
 </div>
