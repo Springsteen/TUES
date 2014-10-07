@@ -70,16 +70,16 @@
             </tr>
             <% FOREACH id IN fetchedEntries.keys.sort %>
                 <tr>
-                <form method=post action=/<%currentType%>s/<%id%>>
                     <% FOREACH elem IN fetchedEntries.$id %>  
                         <% IF (elem.key != "id") AND (elem.key != translated_column) %>
-                            <td><input type=text name=new_<% currentType %>_<% elem.key %>_<%id%> value=<% elem.value %> class="form-control field"></td>
+                            <td><p><% elem.value %></p></td>
                         <% END %>
                     <% END %>
-                    <!-- <td><input type=submit value=Update class="btn btn-primary"></td> -->
+                <form method="get" action="/<%currentType%>s/edit/<%id%>">
+                    <td><input type="submit" value="Edit" class="btn btn-warning"></td>
                 </form>
-                <form method=delete action=/<%currentType%>s/<%id%>>
-                    <td><input type=submit value=<% l("Delete") %> class="btn btn-danger"></td>
+                <form method="delete" action="/<%currentType%>s/<%id%>">
+                    <td><input type="submit" value="<% l("Delete") %>" class="btn btn-danger"></td>
                 </form>
                 </tr>
             <% END %>

@@ -43,8 +43,11 @@ try{
     
     # print Dumper($dbh);
 
-    populateTable($dbh, "types", "DDR", "ДДР");
-    populateTable($dbh, "networks", "net", "мрежа");
+    # populateTable($dbh, "types", "DDR", "ДДР");
+    # populateTable($dbh, "networks", "net", "мрежа");
+    # populateTable($dbh, "models", "model", "модел");
+    # populateTable($dbh, "network_devices", "device", "устройство");
+    # populateTable($dbh, "computers", "computer", "компютър");
 
     $dbh->disconnect();
 }catch{

@@ -467,11 +467,11 @@ any ['post', 'get'] => '/models' => sub {
 			my $offset = 0;
 			$offset = int(params->{'offset'})-1 if (params->{'offset'});
 			my $rows = helpers::countTableRows($dbh, 'models');
-			my $pages =  int($rows / 10);
-			$pages++ if ($rows % 10) != 0;
+			my $pages =  int($rows / 250);
+			$pages++ if ($rows % 250) != 0;
 			my $query = "SELECT models.id, models.name_$curr_lang, types.name_$curr_lang AS type_name_$curr_lang 
-						FROM models, types 
-						WHERE models.type_id = types.id LIMIT 10 OFFSET " . ($offset*10);
+						FROM models LEFT JOIN types 
+						ON models.type_id = types.id LIMIT 250 OFFSET " . ($offset*250);
 			my $modelsHash = helpers::fetchHashSortedById($dbh, $query);
 			$modelsHash = helpers::decodeDBHash($modelsHash, $curr_lang);
 			$query = "SELECT * FROM metadata 
@@ -579,10 +579,10 @@ ajax '/ajax_search' => sub {
 	my $pattern = $dbh->quote(params->{"input"});
 	my $table = params->{"table"};
 	my $currentFormType = params->{"current_type"};
-	print STDERR Dumper($currentFormType);
-	my $networksHash = helpers::fetchHashSortedById($dbh, "SELECT id, name_$curr_lang FROM $table WHERE name_$curr_lang ~ $pattern");
+	# print STDERR Dumper($currentFormType);
+	my $networksHash = helpers::fetchHashSortedById($dbh, "SELECT id, name_$curr_lang FROM $table WHERE name_$curr_lang ~ $pattern LIMIT 50");
 	chop($table);
-	print STDERR Dumper($table);
+	# print STDERR Dumper($table);
 	$dbh->disconnect();
 	$networksHash->{"select_tag_info"} = {"id" => $table . "select", "name" => $currentFormType . "_" . $table . "_id"};
 	my $str = JSON->new->encode($networksHash);
@@ -607,11 +607,11 @@ any ['get', 'post'] => '/network_devices' => sub {
 			my $offset = 0;
 			$offset = int(params->{'offset'})-1 if (params->{'offset'});
 			my $rows = helpers::countTableRows($dbh, 'network_devices');
-			my $pages =  int($rows / 10);
-			$pages++ if ($rows % 10) != 0;
+			my $pages =  int($rows / 250);
+			$pages++ if ($rows % 250) != 0;
 			my $query = "SELECT network_devices.id, network_devices.name_$curr_lang, networks.name_$curr_lang AS network_name_$curr_lang 
-						FROM network_devices, networks
-						WHERE network_devices.network_id = networks.id LIMIT 10 OFFSET " . ($offset*10);
+						FROM network_devices LEFT JOIN networks
+						ON network_devices.network_id = networks.id LIMIT 250 OFFSET " . ($offset*250);
 			my $netDevsHash = helpers::fetchHashSortedById($dbh, $query);
 			$netDevsHash = helpers::decodeDBHash($netDevsHash, $curr_lang);
 			$query = "SELECT * FROM metadata 
@@ -673,11 +673,11 @@ any ['get', 'post'] => '/computers' => sub {
 			my $offset = 0;
 			$offset = int(params->{'offset'})-1 if (params->{'offset'});
 			my $rows = helpers::countTableRows($dbh, 'computers');
-			my $pages =  int($rows / 10);
-			$pages++ if ($rows % 10) != 0;
+			my $pages =  int($rows / 250);
+			$pages++ if ($rows % 250) != 0;
 			my $query = "SELECT computers.id, computers.name_$curr_lang, networks.name_$curr_lang AS network_name_$curr_lang 
-						FROM computers, networks
-						WHERE computers.network_id = networks.id LIMIT 10 OFFSET " . ($offset*10);
+						FROM computers LEFT JOIN networks
+						ON computers.network_id = networks.id LIMIT 250 OFFSET " . ($offset*250);
 			my $computersHash = helpers::fetchHashSortedById($dbh, $query);
 			$computersHash = helpers::decodeDBHash($computersHash, $curr_lang);
 			$query = "SELECT * FROM metadata 
@@ -906,9 +906,6 @@ any ['get', 'post'] => '/search' => sub {
 						LIMIT 200 OFFSET 0";
 			my $sth = $dbh->prepare($stat);
 			$sth->execute() ;
-			# helpers::ASSERT($sth->rows() > 0);
-			# my $hasResult = 1;
-			# $hasResult = 0 if ($sth->rows() == 0 );
 			my $searchHash = $sth->fetchall_hashref("id");
 			$searchHash = helpers::decodeDBHash($searchHash, $curr_lang);
 			$sth = $dbh->prepare("SELECT column_name_$curr_lang FROM metadata 
