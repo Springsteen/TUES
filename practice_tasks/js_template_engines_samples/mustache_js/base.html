@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+
+<html>
+
+    <head>
+        <title>Mustache test</title>
+    </head>
+
+    <body>
+
+        <div id="nav">
+            <button id="1">Test1</button>
+        </div>
+
+        <div id="content">
+            
+        </div>
+
+        <script type="text/javascript" src="mustache/mustache.js"></script>
+        <script type="text/javascript" src="jquery.js"></script>
+        <script type="text/javascript" src="base.js"></script>
+    
+        <script id="test1" type="text/template">
+            
+            <ul>
+                {{#.}}
+                    <li>{{.}}</li>
+                {{/.}}
+            </ul>
+
+        </script>
+    </body>
+
+</html>
