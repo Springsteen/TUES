@@ -76,7 +76,7 @@
                         <% END %>
                     <% END %>
                 <form method="get" action="/<%currentType%>s/edit/<%id%>">
-                    <td><input type="submit" value="Edit" class="btn btn-warning"></td>
+                    <td><input type="submit" value="Edit" class="btn btn-warning" disabled></td>
                 </form>
                 <form method="delete" action="/<%currentType%>s/<%id%>">
                     <td><input type="submit" value="<% l("Delete") %>" class="btn btn-danger"></td>

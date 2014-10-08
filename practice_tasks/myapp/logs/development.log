@@ -31130,3 +31130,25 @@ LINE 3:       WHERE network_devices.network_id = networks.id LIMIT 2...
 LINE 1: SELECT models.id, models.name AS m_name, 
                           ^ at /home/martin/Desktop/TUES/practice_tasks/myapp/lib/myapp.pm line 1103. in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
 [23365] debug @0.002099> [hit #102]martin requested networks view at Tue Oct  7 10:46:32 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[29625] debug @0.210487> [hit #1]Initialized i18n in /usr/local/share/perl/5.18.2/Dancer/Plugin/I18N.pm l. 182
+[29625] debug @0.363134> [hit #6]martin logged in at Wed Oct  8 09:17:44 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[29625] debug @0.002091> [hit #7]martin requested types view at Wed Oct  8 09:17:44 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[29625] debug @0.001986> [hit #10]martin requested user_panel view at Wed Oct  8 09:17:52 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[29625] debug @0.003122> [hit #11]martin requested manuals view at Wed Oct  8 09:18:00 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[29625] debug @0.001843> [hit #12]martin requested search view at Wed Oct  8 09:18:02 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[29625] debug @0.003419> [hit #13]martin requested search view at Wed Oct  8 09:18:04 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[29625] debug @0.002576> [hit #14]martin requested types view at Wed Oct  8 09:18:08 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[29625] debug @0.002667> [hit #15]martin requested networks view at Wed Oct  8 09:19:34 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[29625] debug @0.002625> [hit #16]martin requested types view at Wed Oct  8 09:19:36 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[29625] debug @0.001665> [hit #17]martin requested manuals view at Wed Oct  8 09:19:37 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[29625] debug @0.002191> [hit #18]martin requested user_panel view at Wed Oct  8 09:19:38 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[29845] debug @0.022678> [hit #1]Initialized i18n in /usr/local/share/perl/5.18.2/Dancer/Plugin/I18N.pm l. 182
+[29845] debug @0.030858> [hit #3]martin logged in at Wed Oct  8 09:21:36 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 16
+[29845] debug @0.001662> [hit #4]martin requested types view at Wed Oct  8 09:21:36 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 16
+[29845] debug @0.001289> [hit #5]martin requested user_panel view at Wed Oct  8 09:24:11 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 16
+[29845] debug @0.003130> [hit #6]martin requested user_panel view at Wed Oct  8 09:24:26 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 16
+[30119] debug @0.023617> [hit #1]Initialized i18n in /usr/local/share/perl/5.18.2/Dancer/Plugin/I18N.pm l. 182
+[30119] debug @0.029502> [hit #3]martin logged in at Wed Oct  8 09:29:06 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[30119] debug @0.001497> [hit #4]martin requested types view at Wed Oct  8 09:29:06 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[30119] debug @0.001961> [hit #5]martin requested search view at Wed Oct  8 09:29:27 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[30119] debug @0.001648> [hit #6]martin requested models view at Wed Oct  8 09:43:20 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15

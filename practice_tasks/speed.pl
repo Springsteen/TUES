@@ -40,12 +40,37 @@ while ($counter < $m){
 
     if ($flag == 1) { 
         print "im in";
-        push(@information, @splitted_input);
+        push(@information, [@splitted_input]);
         $counter++;
         print "counter => " . $counter . "\n";
     }
 }
 
-foreach my $subarr (@information) {
-    print STDERR Dumper($subarr);
+my %graph;
+
+sub add_edge {
+    my ($n1, $n2) = @_;
+    $graph{$n1}{$n2} = 1;
+    $graph{$n2}{$n1} = 1;
 }
+
+sub show_edges {
+    foreach my $n1 (keys %graph) {
+        foreach my $n2 (keys %{$graph{$n1}}) {
+            print "$n1 <-> $n2\n";
+        }
+    }
+}
+
+# print "info length =>" . (scalar @information) . "\n";
+
+# print "Dumped =>" . Dumper(@information) . "\n";
+# print $information[4];
+
+foreach my $subarr (@information) {
+    add_edge(${$subarr}[0], ${$subarr}[1]);
+}
+
+show_edges();
+
+
