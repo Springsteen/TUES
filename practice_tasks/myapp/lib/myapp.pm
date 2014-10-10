@@ -124,6 +124,43 @@ get '/exception' => sub {
 	template 'exception.tt';
 };
 
+ajax '/check_facebook_id' => sub {
+	my $dbh = connect_db();
+	my $userID = int(params->{"userID"});
+	# print STDERR Dumper($userID);
+	my $sth = $dbh->prepare("SELECT accounts.name, accounts.rights, 
+								languages.abbreviation AS lang 
+								FROM accounts, languages 
+								WHERE accounts.user_id = ? 
+								AND accounts.interface_language = languages.id");
+	$sth->execute($userID);
+	my $result = $sth->rows();
+	helpers::ASSERT((($result == 1) || ($result == 0)));
+	# if($result == 1) {
+
+	# 	my $userData = $sth->fetchrow_hashref();
+	# 	print STDERR Dumper($userData);
+	# 	my @rights = helpers::checkUserRights($userData->{'rights'});
+	# 	session user_can_read => $rights[2];
+	# 	session user_can_write => $rights[1];
+	# 	session user_is_admin => $rights[0];
+	# 	session user_current_lang => $userData->{'lang'};
+	
+	# }
+	session 'logged_in' => true;
+	session current_user => params->{'userMail'};
+	session user_can_read => 1;
+	session user_can_write => 1;
+	session user_is_admin => 0;
+	session user_current_lang => 'en';
+	$sth->finish();
+	$dbh->disconnect();
+	my $response = {"status" => "OK"};
+	$response = JSON->new->encode($response);
+ 	print STDERR Dumper($response);
+ 	return $response;
+};
+
 any ['post', 'get'] => '/' => sub {
 	my $dbh;
 	if (request->method() eq "POST"){

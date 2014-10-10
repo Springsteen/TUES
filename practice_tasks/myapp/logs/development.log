@@ -31152,3 +31152,287 @@ LINE 1: SELECT models.id, models.name AS m_name,
 [30119] debug @0.001497> [hit #4]martin requested types view at Wed Oct  8 09:29:06 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
 [30119] debug @0.001961> [hit #5]martin requested search view at Wed Oct  8 09:29:27 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
 [30119] debug @0.001648> [hit #6]martin requested models view at Wed Oct  8 09:43:20 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[7803] debug @0.019919> [hit #1]Initialized i18n in /usr/local/share/perl/5.18.2/Dancer/Plugin/I18N.pm l. 182
+[14120] debug @0.000017> Setting up fb access in /usr/local/share/perl/5.18.2/Dancer/Plugin/Facebook.pm l. 95
+[14120] debug @0.000399> Settings are {'application' => {'app_id' => '706460012762664','secret' => 'ae02719cd77c0b2b28414a7cce9de0f1'},'landing' => {'failure' => '/error','success' => '/'},'permissions' => ['create_event','email','offline_access','publish_stream','rsvp_event']} in /usr/local/share/perl/5.18.2/Dancer/Plugin/Facebook.pm l. 99
+[14120] debug @0.000532> Setting application information in /usr/local/share/perl/5.18.2/Dancer/Plugin/Facebook.pm l. 103
+[14120] debug @0.000648> Setting hook to clear facebook context in /usr/local/share/perl/5.18.2/Dancer/Plugin/Facebook.pm l. 111
+[14120] debug @0.000831> Done setting up fb access in /usr/local/share/perl/5.18.2/Dancer/Plugin/Facebook.pm l. 144
+[14515] debug @0.000016> Setting up fb access in /usr/local/share/perl/5.18.2/Dancer/Plugin/Facebook.pm l. 95
+[14515] debug @0.000393> Settings are {'application' => {'app_id' => '706460012762664','secret' => 'ae02719cd77c0b2b28414a7cce9de0f1'},'landing' => {'failure' => '/','success' => '/'},'permissions' => ['create_event','email','offline_access','publish_stream','rsvp_event']} in /usr/local/share/perl/5.18.2/Dancer/Plugin/Facebook.pm l. 99
+[14515] debug @0.000525> Setting application information in /usr/local/share/perl/5.18.2/Dancer/Plugin/Facebook.pm l. 103
+[14515] debug @0.000668> Setting hook to clear facebook context in /usr/local/share/perl/5.18.2/Dancer/Plugin/Facebook.pm l. 111
+[14515] debug @0.000851> Creating handler for /auth/facebook in /usr/local/share/perl/5.18.2/Dancer/Plugin/Facebook.pm l. 136
+[14515] debug @0.001052> Settings are {'application' => {'app_id' => '706460012762664','secret' => 'ae02719cd77c0b2b28414a7cce9de0f1'},'landing' => {'failure' => '/','success' => '/'},'permissions' => ['create_event','email','offline_access','publish_stream','rsvp_event']} in /usr/local/share/perl/5.18.2/Dancer/Plugin/Facebook.pm l. 43
+[14515] debug @0.001187> Getting fb object [undef] in /usr/local/share/perl/5.18.2/Dancer/Plugin/Facebook.pm l. 17
+[14515] debug @0.001802> Creating Facebook::Graph object with settings {'app_id' => '706460012762664','secret' => 'ae02719cd77c0b2b28414a7cce9de0f1'} in /usr/local/share/perl/5.18.2/Dancer/Plugin/Facebook.pm l. 35
+[14515] debug @0.009710> Creating handler for /auth/facebook/postback in /usr/local/share/perl/5.18.2/Dancer/Plugin/Facebook.pm l. 140
+[14515] debug @0.010043> Settings are {'application' => {'app_id' => '706460012762664','secret' => 'ae02719cd77c0b2b28414a7cce9de0f1'},'landing' => {'failure' => '/','success' => '/'},'permissions' => ['create_event','email','offline_access','publish_stream','rsvp_event']} in /usr/local/share/perl/5.18.2/Dancer/Plugin/Facebook.pm l. 59
+[14515] debug @0.010342> Done setting up fb access in /usr/local/share/perl/5.18.2/Dancer/Plugin/Facebook.pm l. 144
+[14515] debug @0.020763> [hit #1]Initialized i18n in /usr/local/share/perl/5.18.2/Dancer/Plugin/I18N.pm l. 182
+[14515] debug @0.022640> [hit #1]Considering clearing facebook context in /usr/local/share/perl/5.18.2/Dancer/Plugin/Facebook.pm l. 114
+[14515] debug @0.001612> [hit #2]Considering clearing facebook context in /usr/local/share/perl/5.18.2/Dancer/Plugin/Facebook.pm l. 114
+[14515] debug @0.030963> [hit #2]martin logged in at Wed Oct  8 15:23:56 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[14515] debug @0.001376> [hit #3]Considering clearing facebook context in /usr/local/share/perl/5.18.2/Dancer/Plugin/Facebook.pm l. 114
+[14515] debug @0.001886> [hit #3]martin requested types view at Wed Oct  8 15:23:56 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[14558] debug @0.000017> Setting up fb access in /usr/local/share/perl/5.18.2/Dancer/Plugin/Facebook.pm l. 95
+[14558] debug @0.000407> Settings are {'application' => {'app_id' => '706460012762664','secret' => 'ae02719cd77c0b2b28414a7cce9de0f1'},'landing' => {'failure' => '/','success' => '/'},'permissions' => ['create_event','email','offline_access','publish_stream','rsvp_event']} in /usr/local/share/perl/5.18.2/Dancer/Plugin/Facebook.pm l. 99
+[14558] debug @0.000536> Setting application information in /usr/local/share/perl/5.18.2/Dancer/Plugin/Facebook.pm l. 103
+[14558] debug @0.000653> Setting hook to clear facebook context in /usr/local/share/perl/5.18.2/Dancer/Plugin/Facebook.pm l. 111
+[14558] debug @0.000836> Creating handler for /auth/facebook in /usr/local/share/perl/5.18.2/Dancer/Plugin/Facebook.pm l. 136
+[14558] debug @0.001054> Settings are {'application' => {'app_id' => '706460012762664','secret' => 'ae02719cd77c0b2b28414a7cce9de0f1'},'landing' => {'failure' => '/','success' => '/'},'permissions' => ['create_event','email','offline_access','publish_stream','rsvp_event']} in /usr/local/share/perl/5.18.2/Dancer/Plugin/Facebook.pm l. 43
+[14558] debug @0.001202> Getting fb object [undef] in /usr/local/share/perl/5.18.2/Dancer/Plugin/Facebook.pm l. 17
+[14558] debug @0.001789> Creating Facebook::Graph object with settings {'app_id' => '706460012762664','secret' => 'ae02719cd77c0b2b28414a7cce9de0f1'} in /usr/local/share/perl/5.18.2/Dancer/Plugin/Facebook.pm l. 35
+[14558] debug @0.009732> Creating handler for /auth/facebook/postback in /usr/local/share/perl/5.18.2/Dancer/Plugin/Facebook.pm l. 140
+[14558] debug @0.010074> Settings are {'application' => {'app_id' => '706460012762664','secret' => 'ae02719cd77c0b2b28414a7cce9de0f1'},'landing' => {'failure' => '/','success' => '/'},'permissions' => ['create_event','email','offline_access','publish_stream','rsvp_event']} in /usr/local/share/perl/5.18.2/Dancer/Plugin/Facebook.pm l. 59
+[14558] debug @0.010376> Done setting up fb access in /usr/local/share/perl/5.18.2/Dancer/Plugin/Facebook.pm l. 144
+[14558] debug @0.020748> [hit #1]Initialized i18n in /usr/local/share/perl/5.18.2/Dancer/Plugin/I18N.pm l. 182
+[14558] debug @0.022269> [hit #1]Considering clearing facebook context in /usr/local/share/perl/5.18.2/Dancer/Plugin/Facebook.pm l. 114
+[14558] debug @0.001241> [hit #2]Considering clearing facebook context in /usr/local/share/perl/5.18.2/Dancer/Plugin/Facebook.pm l. 114
+[14558] debug @0.001068> [hit #3]Considering clearing facebook context in /usr/local/share/perl/5.18.2/Dancer/Plugin/Facebook.pm l. 114
+[14558] debug @0.001426> [hit #3]Redirecting to https://graph.facebook.com/oauth/authorize?client_id=706460012762664&display=page&scope=create_event%2Cemail%2Coffline_access%2Cpublish_stream%2Crsvp_event&redirect_uri= in /usr/local/share/perl/5.18.2/Dancer/Plugin/Facebook.pm l. 52
+[14558] debug @0.001272> [hit #4]Considering clearing facebook context in /usr/local/share/perl/5.18.2/Dancer/Plugin/Facebook.pm l. 114
+[14558] debug @0.001012> [hit #5]Considering clearing facebook context in /usr/local/share/perl/5.18.2/Dancer/Plugin/Facebook.pm l. 114
+[14558] debug @0.001360> [hit #5]Redirecting to https://graph.facebook.com/oauth/authorize?client_id=706460012762664&display=page&scope=create_event%2Cemail%2Coffline_access%2Cpublish_stream%2Crsvp_event&redirect_uri= in /usr/local/share/perl/5.18.2/Dancer/Plugin/Facebook.pm l. 52
+[14665] debug @0.018951> [hit #1]Initialized i18n in /usr/local/share/perl/5.18.2/Dancer/Plugin/I18N.pm l. 182
+[14665] debug @0.020509> [hit #1]Setting up fb access in /usr/local/share/perl/5.18.2/Dancer/Plugin/Facebook.pm l. 95
+[14665] debug @0.020890> [hit #1]Settings are {'application' => {'app_id' => '706460012762664','secret' => 'ae02719cd77c0b2b28414a7cce9de0f1'},'landing' => {'failure' => '/','success' => '/'},'permissions' => ['create_event','email','offline_access','publish_stream','rsvp_event']} in /usr/local/share/perl/5.18.2/Dancer/Plugin/Facebook.pm l. 99
+[14665] debug @0.021023> [hit #1]Setting application information in /usr/local/share/perl/5.18.2/Dancer/Plugin/Facebook.pm l. 103
+[14665] debug @0.021140> [hit #1]Setting hook to clear facebook context in /usr/local/share/perl/5.18.2/Dancer/Plugin/Facebook.pm l. 111
+[14665] debug @0.021337> [hit #1]Creating handler for /auth/facebook in /usr/local/share/perl/5.18.2/Dancer/Plugin/Facebook.pm l. 136
+[14665] debug @0.021564> [hit #1]Settings are {'application' => {'app_id' => '706460012762664','secret' => 'ae02719cd77c0b2b28414a7cce9de0f1'},'landing' => {'failure' => '/','success' => '/'},'permissions' => ['create_event','email','offline_access','publish_stream','rsvp_event']} in /usr/local/share/perl/5.18.2/Dancer/Plugin/Facebook.pm l. 43
+[14665] debug @0.021721> [hit #1]Getting fb object [undef] in /usr/local/share/perl/5.18.2/Dancer/Plugin/Facebook.pm l. 17
+[14665] debug @0.022020> [hit #1]Creating Facebook::Graph object with settings {'app_id' => '706460012762664','secret' => 'ae02719cd77c0b2b28414a7cce9de0f1'} in /usr/local/share/perl/5.18.2/Dancer/Plugin/Facebook.pm l. 35
+[14665] debug @0.029654> [hit #1]Creating handler for /auth/facebook/postback in /usr/local/share/perl/5.18.2/Dancer/Plugin/Facebook.pm l. 140
+[14665] debug @0.029977> [hit #1]Settings are {'application' => {'app_id' => '706460012762664','secret' => 'ae02719cd77c0b2b28414a7cce9de0f1'},'landing' => {'failure' => '/','success' => '/'},'permissions' => ['create_event','email','offline_access','publish_stream','rsvp_event']} in /usr/local/share/perl/5.18.2/Dancer/Plugin/Facebook.pm l. 59
+[14665] debug @0.030423> [hit #1]Done setting up fb access in /usr/local/share/perl/5.18.2/Dancer/Plugin/Facebook.pm l. 144
+[14665] debug @0.001805> [hit #2]Considering clearing facebook context in /usr/local/share/perl/5.18.2/Dancer/Plugin/Facebook.pm l. 114
+[14665] debug @0.002157> [hit #2]Redirecting to https://graph.facebook.com/oauth/authorize?redirect_uri=&client_id=706460012762664&scope=create_event%2Cemail%2Coffline_access%2Cpublish_stream%2Crsvp_event&display=page in /usr/local/share/perl/5.18.2/Dancer/Plugin/Facebook.pm l. 52
+[14699] debug @0.027721> [hit #1]Initialized i18n in /usr/local/share/perl/5.18.2/Dancer/Plugin/I18N.pm l. 182
+[14699] debug @0.029150> [hit #1]Setting up fb access in /usr/local/share/perl/5.18.2/Dancer/Plugin/Facebook.pm l. 95
+[14699] debug @0.029491> [hit #1]Settings are {'application' => {'app_id' => '706460012762664','secret' => 'ae02719cd77c0b2b28414a7cce9de0f1'},'landing' => {'failure' => 'localhost','success' => 'localhost'},'permissions' => ['create_event','email','offline_access','publish_stream','rsvp_event']} in /usr/local/share/perl/5.18.2/Dancer/Plugin/Facebook.pm l. 99
+[14699] debug @0.029666> [hit #1]Setting application information in /usr/local/share/perl/5.18.2/Dancer/Plugin/Facebook.pm l. 103
+[14699] debug @0.029791> [hit #1]Setting hook to clear facebook context in /usr/local/share/perl/5.18.2/Dancer/Plugin/Facebook.pm l. 111
+[14699] debug @0.029989> [hit #1]Creating handler for /auth/facebook in /usr/local/share/perl/5.18.2/Dancer/Plugin/Facebook.pm l. 136
+[14699] debug @0.030282> [hit #1]Settings are {'application' => {'app_id' => '706460012762664','secret' => 'ae02719cd77c0b2b28414a7cce9de0f1'},'landing' => {'failure' => 'localhost','success' => 'localhost'},'permissions' => ['create_event','email','offline_access','publish_stream','rsvp_event']} in /usr/local/share/perl/5.18.2/Dancer/Plugin/Facebook.pm l. 43
+[14699] debug @0.030449> [hit #1]Getting fb object [undef] in /usr/local/share/perl/5.18.2/Dancer/Plugin/Facebook.pm l. 17
+[14699] debug @0.030772> [hit #1]Creating Facebook::Graph object with settings {'app_id' => '706460012762664','secret' => 'ae02719cd77c0b2b28414a7cce9de0f1'} in /usr/local/share/perl/5.18.2/Dancer/Plugin/Facebook.pm l. 35
+[14699] debug @0.037950> [hit #1]Creating handler for /auth/facebook/postback in /usr/local/share/perl/5.18.2/Dancer/Plugin/Facebook.pm l. 140
+[14699] debug @0.038289> [hit #1]Settings are {'application' => {'app_id' => '706460012762664','secret' => 'ae02719cd77c0b2b28414a7cce9de0f1'},'landing' => {'failure' => 'localhost','success' => 'localhost'},'permissions' => ['create_event','email','offline_access','publish_stream','rsvp_event']} in /usr/local/share/perl/5.18.2/Dancer/Plugin/Facebook.pm l. 59
+[14699] debug @0.038587> [hit #1]Done setting up fb access in /usr/local/share/perl/5.18.2/Dancer/Plugin/Facebook.pm l. 144
+[14699] debug @0.001724> [hit #2]Considering clearing facebook context in /usr/local/share/perl/5.18.2/Dancer/Plugin/Facebook.pm l. 114
+[14699] debug @0.002069> [hit #2]Redirecting to https://graph.facebook.com/oauth/authorize?client_id=706460012762664&redirect_uri=&display=page&scope=create_event%2Cemail%2Coffline_access%2Cpublish_stream%2Crsvp_event in /usr/local/share/perl/5.18.2/Dancer/Plugin/Facebook.pm l. 52
+[14889] debug @0.020666> [hit #1]Initialized i18n in /usr/local/share/perl/5.18.2/Dancer/Plugin/I18N.pm l. 182
+[15222] debug @0.012810> [hit #1]Initialized i18n in /usr/local/share/perl/5.18.2/Dancer/Plugin/I18N.pm l. 182
+[18140] debug @0.013476> [hit #1]Initialized i18n in /usr/local/share/perl/5.18.2/Dancer/Plugin/I18N.pm l. 182
+[18485] debug @0.014401> [hit #1]Initialized i18n in /usr/local/share/perl/5.18.2/Dancer/Plugin/I18N.pm l. 182
+[18509] debug @0.014325> [hit #1]Initialized i18n in /usr/local/share/perl/5.18.2/Dancer/Plugin/I18N.pm l. 182
+[18669] debug @0.022282> [hit #1]Initialized i18n in /usr/local/share/perl/5.18.2/Dancer/Plugin/I18N.pm l. 182
+[18669] debug @0.030161> [hit #4]Warning caught during route execution: DBI::db=HASH(0x356ecc0)->disconnect invalidates 1 active statement handle (either destroy statement handles or call finish on them before disconnecting) at /home/martin/Desktop/TUES/practice_tasks/myapp/lib/myapp.pm line 134. in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[18669] debug @0.008126> [hit #5]Warning caught during route execution: DBI::db=HASH(0x356e600)->disconnect invalidates 1 active statement handle (either destroy statement handles or call finish on them before disconnecting) at /home/martin/Desktop/TUES/practice_tasks/myapp/lib/myapp.pm line 134. in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[18773] debug @0.012882> [hit #1]Initialized i18n in /usr/local/share/perl/5.18.2/Dancer/Plugin/I18N.pm l. 182
+[18839] debug @0.015793> [hit #1]Initialized i18n in /usr/local/share/perl/5.18.2/Dancer/Plugin/I18N.pm l. 182
+[18839] debug @0.031512> [hit #3]DBI fetchall_hashref: invalid number of arguments: got handle + 0, expected handle + between 1 and 1
+Usage: $h->fetchall_hashref($key_field) at /home/martin/Desktop/TUES/practice_tasks/myapp/lib/myapp.pm line 133. in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[18870] debug @0.021677> [hit #1]Initialized i18n in /usr/local/share/perl/5.18.2/Dancer/Plugin/I18N.pm l. 182
+[18870] debug @0.059658> [hit #3]DBD::Pg::st execute failed: ERROR:  syntax error at or near "FROM"
+LINE 1: SELECT FROM accounts WHERE user_id = $1
+               ^ at /home/martin/Desktop/TUES/practice_tasks/myapp/lib/myapp.pm line 132. in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[18896] debug @0.024484> [hit #1]Initialized i18n in /usr/local/share/perl/5.18.2/Dancer/Plugin/I18N.pm l. 182
+[18956] debug @0.018033> [hit #1]Initialized i18n in /usr/local/share/perl/5.18.2/Dancer/Plugin/I18N.pm l. 182
+[19212] debug @0.013476> [hit #1]Initialized i18n in /usr/local/share/perl/5.18.2/Dancer/Plugin/I18N.pm l. 182
+[19212] debug @0.001765> [hit #4] requested user_panel view at Wed Oct  8 17:21:54 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[19212] debug @0.005996> [hit #4]Died on line: 202 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 8
+[19212] debug @0.006457> [hit #4]Died at /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm line 9. in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[19212] debug @0.002918> [hit #6] requested user_panel view at Wed Oct  8 17:22:20 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[19212] debug @0.008181> [hit #6]Died on line: 202 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 8
+[19212] debug @0.011151> [hit #6]Died at /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm line 9. in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[19212] debug @0.001588> [hit #8] requested user_panel view at Wed Oct  8 17:22:23 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[19212] debug @0.007110> [hit #8]Died on line: 202 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 8
+[19212] debug @0.009385> [hit #8]Died at /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm line 9. in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[19251] debug @0.019538> [hit #1]Initialized i18n in /usr/local/share/perl/5.18.2/Dancer/Plugin/I18N.pm l. 182
+[19251] debug @0.001758> [hit #6] requested user_panel view at Wed Oct  8 17:22:48 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[19251] debug @0.005375> [hit #6]Died on line: 202 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 8
+[19251] debug @0.005766> [hit #6]Died at /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm line 9. in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[19278] debug @0.013180> [hit #1]Initialized i18n in /usr/local/share/perl/5.18.2/Dancer/Plugin/I18N.pm l. 182
+[20882] debug @0.016140> [hit #1]Initialized i18n in /usr/local/share/perl/5.18.2/Dancer/Plugin/I18N.pm l. 182
+[20882] debug @0.001399> [hit #10] requested user_panel view at Thu Oct  9 08:59:19 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[20882] debug @0.004753> [hit #10]Died on line: 207 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 8
+[20882] debug @0.006633> [hit #10]Died at /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm line 9. in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[20882] debug @0.002060> [hit #12] requested user_panel view at Thu Oct  9 08:59:20 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[20882] debug @0.005808> [hit #12]Died on line: 207 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 8
+[20882] debug @0.006271> [hit #12]Died at /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm line 9. in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[20939] debug @0.014944> [hit #1]Initialized i18n in /usr/local/share/perl/5.18.2/Dancer/Plugin/I18N.pm l. 182
+[20939] debug @0.001383> [hit #5]martin requested user_panel view at Thu Oct  9 09:00:11 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[20939] debug @0.002762> [hit #6]martin requested models view at Thu Oct  9 09:00:12 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[20939] debug @0.011060> [hit #6]DBD::Pg::st execute failed: ERROR:  column "name_" does not exist
+LINE 1: SELECT id, name_ FROM types LIMIT 100 OFFSET 0
+                   ^ at /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm line 47. in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[20939] debug @0.001537> [hit #8]martin requested user_panel view at Thu Oct  9 09:00:13 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[20939] debug @0.002549> [hit #9]martin requested types view at Thu Oct  9 09:00:14 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[20939] debug @0.078019> [hit #9]DBD::Pg::st execute failed: ERROR:  column "column_name_" does not exist
+LINE 1: SELECT id, column_name_, column_name
+                   ^ at /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm line 47. in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[21825] debug @0.033530> [hit #1]Initialized i18n in /usr/local/share/perl/5.18.2/Dancer/Plugin/I18N.pm l. 182
+[21825] debug @0.001440> [hit #5]martin requested user_panel view at Thu Oct  9 09:05:08 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[21825] debug @0.001954> [hit #6]martin requested models view at Thu Oct  9 09:05:10 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[21825] debug @0.001830> [hit #7]martin requested types view at Thu Oct  9 09:05:11 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[2939] debug @0.120473> [hit #1]Initialized i18n in /usr/local/share/perl/5.18.2/Dancer/Plugin/I18N.pm l. 182
+[2939] debug @0.001998> [hit #16]martin requested user_panel view at Thu Oct  9 09:18:16 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[2939] debug @0.001597> [hit #19]martin requested user_panel view at Thu Oct  9 09:18:19 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[2939] debug @0.001448> [hit #20]martin requested types view at Thu Oct  9 09:18:23 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[2939] debug @0.001543> [hit #22]martin requested models view at Thu Oct  9 09:18:25 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[2939] debug @0.001872> [hit #23]martin requested networks view at Thu Oct  9 09:18:27 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[2939] debug @0.002179> [hit #24]martin requested networks view at Thu Oct  9 09:19:03 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[2939] debug @0.001510> [hit #26]martin requested models view at Thu Oct  9 09:19:04 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[2939] debug @0.001280> [hit #27]martin requested user_panel view at Thu Oct  9 09:19:05 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[2939] debug @0.001299> [hit #31]martin requested user_panel view at Thu Oct  9 09:19:29 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[2939] debug @0.001608> [hit #32]martin logged out atThu Oct  9 09:23:43 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[2939] debug @0.001268> [hit #43]martin requested user_panel view at Thu Oct  9 09:23:50 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[2939] debug @0.001702> [hit #45]martin logged out atThu Oct  9 09:23:55 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[2939] debug @0.001347> [hit #50]martin requested user_panel view at Thu Oct  9 09:24:04 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[2939] debug @0.001678> [hit #52]martin requested user_panel view at Thu Oct  9 09:24:13 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[2939] debug @0.001458> [hit #58]martin logged out atThu Oct  9 09:24:14 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[2939] debug @0.001494> [hit #63]martin requested user_panel view at Thu Oct  9 09:25:03 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[2939] debug @0.002657> [hit #69]martin logged out atThu Oct  9 09:25:04 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[2939] debug @0.001713> [hit #80]martin requested user_panel view at Thu Oct  9 09:26:05 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[2939] debug @0.001323> [hit #86]martin logged out atThu Oct  9 09:26:06 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[2939] debug @0.001548> [hit #90]martin requested user_panel view at Thu Oct  9 09:30:26 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[2939] debug @0.001280> [hit #96]martin logged out atThu Oct  9 09:30:27 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[2939] debug @0.001210> [hit #107]martin requested user_panel view at Thu Oct  9 09:31:09 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[2939] debug @0.001539> [hit #109]martin requested user_panel view at Thu Oct  9 09:31:38 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[2939] debug @0.001621> [hit #115]martin logged out atThu Oct  9 09:31:40 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[3561] debug @0.012904> [hit #1]Initialized i18n in /usr/local/share/perl/5.18.2/Dancer/Plugin/I18N.pm l. 182
+[3636] debug @0.012991> [hit #1]Initialized i18n in /usr/local/share/perl/5.18.2/Dancer/Plugin/I18N.pm l. 182
+[3636] debug @0.001391> [hit #5]fbapptester@abv.bg requested user_panel view at Thu Oct  9 10:07:28 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[3636] debug @0.006511> [hit #5]Died on line: 219 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 8
+[3636] debug @0.007204> [hit #5]Died at /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm line 9. in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[3636] debug @0.001305> [hit #7]fbapptester@abv.bg requested user_panel view at Thu Oct  9 10:07:51 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[3636] debug @0.007256> [hit #7]Died on line: 219 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 8
+[3636] debug @0.008039> [hit #7]Died at /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm line 9. in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[3636] debug @0.001508> [hit #10]fbapptester@abv.bg requested user_panel view at Thu Oct  9 10:07:57 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[3636] debug @0.007646> [hit #10]Died on line: 219 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 8
+[3636] debug @0.008639> [hit #10]Died at /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm line 9. in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[3636] debug @0.002201> [hit #11]fbapptester@abv.bg requested types view at Thu Oct  9 10:08:02 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[3636] debug @0.001796> [hit #12]fbapptester@abv.bg requested models view at Thu Oct  9 10:08:04 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[3636] debug @0.001881> [hit #13]fbapptester@abv.bg requested networks view at Thu Oct  9 10:08:05 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[3636] debug @0.002382> [hit #14]fbapptester@abv.bg requested computers view at Thu Oct  9 10:08:08 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[3636] debug @0.001966> [hit #16]fbapptester@abv.bg requested parts view at Thu Oct  9 10:08:10 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[3636] debug @0.002237> [hit #17]fbapptester@abv.bg requested user_panel view at Thu Oct  9 10:08:11 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[3636] debug @0.008966> [hit #17]Died on line: 219 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 8
+[3636] debug @0.009685> [hit #17]Died at /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm line 9. in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[3636] debug @0.001758> [hit #19]fbapptester@abv.bg requested user_panel view at Thu Oct  9 10:08:13 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[3636] debug @0.008638> [hit #19]Died on line: 219 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 8
+[3636] debug @0.009327> [hit #19]Died at /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm line 9. in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[3711] debug @0.012604> [hit #1]Initialized i18n in /usr/local/share/perl/5.18.2/Dancer/Plugin/I18N.pm l. 182
+[3711] debug @0.001313> [hit #6]fbapptester@abv.bg requested user_panel view at Thu Oct  9 10:09:41 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[3711] debug @0.023000> [hit #6]Warning caught during route execution: Use of uninitialized value in numeric eq (==) at /home/martin/Desktop/TUES/practice_tasks/myapp/lib/myapp.pm line 224. in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[3735] debug @0.012958> [hit #1]Initialized i18n in /usr/local/share/perl/5.18.2/Dancer/Plugin/I18N.pm l. 182
+[3735] debug @0.001482> [hit #6]fbapptester@abv.bg requested user_panel view at Thu Oct  9 10:10:48 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[3735] debug @0.019907> [hit #6]Warning caught during route execution: Use of uninitialized value in numeric eq (==) at /home/martin/Desktop/TUES/practice_tasks/myapp/lib/myapp.pm line 225. in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[3765] debug @0.012551> [hit #1]Initialized i18n in /usr/local/share/perl/5.18.2/Dancer/Plugin/I18N.pm l. 182
+[3765] debug @0.001643> [hit #6]fbapptester@abv.bg requested user_panel view at Thu Oct  9 10:11:20 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[3765] debug @0.020981> [hit #6]Warning caught during route execution: Use of uninitialized value in numeric eq (==) at /home/martin/Desktop/TUES/practice_tasks/myapp/lib/myapp.pm line 226. in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[3765] debug @0.001300> [hit #8]fbapptester@abv.bg requested user_panel view at Thu Oct  9 10:11:59 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[3765] debug @0.011836> [hit #8]Warning caught during route execution: Use of uninitialized value in numeric eq (==) at /home/martin/Desktop/TUES/practice_tasks/myapp/lib/myapp.pm line 226. in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[3765] debug @0.001291> [hit #11]fbapptester@abv.bg requested user_panel view at Thu Oct  9 10:12:01 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[3765] debug @0.010714> [hit #11]Warning caught during route execution: Use of uninitialized value in numeric eq (==) at /home/martin/Desktop/TUES/practice_tasks/myapp/lib/myapp.pm line 226. in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[3804] debug @0.016149> [hit #1]Initialized i18n in /usr/local/share/perl/5.18.2/Dancer/Plugin/I18N.pm l. 182
+[3804] debug @0.002916> [hit #5]fbapptester@abv.bg requested types view at Thu Oct  9 10:12:51 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[3804] debug @0.001467> [hit #6]fbapptester@abv.bg requested user_panel view at Thu Oct  9 10:12:54 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[3804] debug @0.007889> [hit #6]Died on line: 219 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 8
+[3804] debug @0.010568> [hit #6]Died at /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm line 9. in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[3804] debug @0.001723> [hit #7]fbapptester@abv.bg requested types view at Thu Oct  9 10:12:57 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[3804] debug @0.002723> [hit #8]fbapptester@abv.bg requested types view at Thu Oct  9 10:35:07 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[3804] debug @0.001668> [hit #10]fbapptester@abv.bg requested types view at Thu Oct  9 10:38:38 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[3804] debug @0.001378> [hit #16]fbapptester@abv.bg logged out atThu Oct  9 10:38:40 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[3804] debug @0.001615> [hit #20]fbapptester@abv.bg requested types view at Thu Oct  9 10:38:47 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[3804] debug @0.001428> [hit #22]fbapptester@abv.bg logged out atThu Oct  9 10:38:48 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[3804] debug @0.001178> [hit #27]fbapptester@abv.bg requested user_panel view at Thu Oct  9 10:39:08 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[3804] debug @0.007059> [hit #27]Died on line: 219 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 8
+[3804] debug @0.007771> [hit #27]Died at /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm line 9. in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[3804] debug @0.001603> [hit #33]fbapptester@abv.bg requested types view at Thu Oct  9 10:39:10 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[3804] debug @0.001225> [hit #35]fbapptester@abv.bg logged out atThu Oct  9 10:39:11 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[3804] debug @0.001968> [hit #40]fbapptester@abv.bg requested user_panel view at Thu Oct  9 10:39:41 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[3804] debug @0.007670> [hit #40]Died on line: 219 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 8
+[3804] debug @0.008455> [hit #40]Died at /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm line 9. in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[3804] debug @0.001810> [hit #46]fbapptester@abv.bg requested types view at Thu Oct  9 10:39:44 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[3804] debug @0.001439> [hit #48]fbapptester@abv.bg logged out atThu Oct  9 10:39:46 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[4019] debug @0.017604> [hit #1]Initialized i18n in /usr/local/share/perl/5.18.2/Dancer/Plugin/I18N.pm l. 182
+[4019] debug @0.001851> [hit #4]fbapptester@abv.bg requested types view at Thu Oct  9 10:40:42 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[4019] debug @0.001284> [hit #6]fbapptester@abv.bg requested user_panel view at Thu Oct  9 10:40:47 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[4019] debug @0.007267> [hit #6]Died on line: 219 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 8
+[4019] debug @0.008150> [hit #6]Died at /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm line 9. in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[4019] debug @0.001576> [hit #8]fbapptester@abv.bg requested user_panel view at Thu Oct  9 10:44:57 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[4019] debug @0.007553> [hit #8]Died on line: 219 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 8
+[4019] debug @0.010298> [hit #8]Died at /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm line 9. in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[4019] debug @0.002671> [hit #14]fbapptester@abv.bg requested types view at Thu Oct  9 10:44:59 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[4019] debug @0.001332> [hit #16]fbapptester@abv.bg logged out atThu Oct  9 10:45:00 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[4100] debug @0.012710> [hit #1]Initialized i18n in /usr/local/share/perl/5.18.2/Dancer/Plugin/I18N.pm l. 182
+[4121] debug @0.013219> [hit #1]Initialized i18n in /usr/local/share/perl/5.18.2/Dancer/Plugin/I18N.pm l. 182
+[4153] debug @0.014893> [hit #1]Initialized i18n in /usr/local/share/perl/5.18.2/Dancer/Plugin/I18N.pm l. 182
+[4153] debug @0.002045> [hit #5]fbapptester@abv.bg requested user_panel view at Thu Oct  9 10:46:56 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[4153] debug @0.007996> [hit #5]Died on line: 219 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 8
+[4153] debug @0.008729> [hit #5]Died at /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm line 9. in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[4153] debug @0.001834> [hit #11]fbapptester@abv.bg requested types view at Thu Oct  9 10:46:57 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[4153] debug @0.001364> [hit #13]fbapptester@abv.bg logged out atThu Oct  9 10:46:59 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[4153] debug @0.001690> [hit #18]fbapptester@abv.bg requested user_panel view at Thu Oct  9 10:47:07 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[4153] debug @0.008107> [hit #18]Died on line: 219 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 8
+[4153] debug @0.009127> [hit #18]Died at /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm line 9. in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[4153] debug @0.001635> [hit #24]fbapptester@abv.bg requested types view at Thu Oct  9 10:47:08 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[4153] debug @0.001839> [hit #26]fbapptester@abv.bg logged out atThu Oct  9 10:47:10 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[4213] debug @0.016963> [hit #1]Initialized i18n in /usr/local/share/perl/5.18.2/Dancer/Plugin/I18N.pm l. 182
+[4219] debug @0.012927> [hit #1]Initialized i18n in /usr/local/share/perl/5.18.2/Dancer/Plugin/I18N.pm l. 182
+[4232] debug @0.013239> [hit #1]Initialized i18n in /usr/local/share/perl/5.18.2/Dancer/Plugin/I18N.pm l. 182
+[4232] debug @0.029870> [hit #3]hash- or arrayref expected (not a simple scalar, use allow_nonref to allow this) at /home/martin/Desktop/TUES/practice_tasks/myapp/lib/myapp.pm line 158. in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[4232] debug @0.001342> [hit #5]fbapptester@abv.bg requested user_panel view at Thu Oct  9 10:49:03 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[4232] debug @0.006782> [hit #5]Died on line: 218 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 8
+[4232] debug @0.012111> [hit #5]Died at /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm line 9. in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[4232] debug @0.002837> [hit #11]fbapptester@abv.bg requested types view at Thu Oct  9 10:49:05 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[4232] debug @0.001330> [hit #13]fbapptester@abv.bg logged out atThu Oct  9 10:49:07 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[4232] debug @0.008165> [hit #16]hash- or arrayref expected (not a simple scalar, use allow_nonref to allow this) at /home/martin/Desktop/TUES/practice_tasks/myapp/lib/myapp.pm line 158. in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[4232] debug @0.001376> [hit #17]fbapptester@abv.bg requested types view at Thu Oct  9 10:49:19 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[4232] debug @0.002222> [hit #19]fbapptester@abv.bg logged out atThu Oct  9 10:49:22 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[4232] debug @0.008731> [hit #28]hash- or arrayref expected (not a simple scalar, use allow_nonref to allow this) at /home/martin/Desktop/TUES/practice_tasks/myapp/lib/myapp.pm line 158. in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[4309] debug @0.013168> [hit #1]Initialized i18n in /usr/local/share/perl/5.18.2/Dancer/Plugin/I18N.pm l. 182
+[4309] debug @0.034452> [hit #3]hash- or arrayref expected (not a simple scalar, use allow_nonref to allow this) at /home/martin/Desktop/TUES/practice_tasks/myapp/lib/myapp.pm line 159. in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[4331] debug @0.012822> [hit #1]Initialized i18n in /usr/local/share/perl/5.18.2/Dancer/Plugin/I18N.pm l. 182
+[4331] debug @0.028954> [hit #3]cannot encode reference to scalar at /home/martin/Desktop/TUES/practice_tasks/myapp/lib/myapp.pm line 159. in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[4350] debug @0.019660> [hit #1]Initialized i18n in /usr/local/share/perl/5.18.2/Dancer/Plugin/I18N.pm l. 182
+[4373] debug @0.015021> [hit #1]Initialized i18n in /usr/local/share/perl/5.18.2/Dancer/Plugin/I18N.pm l. 182
+[4373] debug @0.001685> [hit #4]fbapptester@abv.bg requested types view at Thu Oct  9 10:52:15 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[4373] debug @0.001978> [hit #6]fbapptester@abv.bg requested types view at Thu Oct  9 10:54:41 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[4373] debug @0.108288> [hit #6]DBD::Pg::st execute failed: ERROR:  duplicate key value violates unique constraint "types_name_en_key"
+DETAIL:  Key (name_en)=(Pesho) already exists. at /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm line 39. in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[4373] debug @0.001456> [hit #8]fbapptester@abv.bg requested types view at Thu Oct  9 10:54:51 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[4373] debug @0.002024> [hit #9]fbapptester@abv.bg requested types view at Thu Oct  9 10:55:01 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[4373] debug @0.131005> [hit #9]fbapptester@abv.bg created type atThu Oct  9 10:55:01 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[4373] debug @0.001838> [hit #11]fbapptester@abv.bg requested types view at Thu Oct  9 10:55:13 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[4373] debug @0.001464> [hit #12]fbapptester@abv.bg requested types view at Thu Oct  9 10:55:24 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[4373] debug @0.001725> [hit #14]fbapptester@abv.bg requested types view at Thu Oct  9 10:55:36 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[4373] debug @0.001730> [hit #15]fbapptester@abv.bg requested types view at Thu Oct  9 10:55:42 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[4373] debug @0.002132> [hit #16]fbapptester@abv.bg requested types view at Thu Oct  9 10:55:48 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[4373] debug @0.069676> [hit #18]fbapptester@abv.bg deleted type with id 1023206Thu Oct  9 10:56:22 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[4373] debug @0.001404> [hit #19]fbapptester@abv.bg requested types view at Thu Oct  9 10:56:22 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[4373] debug @0.032744> [hit #21]fbapptester@abv.bg deleted type with id 1023207Thu Oct  9 10:56:24 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[4373] debug @0.001551> [hit #22]fbapptester@abv.bg requested types view at Thu Oct  9 10:56:24 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[4373] debug @0.036241> [hit #23]fbapptester@abv.bg deleted type with id 1023208Thu Oct  9 10:56:25 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[4373] debug @0.001535> [hit #24]fbapptester@abv.bg requested types view at Thu Oct  9 10:56:25 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[4373] debug @0.002761> [hit #25]fbapptester@abv.bg requested types view at Thu Oct  9 10:56:29 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[4373] debug @0.001573> [hit #26]fbapptester@abv.bg requested types view at Thu Oct  9 10:56:30 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[4373] debug @0.001484> [hit #27]fbapptester@abv.bg requested models view at Thu Oct  9 10:57:04 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[4373] debug @0.002265> [hit #40]fbapptester@abv.bg requested search view at Thu Oct  9 10:57:14 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[4373] debug @0.001936> [hit #41]fbapptester@abv.bg requested search view at Thu Oct  9 10:57:20 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[4373] debug @0.135068> [hit #41]fbapptester@abv.bg used search at Thu Oct  9 10:57:20 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[4373] debug @0.001575> [hit #42]fbapptester@abv.bg requested user_panel view at Thu Oct  9 10:57:22 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[4373] debug @0.007765> [hit #42]Died on line: 221 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 8
+[4373] debug @0.008529> [hit #42]Died at /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm line 9. in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[4373] debug @0.001488> [hit #43]fbapptester@abv.bg requested types view at Thu Oct  9 10:57:24 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[4373] debug @0.001244> [hit #44]fbapptester@abv.bg logged out atThu Oct  9 11:11:16 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[4373] debug @0.001352> [hit #78]fbapptester@abv.bg requested types view at Thu Oct  9 11:12:10 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[4373] debug @0.001422> [hit #80]fbapptester@abv.bg logged out atThu Oct  9 11:12:13 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[4373] debug @0.001670> [hit #90]fbapptester@abv.bg requested types view at Thu Oct  9 11:12:33 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[4373] debug @0.001659> [hit #92]fbapptester@abv.bg requested types view at Thu Oct  9 11:13:59 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[4373] debug @0.001720> [hit #98]fbapptester@abv.bg logged out atThu Oct  9 11:14:02 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[4373] debug @0.001598> [hit #104]fbapptester@abv.bg requested types view at Thu Oct  9 11:14:08 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15
+[4373] debug @0.001404> [hit #106]fbapptester@abv.bg logged out atThu Oct  9 11:14:10 2014 in /home/martin/Desktop/TUES/practice_tasks/myapp/lib/helpers.pm l. 15

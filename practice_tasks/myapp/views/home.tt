@@ -17,3 +17,7 @@
         <p>You have forgotten your password. <a href="/restore_password">Restore</a> it now!</p>
     </div>
 </div>
+
+<button id="fb_btn">Login with facebook</button>
+
+<div id="status"></div>

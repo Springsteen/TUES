@@ -6,7 +6,8 @@ use Data::Dumper;
 my ($n, $m, $input, $flag, @splitted_input);
 $flag = 0;
 
-while (!$flag){
+while (!$flag)
+{
     $flag = 1;
     $input = <>;
     @splitted_input = split(" ",$input);
@@ -24,7 +25,8 @@ my ($f, $t, $s, $counter, @information);
 $flag = 0;
 $counter = 0;
 
-while ($counter < $m){
+while ($counter < $m)
+{
     $flag = 1;
     $input = <>;
     @splitted_input = split(" ",$input);
@@ -38,7 +40,8 @@ while ($counter < $m){
     $flag = 0 if (($t < 1) || ($t > $n));
     $flag = 0 if (($s < 1) || ($s > 30000));
 
-    if ($flag == 1) { 
+    if ($flag == 1) 
+    { 
         print "im in";
         push(@information, [@splitted_input]);
         $counter++;
@@ -47,30 +50,58 @@ while ($counter < $m){
 }
 
 my %graph;
+my @parent=();
 
-sub add_edge {
-    my ($n1, $n2) = @_;
-    $graph{$n1}{$n2} = 1;
-    $graph{$n2}{$n1} = 1;
+sub add_edge 
+{
+    my ($n1, $n2, $weight) = @_;
+    if (defined $graph{$n1}{$n2})
+    {
+        if($graph{$n1}{$n2} > $weight){
+            $graph{$n1}{$n2} = $weight;
+            $graph{$n2}{$n1} = $weight;
+        }
+    }
+    else
+    {
+        $graph{$n1}{$n2} = $weight;
+        $graph{$n2}{$n1} = $weight;
+    }
 }
 
-sub show_edges {
-    foreach my $n1 (keys %graph) {
-        foreach my $n2 (keys %{$graph{$n1}}) {
-            print "$n1 <-> $n2\n";
+sub show_edges 
+{
+    foreach my $n1 (keys %graph) 
+    {
+        foreach my $n2 (keys %{$graph{$n1}}) 
+        {
+            print "$n1 <-> $n2 -> $graph{$n1}{$n2}\n";
         }
     }
 }
 
-# print "info length =>" . (scalar @information) . "\n";
-
-# print "Dumped =>" . Dumper(@information) . "\n";
-# print $information[4];
-
-foreach my $subarr (@information) {
-    add_edge(${$subarr}[0], ${$subarr}[1]);
+foreach my $subarr (@information) 
+{
+    add_edge(${$subarr}[0], ${$subarr}[1], ${$subarr}[2]);
 }
 
 show_edges();
+
+# sub compere
+# {
+#     my ($node)= @_;
+#     if($parent[$node] == $node)
+#     {
+#         return $node;
+#     }
+#     return $parent[$node] = compere($parent[$node]);
+# }
+
+# sub solve 
+# {
+
+# }
+
+# solve();
 
 

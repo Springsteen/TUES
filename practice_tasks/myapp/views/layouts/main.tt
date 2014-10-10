@@ -13,7 +13,7 @@
 <body>
 		<nav class="navbar navbar-default" role="navigation">
 			<div class="navbar-header">
-			    <a class="navbar-brand" href="/"><% l("Computers manager") %></a>
+			    <a class="navbar-brand" href="/types"><% l("Computers manager") %></a>
 			</div>
 			<ul class="nav navbar-nav">
 				<% IF logged == 'true' || msg == 1 %>
@@ -37,10 +37,11 @@
 	<% content %>
 	<div id="footer">
 	</div>
-	<script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
-	<script type="text/javascript">
+	<script src="javascripts/jquery.min.js"></script>
+	<!--<script type="text/javascript">
 	    !window.jQuery && document.write('<script type="text/javascript" src="javascripts/jquery.min.js"><\/script>')
-	</script>
+	</script>-->
 	<script type="text/javascript" src="javascripts/base.js"></script>
+	<script type="text/javascript" src="javascripts/facebook.js"></script>
 </body>
 </html>
